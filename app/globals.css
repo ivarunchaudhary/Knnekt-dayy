@@ -1,26 +1,176 @@
 @import "tailwindcss";
+@import "swiper/css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@theme {
+  --font-sans: var(--font-ft-system-blank), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-mono: var(--font-ft-system-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-black: #000;
+  --color-white: #fff;
+  --color-dark: #141a22;
+  --color-dark-subtle: #141a2280;
+  --color-dark-very-subtle: #141a2259;
+  --color-darker: #0b0d10;
+  --color-gray-100: #f8f8f8;
+  --color-gray-200: #f2f2f2;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  --ease-in-out-quart: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-grain: grain 8s steps(10) infinite;
+  --animate-hero-reveal: hero-reveal 1.6s var(--ease-out-expo) both;
+  --animate-hero-drift: hero-drift 48s var(--ease-in-out-quart) infinite alternate;
+  --animate-hero-breathe: hero-breathe 19s var(--ease-in-out-quart) infinite alternate;
+  --background-image-grain: url(/images/grain.png);
+  --scale-102: 1.02;
+
+  --text-xs: clamp(0.875rem, 0.0658vi + 0.8618rem, 0.9375rem);
+  --text-xs--letter-spacing: calc(0.005 * var(--text-xs));
+  --text-xs--line-height: clamp(125%, 0.5263vi + 124.474%, 130%);
+  --text-sm: 1.0625rem;
+  --text-sm--letter-spacing: 0.00531rem;
+  --text-sm--line-height: 130%;
+  --text-base: clamp(1.0625rem, 0.1316vi + 1.0296rem, 1.1875rem);
+  --text-base--letter-spacing: clamp(0.00531rem, 0.00078vi + 0.00513rem, 0.00625rem);
+  --text-base--line-height: clamp(130%, -10% * (0.1316vi) + 130%, 120%);
+  --text-md: var(--text-base);
+  --text-md--letter-spacing: var(--text-base--letter-spacing);
+  --text-md--line-height: var(--text-base--line-height);
+  --text-lg: clamp(1.1875rem, 0.1974vi + 1.1382rem, 1.375rem);
+  --text-lg--letter-spacing: clamp(-0.00563rem, calc(-0.00875vi - 0.0039rem), -0.01438rem);
+  --text-lg--line-height: clamp(120%, calc(0.1974vi + 117.605%), 118%);
+  --text-xl: clamp(1.25rem, 0.2632vi + 1.1842rem, 1.5rem);
+  --text-xl--letter-spacing: clamp(0.00625rem, calc(-0.005vi + 0.007rem), 0rem);
+  --text-xl--line-height: clamp(120%, calc(0.2632vi + 116.842%), 116%);
+  --text-2xl: clamp(1.5rem, 0.2632vi + 1.4342rem, 1.75rem);
+  --text-2xl--letter-spacing: clamp(0rem, calc(-0.007vi), -0.0175rem);
+  --text-2xl--line-height: clamp(116%, calc(0.2632vi + 115.605%), 118%);
+  --text-3xl: clamp(1.75rem, 0.5263vi + 1.6184rem, 2.25rem);
+  --text-3xl--letter-spacing: clamp(-0.0175rem, calc(-0.01vi - 0.007rem), -0.03375rem);
+  --text-3xl--line-height: clamp(118%, calc(0.5263vi + 116.842%), 110%);
+  --text-4xl: clamp(2.625rem, 0.6579vi + 2.4474rem, 3.125rem);
+  --text-4xl--letter-spacing: clamp(-0.03125rem, calc(-0.012vi - 0.02rem), -0.05rem);
+  --text-4xl--line-height: clamp(110%, calc(0.6579vi + 108.421%), 105%);
+
+  @keyframes grain {
+    0% { transform: translate(0); }
+    10% { transform: translate(-5%, -10%); }
+    20% { transform: translate(-15%, -20%); }
+    30% { transform: translate(-5%, -10%); }
+    40% { transform: translate(-15%, -20%); }
+    50% { transform: translate(-5%, -10%); }
+    60% { transform: translate(-15%, -20%); }
+    70% { transform: translate(-5%, -10%); }
+    80% { transform: translate(-15%, -20%); }
+    90% { transform: translate(-5%, -10%); }
+    100% { transform: translate(-15%, -20%); }
+  }
+
+  /* Hero: fade up out of the dark with a slight push-in, once, on load. */
+  @keyframes hero-reveal {
+    from { opacity: 0; transform: scale(1.05); }
+    to { opacity: 1; transform: none; }
+  }
+
+  /* Hero: a slow Ken Burns drift. Held inside the 1.08–1.16 scale range so the
+     translation never exposes an edge (overflow per side is (scale − 1) / 2). */
+  @keyframes hero-drift {
+    from { transform: scale(1.08) translate3d(1.2%, 0.8%, 0); }
+    to { transform: scale(1.16) translate3d(-1.2%, -0.8%, 0); }
+  }
+
+  /* Hero: the vignette breathing, like light shifting in the room. Only ever
+     darker than the resting 0.8, so it can never cost the white type contrast. */
+  @keyframes hero-breathe {
+    from { opacity: 0.8; }
+    to { opacity: 0.94; }
   }
 }
 
+@layer components {
+  .mono-text {
+    font-family: var(--font-mono);
+    letter-spacing: 0.055rem;
+    text-transform: uppercase;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    line-height: normal;
+  }
+}
+
+@utility bg-grain {
+  background-image: var(--background-image-grain);
+}
+
+@utility ease-in-out-quart {
+  --tw-ease: var(--ease-in-out-quart);
+  transition-timing-function: var(--ease-in-out-quart);
+}
+
+@utility hide-scrollbars {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+  background: var(--color-white);
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-white);
+  color: var(--color-dark);
+}
+
+/* Client logo marquee: three identical rows, shift by one row width */
+.marquee {
+  width: max-content;
+  animation: marquee 40s linear infinite;
+}
+.marquee:hover {
+  animation-play-state: paused;
+}
+@keyframes marquee {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-33.3333%, 0, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee { animation: none; }
+}
+
+/* Free-scrolling card sliders (collaboration + culture) */
+.swiper {
+  overflow: visible;
+}
+.swiper-wrapper {
+  cursor: grab;
+}
+.swiper-wrapper:active {
+  cursor: grabbing;
+}
+.swiper-slide {
+  width: auto;
+  height: auto;
+}
+
+/* Background (autoplaying, chromeless) Vimeo embeds. Size is set by <Vimeo/> from the clip's aspect ratio. */
+.vimeo-cover {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  border: 0;
+}
+.vimeo-inline {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  pointer-events: none;
 }
