@@ -78,8 +78,8 @@ export default function Work() {
 
   return (
     <Container id="work" className="pt-10 pb-20 md:py-48">
-      <SectionHeading lead="We orchestrate strategy, design, and technology">
-        to create digital experiences that connect with millions and give you the edge that sets you apart.
+      <SectionHeading lead="Proof, not promises.">
+        What we’ve built—and what we refused to build. Real builds, scored on the same six pillars before and after, each one naming what we told the founder not to buy.
       </SectionHeading>
       <div ref={grid} className="mt-14 space-y-10 gap-x-1.5 gap-y-10 sm:grid sm:grid-cols-2 sm:space-y-0 lg:grid-cols-3 lg:gap-y-16">
         {work.map((item, i) => (

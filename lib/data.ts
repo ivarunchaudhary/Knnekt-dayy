@@ -15,6 +15,18 @@ export type WorkItem = {
   slug: string;
   client: string;
   title: string;
+  /** What they build and who for */
+  sector: string;
+  /** Which engagement they took */
+  tier: string;
+  blurb: string;
+  quote: string;
+  attribution: string;
+  /** What we told them not to buy */
+  refused: string;
+  timeline: [string, string][];
+  delivered: string[];
+  results: [string, string][];
   wide?: boolean;
   vimeo?: string;
   /** width / height of the clip */
@@ -24,84 +36,127 @@ export type WorkItem = {
   desktop?: { src: string; w: number; h: number };
 };
 
+/**
+ * Representative engagements. Real founder photos, quotes and scorecards go live
+ * as founders consent — the imagery here stands in until they do.
+ */
 export const work: WorkItem[] = [
   {
-    slug: "red-bull-redbull-com",
-    client: "Red Bull",
-    title: "A global Platform built to Scale, Evolve, and Perform",
+    slug: "i-say-move",
+    client: "I Say Move",
+    title: "Clarity, then launch",
+    sector: "Athleisure · Gen Z",
+    tier: "Launch 30",
+    blurb:
+      "Twelve weeks of weekly commitments turned a fashion-and-pop athleisure idea into a shipped, in-market product.",
+    quote:
+      "Knnekt gave me a clear vision to launch. Within two months I shipped my product and gained the traction that helped me understand my customers.",
+    attribution: "Founder · Athleisure · In market",
+    refused:
+      "They wanted a big paid launch on day one. We refused — proving the drop with organic demand first meant they didn’t burn cash on an audience they hadn’t earned.",
+    timeline: [
+      ["Week 1–3", "Diagnosis: positioning before product."],
+      ["Week 4–8", "Product line built, storefront shipped."],
+      ["Week 9–12", "First drop live, demand tested with real buyers."],
+    ],
+    delivered: ["Brand & positioning system", "Shopify storefront", "First product drop", "Demand-gen playbook"],
+    results: [
+      ["Live", "product in market"],
+      ["45 → 71", "Startup Operating Score"],
+      ["+26", "operating points"],
+    ],
     wide: true,
-    vimeo: "1184069886",
-    vimeoAspect: 1280 / 941,
-  },
-  {
-    slug: "the-organics-translating-a-refreshing-identity-into-a-bold-platform",
-    client: "The Organics",
-    title: "Translating a refreshing identity into a bold platform",
-    alt: "A tablet displaying a website with colorful cans of ORGANICS drinks and people holding beverages, placed on a green textured surface",
-    mobile: { src: `${cdn}/bbff6ed0309689de764e93892703550fadad9282-1200x1249.webp`, w: 2500, h: 2600 },
-    desktop: { src: `${cdn}/b8eceb16e50d10afb9000094a5bb048d19b394de-1200x1560.webp`, w: 2500, h: 3250 },
-  },
-  {
-    slug: "volvo-car-protection",
-    client: "Volvo",
-    title: "Redefining how people experience Insurance",
-    alt: "Person standing next to a car, using a smartphone, with an app interface asking, “Who will drive your car?”",
-    mobile: { src: `${cdn}/6d4203a26a935285c7869dcc83ff68ed568778c1-1200x1249.webp`, w: 2500, h: 2600 },
-    desktop: { src: `${cdn}/25d452de1b87378bd8baa6e3860b17d5b656edaf-1200x1560.webp`, w: 2500, h: 3250 },
-  },
-  {
-    slug: "athlete-perfomance-hub-decode-sporting-success",
-    client: "Athlete Performance Hub",
-    title: "Decode Sporting Success",
-    alt: "Coach reviewing data on a laptop while two athletes train in the background",
+    alt: "Coach reviewing data on a laptop while athletes train on an indoor track",
     mobile: { src: `${cdn}/630edbc02eae351ece1f45cce3e1ede17718cca4-1200x1249.webp`, w: 2500, h: 2600 },
     desktop: { src: `${cdn}/3ed3108d64274ac97731fb2c2eaf99dc6653bb67-1200x1560.webp`, w: 2500, h: 3250 },
   },
   {
-    slug: "isar-aerospace-launch-learn-repeat",
-    client: "Isar Aerospace",
-    title: "Launching a Brand Built for Orbit",
-    vimeo: "1184090121",
-    vimeoAspect: 1280 / 997,
-  },
-  {
-    slug: "alpha-tauri-heatable-capsule-collection",
-    client: "Alpha Tauri",
-    title: "Designing the Interface of Wearable Intelligence",
-    vimeo: "1184092283",
-    vimeoAspect: 1280 / 675,
-  },
-  {
-    slug: "zalando-designing-the-zalando-e-commerce-operating-system",
-    client: "ZEOS",
-    title: "Designing the Zalando E-Commerce Operating System",
-    wide: true,
-    alt: "Smartphone displaying the ZEOS website with the headline of the Zalando E-Commerce Operating System",
-    mobile: { src: `${cdn}/d06e8a99d40ed99df79244cb1ebb27d07e8e6bca-1200x1249.webp`, w: 2500, h: 2600 },
-    desktop: { src: `${cdn}/83c6a0d8ba17e548268a785223b31db9a5fa87a3-1200x780.webp`, w: 2500, h: 1625 },
-  },
-  {
-    slug: "rewe-to-go",
-    client: "REWE",
-    title: "Digital Convenience in your Pocket",
-    alt: "Close-up of a hand holding a smartphone displaying the REWE To Go app",
-    mobile: { src: `${cdn}/61bf8880b19c1615bd75b1d3c26e955fbf61d6d0-1200x1249.webp`, w: 2500, h: 2600 },
-    desktop: { src: `${cdn}/624c0e7494e0f16e9cce748099b2917cfc8d18a9-1200x1560.webp`, w: 2500, h: 3250 },
-  },
-  {
-    slug: "zalando-partner",
-    client: "Zalando Partner",
-    title: "Building Zalando’s partnership hub",
-    vimeo: "1184093992",
-    vimeoAspect: 1280 / 1661,
-  },
-  {
-    slug: "tng-technology-consulting-taia",
-    client: "TNG",
-    title: "TNG Technology Consulting – TAIA",
+    slug: "klypp",
+    client: "Klypp",
+    title: "The story before the raise",
+    sector: "AI · equity-firm SaaS",
+    tier: "Build & Scale",
+    blurb:
+      "An AI data and client-management platform for equity firms — built, piloted, and repositioned for the round.",
+    quote: "The platform was never the question. Knnekt made us answer who it’s really for.",
+    attribution: "Founder · Equity-firm SaaS · In market",
+    refused:
+      "They wanted a paid-acquisition push at pilot stage. We refused — spending to grow before positioning is proven just buys the wrong customers faster.",
+    timeline: [
+      ["Week 1–3", "Diagnosis: positioning, not product."],
+      ["Week 4–8", "AI data pipeline and client management hardened."],
+      ["Week 6–12", "Two equity-firm pilots onboarded."],
+      ["Month 4", "Positioning and go-to-market narrative rebuilt."],
+    ],
+    delivered: [
+      "AI data & client-management platform",
+      "Two pilot deployments",
+      "Positioning & messaging system",
+      "Diligence-ready metrics deck",
+    ],
+    results: [
+      ["2 pilots", "live with equity firms"],
+      ["61 → 74", "Startup Operating Score"],
+      ["+13", "operating points"],
+    ],
     alt: "Person holding a tablet displaying an AI assistant interface",
     mobile: { src: `${cdn}/39491c8a82d60f80a16f404d543c829d3123d7d7-1200x1249.webp`, w: 2500, h: 2600 },
     desktop: { src: `${cdn}/2119998eb4a41a635571378dbf2c62f5c91e5de0-1200x1560.webp`, w: 2500, h: 3250 },
+  },
+  {
+    slug: "qolorr",
+    client: "Qolorr",
+    title: "Luxury, made ownable",
+    sector: "Luxury content-commerce",
+    tier: "Build & Scale",
+    blurb:
+      "Luxury content-commerce with ownership tags and resale — scope cut to the one thing that proves the model.",
+    quote: "They cut half my roadmap and I launched twice as fast. The no’s were the value.",
+    attribution: "Founder · Luxury commerce · Launched",
+    refused:
+      "They wanted every feature in v1. We refused — we shipped the one that proves the model and parked the rest until it earned its place.",
+    timeline: [
+      ["Week 1–3", "Diagnosis: scope, not features."],
+      ["Week 4–8", "Ownership-tag platform built."],
+      ["Week 9–12", "Creator storefronts live."],
+    ],
+    delivered: ["Ownership-tag platform", "Creator storefront system", "Brand & positioning", "Launch campaign"],
+    results: [
+      ["Launched", "storefronts live"],
+      ["52 → 79", "Startup Operating Score"],
+      ["+27", "operating points"],
+    ],
+    alt: "A tablet displaying a storefront with colourful products, placed on a textured surface",
+    mobile: { src: `${cdn}/bbff6ed0309689de764e93892703550fadad9282-1200x1249.webp`, w: 2500, h: 2600 },
+    desktop: { src: `${cdn}/b8eceb16e50d10afb9000094a5bb048d19b394de-1200x1560.webp`, w: 2500, h: 3250 },
+  },
+  {
+    slug: "khoj",
+    client: "Khoj",
+    title: "A plan they could run themselves",
+    sector: "D2C · beverage",
+    tier: "The Founder’s Roadmap",
+    blurb:
+      "Early-stage D2C beverage. The honest sell was a plan, not execution — so a ₹10k roadmap and six calls is what we gave them.",
+    quote: "They talked me out of spending ₹50k I didn’t need to. I ran the roadmap myself and it worked.",
+    attribution: "Founder · D2C beverage · Roadmap",
+    refused:
+      "They came for a full build. We refused — a ₹10k roadmap was the honest sell, and we’d rather they came back ready than pay for execution they couldn’t use.",
+    timeline: [
+      ["Week 1–3", "Diagnosis: not ready to build."],
+      ["Roadmap", "90-day plan handed over."],
+      ["Calls", "Six 1:1s across the quarter."],
+    ],
+    delivered: ["Personalised 90-day roadmap", "Operating manuals & library", "Six 1:1 guidance calls", "Founder community"],
+    results: [
+      ["Self-run", "they executed it"],
+      ["38 → 55", "Startup Operating Score"],
+      ["+17", "operating points"],
+    ],
+    wide: true,
+    alt: "Close-up of a hand holding a smartphone displaying a drinks ordering app",
+    mobile: { src: `${cdn}/61bf8880b19c1615bd75b1d3c26e955fbf61d6d0-1200x1249.webp`, w: 2500, h: 2600 },
+    desktop: { src: `${cdn}/83c6a0d8ba17e548268a785223b31db9a5fa87a3-1200x780.webp`, w: 2500, h: 1625 },
   },
 ];
 
