@@ -13,13 +13,27 @@ export default function Footer() {
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:block md:space-y-6">
           <address className="not-italic">
-            <span className="flex min-h-6 items-center">CGN Office</span>
-            <span className="text-dark-subtle block">Brüsseler Str. 92</span>
-            <span className="text-dark-subtle block">50672 Köln</span>
-            <span className="text-dark-subtle block">Germany</span>
+            <span className="flex min-h-6 items-center">Studio</span>
+            <span className="text-dark-subtle block">Delhi NCR</span>
+            <span className="text-dark-subtle block">India</span>
+            <span className="text-dark-subtle block">+91 00000 00000</span>
           </address>
         </div>
         <nav className="grid grid-cols-2 sm:grid-cols-3 md:block md:space-y-6">
+          <ul>
+            <li>
+              <Link className={link} href="/en#work">Our Proof</Link>
+            </li>
+            <li>
+              <Link className={link} href="/en#services">Services</Link>
+            </li>
+            <li>
+              <Link className={link} href="/en#about">Execution Studio</Link>
+            </li>
+            <li>
+              <Link className={link} href="/en#contact">Contact</Link>
+            </li>
+          </ul>
           <ul>
             <li>
               <a className={link} href="https://www.instagram.com/knnektstudios/" target="_blank" rel="noopener noreferrer">Instagram</a>
@@ -33,26 +47,43 @@ export default function Footer() {
           </ul>
           <ul>
             <li>
-              <Link className={`text-dark-subtle hover:text-dark ${link}`} href="/en/privacy-policy">Datenschutzerklärung</Link>
+              <Link className={`text-dark-subtle hover:text-dark ${link}`} href="/en/privacy-policy">Privacy Policy</Link>
             </li>
             <li>
-              <Link className={`text-dark-subtle hover:text-dark ${link}`} href="/en/imprint">Impressum</Link>
+              <Link className={`text-dark-subtle hover:text-dark ${link}`} href="/en/imprint">Imprint</Link>
             </li>
             <li>
-              <Link className={`text-dark-subtle hover:text-dark ${link}`} href="/en/terms-and-conditions">AGB</Link>
+              <Link className={`text-dark-subtle hover:text-dark ${link}`} href="/en/terms-and-conditions">Terms &amp; Conditions</Link>
             </li>
           </ul>
         </nav>
         <div>
           <p>
-            <a className={link} href="mailto:info@knnektstudios.com">info@knnektstudios.com</a>
+            <a className={link} href="mailto:hello@knnekt.studio">hello@knnekt.studio</a>
           </p>
-          <p>Knnekt Studios GmbH</p>
-          <p className="text-dark-subtle">{new Date().getFullYear()} All rights reserved</p>
+          <p>Knnekt® — Startup Operating Partner</p>
+          <p className="text-dark-subtle">©{new Date().getFullYear()} All rights reserved</p>
         </div>
       </div>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img alt="Let’s rethink tomorrow" loading="lazy" width={1000} height={56} className="pointer-events-none mt-20 w-full selection:bg-transparent" src="/images/claim.svg" />
+      <svg
+        viewBox="0 0 1000 56"
+        role="img"
+        aria-label="Every startup needs that one friend."
+        className="pointer-events-none mt-20 w-full selection:bg-transparent"
+      >
+        <text
+          x="0"
+          y="46"
+          textLength="1000"
+          lengthAdjust="spacingAndGlyphs"
+          fontSize="56"
+          fontWeight="600"
+          letterSpacing="-0.03em"
+          className="fill-dark font-sans"
+        >
+          Every startup needs that one friend.
+        </text>
+      </svg>
     </footer>
   );
 }
