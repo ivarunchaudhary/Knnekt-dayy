@@ -1,13 +1,14 @@
 const cdn = "/sanity";
 
-export const clientLogos = [
-  { name: "Isar Aerospace", src: `${cdn}/ccda9186c78f86abaf8edac61fa972e3a2ebdf67-100x18.svg`, w: 100, h: 18 },
-  { name: "Spotify", src: `${cdn}/8019b4d453344af48f0d07f128f0b617c4a43584-100x30.svg`, w: 100, h: 30 },
-  { name: "Red Bull", src: `${cdn}/5fbc8c086cc290164d62bf8d31ce3a4899891829-100x63.svg`, w: 100, h: 63 },
-  { name: "Zalando", src: `${cdn}/2bb9ba5947413cd174d5777788a5a66eea7824eb-100x18.svg`, w: 100, h: 18 },
-  { name: "REWE", src: `${cdn}/8ae60b692c42a40c2e1aeb7e585c8db55959a83c-100x34.svg`, w: 100, h: 34 },
-  { name: "Allianz", src: `${cdn}/e4dea4fc04c9476ff2af7b28cd9fbecbda1d9839-100x26.svg`, w: 100, h: 26 },
-  { name: "Volvo", src: `${cdn}/2a304a8270fe2354d78ba7589c761bb98b961fe6-100x100.svg`, w: 100, h: 100 },
+/** Marquee claims under the intro headline — the studio in seven short facts. */
+export const proofPoints = [
+  "Built on 300+ startups",
+  "Every stage",
+  "Every industry",
+  "Only 15 founders",
+  "90 days",
+  "First 100 customers",
+  "One honest score",
 ];
 
 export type WorkItem = {
