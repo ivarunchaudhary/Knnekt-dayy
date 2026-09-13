@@ -10,8 +10,8 @@ export default function Culture() {
   return (
     <div className="overflow-hidden">
       <Container className="py-15 md:py-40">
-        <SectionHeading id="people-title" lead="We focus on people, not just projects." className="whitespace-pre-line">
-          {"\n"}In a world of digital meetings, we value face-to-face connections. Our culture is built on trust, freedom, and support, fostering personal growth and collaboration that goes beyond just completing tasks—it’s about enjoying the journey together.
+        <SectionHeading id="people-title" lead="One price. Clarity both ways." className="whitespace-pre-line">
+          {"\n"}Everything the roadmap needs to hit the goal is included. Ad spend, tool subscriptions and shoots stay your call, so you keep control and there’s no scope creep and no surprises.
         </SectionHeading>
         <div className="mt-16 md:mt-24" aria-labelledby="people-title">
           <Swiper
