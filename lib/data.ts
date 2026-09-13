@@ -244,6 +244,7 @@ export const principles = [
   },
 ];
 
+/** The cohort — fifteen founders a quarter. */
 export const team = [
   { alt: "Person with long blonde hair wearing a white top and hoop earrings, standing outdoors in front of a window", src: `${cdn}/dcb621c0f613969c6d206a3ab4857a5aba9d02b0-400x400.webp` },
   { alt: "Person with short brown hair and a beard, wearing a grey sweatshirt indoors", src: `${cdn}/811759779651a949df88ca8ce197173b0d082693-400x400.webp` },
@@ -259,9 +260,83 @@ export const team = [
   { alt: "Person with dark hair tied back, wearing a beige turtleneck sweater and hoop earrings, standing indoors", src: `${cdn}/cfc12095e86efb371285ab2914add93ecdc9bc94-400x400.webp` },
 ];
 
-export const bcorpLogo = `${cdn}/bd521b8a0aefb26c89e049ec70d8c3dbd6166970-400x400.webp`;
-export const officesVimeo = "1184095687";
-export const officesVimeoAspect = 16 / 9;
+/** The 90 days, stage by stage — ticker in the facts list. */
+export const journey = [
+  "Day 1–10 · Plan it together",
+  "Day 11–90 · Build & launch",
+  "Day 90 · First 100 customers",
+  "Day 90 · Fund-ready",
+  "Day 90 · Pitch day",
+];
+
+/** The four movements of the quarter, walked through by the scroll-driven spine. */
+export type JourneyPhase = {
+  days: string;
+  tag: string;
+  title: string;
+  body: string;
+  bars: [string, string][];
+};
+
+export const journeyPhases: JourneyPhase[] = [
+  {
+    days: "Days 1\u201310",
+    tag: "Plan \u00b7 ten live classes",
+    title: "We plan it with you.",
+    body: "Ten live classes. We read your real constraints, then map all 90 days to the goal\u2014together.",
+    bars: [
+      ["Read constraints", "Where you actually are."],
+      ["Map 90 days", "Week by week, one plan."],
+      ["Set the goal", "The number we build around."],
+    ],
+  },
+  {
+    days: "Days 11\u201390",
+    tag: "Build & launch",
+    title: "We build. You steer.",
+    body: "The full studio ships across product, growth, AI, legal and compliance while you make the calls.",
+    bars: [
+      ["Website & MVP", "Real product\u2014with AI inside."],
+      ["Growth engine", "Positioning to demand."],
+      ["Legal & compliance", "Structure, done right."],
+    ],
+  },
+  {
+    days: "By day 90",
+    tag: "The outcome",
+    title: "100 customers. Fund-ready. Real traction.",
+    body: "At day 90 you have proof\u2014not a pretty deck. Customers using what we built.",
+    bars: [
+      ["100 customers", "In market, paying attention."],
+      ["Fund-ready", "The metrics and the narrative."],
+      ["Real traction", "Momentum you can point to."],
+    ],
+  },
+  {
+    days: "Day 90",
+    tag: "Pitch day",
+    title: "Then you pitch it live.",
+    body: "The cohort\u2019s demo day\u2014you present 90 days of proof to a room of investors and operators.",
+    bars: [
+      ["Present live", "You take the stage."],
+      ["The room", "Investors and operators."],
+      ["Warm intros", "The conversations that follow."],
+    ],
+  },
+];
+
+/** Pillars light up on the spine as the quarter reaches each one. */
+export const journeyPillars: [string, number][] = [
+  ["Growth", 22],
+  ["Technology", 29],
+  ["AI", 36],
+  ["Legal", 43],
+];
+
+export const studioVimeo = "1184110386";
+export const studioVimeoAspect = 1280 / 536;
+export const scoreVimeo = "1184110361";
+export const scoreVimeoAspect = 1280 / 536;
 export const founderPortrait = `${cdn}/b6c4df15de20e1699da43919380d4d3516666aca-400x400.webp`;
 
 export const culture = [
