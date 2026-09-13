@@ -5,9 +5,9 @@ import Nav from "@/components/Nav";
 import { containerClass } from "@/components/Container";
 
 const pages: Record<string, string> = {
-  "privacy-policy": "Datenschutzerklärung",
-  imprint: "Impressum",
-  "terms-and-conditions": "AGB",
+  "privacy-policy": "Privacy Policy",
+  imprint: "Imprint",
+  "terms-and-conditions": "Terms & Conditions",
 };
 
 export function generateStaticParams() {
