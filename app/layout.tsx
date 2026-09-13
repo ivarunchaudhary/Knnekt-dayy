@@ -18,9 +18,9 @@ const ftSystemMono = localFont({
   src: [{ path: "./fonts/ft-system-mono-medium.woff2", weight: "500", style: "normal" }],
 });
 
-const title = "Knnekt Studios – Let's rethink tomorrow.";
+const title = "Knnekt Studios — Launch in 90 days. Get your first 100 customers.";
 const description =
-  "Your 0 to 1 Partner for Digital Innovation. Blending consultancy expertise with agency craft, we lead ambitious companies from insight to impact—fast.";
+  "India's first Startup Execution Studio. It starts with your Startup Operating Score. Then fifteen founders per cohort go all-in for one 90-day build—and come out with real customers and a company ready to raise.";
 
 export const metadata: Metadata = {
   title,
