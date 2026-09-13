@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 
 const items = [
-  { href: "#work", label: "Work" },
+  { href: "#work", label: "Proof" },
   { href: "#services", label: "Services" },
-  { href: "#about", label: "About" },
+  { href: "#about", label: "Studio" },
   { href: "#contact", label: "Contact" },
 ];
 
