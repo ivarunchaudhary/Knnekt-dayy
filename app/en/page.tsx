@@ -5,6 +5,7 @@ import Facts from "@/components/Facts";
 import Footer from "@/components/Footer";
 import Hero from "@/components/Hero";
 import Intro from "@/components/Intro";
+import Journey from "@/components/Journey";
 import Nav from "@/components/Nav";
 import Services from "@/components/Services";
 import Work from "@/components/Work";
@@ -28,6 +29,7 @@ export default function HomePage() {
             <Services />
             <Collaboration />
             <Facts />
+            <Journey />
             <Culture />
             <Contact />
           </main>
