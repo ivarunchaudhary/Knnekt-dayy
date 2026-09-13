@@ -58,7 +58,7 @@ export default function Services() {
         return (
           <div key={s.id} data-panel className={panelClass}>
             <h2 className="text-2xl font-medium text-white lg:sr-only">
-              <span className="block text-white/50">People work with us to</span>
+              <span className="block text-white/50">Under one roof, we run</span>
               <span className="block">{s.title}</span>
             </h2>
             <div
@@ -76,7 +76,7 @@ export default function Services() {
                 <div className="p-5 pt-7 lg:px-14 lg:py-12 lg:[@media(max-height:910px)]:py-8">
                   <p className="text-md leading-tight lg:max-w-145">{s.text}</p>
                   <p id={`service-list-title-${s.id}`} className="mono-text text-dark/80 mt-11 font-mono leading-tight lg:[@media(max-height:910px)]:mt-8">
-                    Our Capabilities
+                    What that covers
                   </p>
                   <ul
                     className="mt-3.5 grid grid-cols-2 gap-1.5 text-xs leading-tight lg:gap-2 lg:[@media(max-height:910px)]:mt-2"
@@ -101,7 +101,7 @@ export default function Services() {
           <div className="mx-auto hidden w-full max-w-418 grid-cols-12 px-9 text-3xl font-medium text-white lg:grid">
             <div className="col-span-5 flex h-full flex-col">
               <div className="flex h-1/2 flex-col justify-end">
-                <h2 className="text-white/50">People work with us to</h2>
+                <h2 className="text-white/50">Under one roof, we run</h2>
               </div>
               <div className="relative h-1/2">
                 {services.map((s, i) => (
