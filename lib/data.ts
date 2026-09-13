@@ -204,40 +204,41 @@ export const services = [
   },
 ];
 
+/** What an agency does, and what we do instead. */
 export const principles = [
   {
-    a: "We’re Not Just a Vendor.",
-    b: "We’re Your Partner in Crime.",
+    a: "An agency sells you whatever you ask for.",
+    b: "We say no when you’re not ready.",
     alt: "Two people are standing indoors near large windows, one wearing a brown jacket and the other in dark clothing, engaged in conversation",
     src: `${cdn}/99281afbb83464441f7ec29f3f025202d7000443-1200x849.webp`,
   },
   {
-    a: "We Don’t Just Follow Trends.",
-    b: "We Shape New Territories.",
+    a: "An agency bills the hours and ships a deck.",
+    b: "We build it with you.",
     alt: "Person sitting at a workbench with a 3D printer and tools organized on a pegboard wall",
     src: `${cdn}/146fe6a793fd3671a74e623447f36b2cc5abf929-1200x849.webp`,
   },
   {
-    a: "We Don’t Play by the Book.",
-    b: "We Write It Together.",
+    a: "Four vendors who never meet.",
+    b: "One studio, four functions.",
     alt: "Three people collaborating in front of a whiteboard, with one person seated at a table with a laptop",
     src: `${cdn}/26923509ab3eb9c18db9333b483f2198c570ef6a-1200x849.webp`,
   },
   {
-    a: "We Don’t Sell Empty Ideas.",
-    b: "We Recommend What Actually Works.",
+    a: "An agency hands you a login and leaves.",
+    b: "We own the outcome.",
     alt: "Two people having a discussion in a meeting room with a laptop and a large screen displaying a diagram",
     src: `${cdn}/954a137137d858217286a7dd6b315e23ad4121d6-1200x849.webp`,
   },
   {
-    a: "We Don’t Overstrategize.",
-    b: "We Keep It Efficient & Real.",
+    a: "Fluff metrics on a dashboard.",
+    b: "Revenue, retention, runway.",
     alt: "Person working at a desk with a laptop, with several awards and certificates displayed on a shelf in the background",
     src: `${cdn}/9c6ad38a21c66d2f9c66155cc8ba04f7f11fbba6-1200x849.webp`,
   },
   {
-    a: "We Don’t Rush.",
-    b: "We Build for the Long Haul.",
+    a: "A hidden, moving invoice.",
+    b: "Fixed price, flexible scope.",
     alt: "Three people standing and arranging sticky notes on a whiteboard during a team workshop",
     src: `${cdn}/185dc8311ae3dd2ab6f7344a60e642a552b94a91-1200x849.webp`,
   },

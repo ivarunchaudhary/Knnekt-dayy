@@ -16,8 +16,8 @@ export default function Collaboration() {
   return (
     <section id="about" className="overflow-hidden py-15 md:py-40">
       <Container>
-        <SectionHeading lead="Collaboration isn’t just a buzzword—it’s how we roll.">
-          We’re not here to hand off some cookie-cutter deliverable and disappear; we’re in it with you, from day one.
+        <SectionHeading lead="We’re not an agency. We’re an execution partner.">
+          An agency takes your brief and bills the hours. We take a position on your business, build it with you, and own the outcome—same four functions under one roof, but on your side of the table.
         </SectionHeading>
         <Swiper
           modules={[FreeMode, Mousewheel]}
