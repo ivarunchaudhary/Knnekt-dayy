@@ -565,3 +565,92 @@ export const testimonials: Testimonial[] = [
     result: "100 customers",
   },
 ];
+
+/* ------------------------------------------------------------------------- *
+ * Pricing                                                                    *
+ * ------------------------------------------------------------------------- */
+
+/**
+ * One fee, and the four things we promise about it. Stated as flat rules rather
+ * than plan cards, because there is only one number to explain.
+ */
+export const pricingFacts: [string, string][] = [
+  ["One partner, not five", "Four functions under one roof. No vendor management, no invoices you didn’t expect."],
+  ["We move scope, not price", "If the roadmap changes at day 40, we rebuild the plan — at the same fee."],
+  ["A desk, not a login", "Three months at WeWork, building beside the cohort and the studio team."],
+  ["Fifteen founders, no more", "We take the number we can actually move. That’s the whole reason for the call."],
+];
+
+export type PaymentStep = {
+  title: string;
+  body: string;
+  /** What leaves your account at this point. */
+  amount: string;
+  when: string;
+};
+
+/** The whole fee, scheduled before the quarter starts. */
+export const paymentSteps: PaymentStep[] = [
+  {
+    title: "Book your seat",
+    body: "Pay ₹15,000 within 48 hours of the call to book your seat. It counts against the fee — it holds the place, it isn’t extra.",
+    amount: "₹15,000",
+    when: "Within 48 hrs of the call",
+  },
+  {
+    title: "Three payments while we build",
+    body: "The balance splits into three across the first 45 days — so you’re paying alongside the work, not ahead of it.",
+    amount: "3 × ₹95,000",
+    when: "Within 45 days",
+  },
+  {
+    title: "Days 46 to 90",
+    body: "The build keeps running to pitch day. There’s nothing left to pay for it.",
+    amount: "₹0",
+    when: "Nothing further",
+  },
+];
+
+/** What the fee covers, as `[the thing, what it means]`. */
+export const feeIncludes: [string, string][] = [
+  ["Ten live planning classes", "your 90-day roadmap, built with you in days 1–10"],
+  ["Website and MVP development", "real product, with AI inside it"],
+  ["Growth and marketing", "positioning through to demand"],
+  ["Legal and compliance", "from incorporation to data room, whatever the build needs"],
+  ["The full studio team", "plus vetted partners on call"],
+  ["Weekly 1:1s and masterclasses", "an industry expert, live, every week"],
+  ["Three months at WeWork", "and a live dashboard on the build"],
+  ["Pitch day", "you present 90 days of proof to investors and operators"],
+];
+
+/** The one number on the page, and the cohort it buys a seat in. */
+export const pricing = {
+  fee: "₹3,00,000",
+  gst: "+ GST",
+  total: "₹3,00,000 + GST",
+  cohort: "The 90 · Q3 cohort",
+  seats: 15,
+  seatsLeft: 6,
+  fine: "You only pay after the call — and only if we both decide to build.",
+};
+
+/** Clarity both ways: what the fee buys, and what deliberately stays on your card. */
+export const ledgerIn: string[] = [
+  "Website development",
+  "MVP development",
+  "Marketing strategy",
+  "Legal & compliance",
+  "The full studio team",
+  "Vetted partners",
+  "Weekly masterclasses",
+  "3 months at WeWork",
+  "The founder cohort",
+  "Weekly 1:1s",
+];
+
+export const ledgerOut: [string, string][] = [
+  ["Ad spend", "Your budget, your call."],
+  ["Tool subscriptions", "You own the accounts."],
+  ["Shoots", "Only if the plan needs one."],
+  ["Anything extra outside the roadmap", "No scope creep, no surprises."],
+];
