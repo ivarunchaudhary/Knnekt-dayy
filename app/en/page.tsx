@@ -1,13 +1,16 @@
 import Collaboration from "@/components/Collaboration";
 import Contact from "@/components/Contact";
-import Culture from "@/components/Culture";
 import Facts from "@/components/Facts";
+import Faculty from "@/components/Faculty";
 import Footer from "@/components/Footer";
 import Hero from "@/components/Hero";
+import Insights from "@/components/Insights";
 import Intro from "@/components/Intro";
 import Journey from "@/components/Journey";
 import Nav from "@/components/Nav";
+import Pricing from "@/components/Pricing";
 import Services from "@/components/Services";
+import Testimonials from "@/components/Testimonials";
 import Work from "@/components/Work";
 
 export default function HomePage() {
@@ -30,7 +33,10 @@ export default function HomePage() {
             <Collaboration />
             <Facts />
             <Journey />
-            <Culture />
+            <Pricing />
+            <Faculty />
+            <Testimonials />
+            <Insights />
             <Contact />
           </main>
         </div>
