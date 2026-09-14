@@ -122,7 +122,7 @@ export default function Journey() {
   const customers = customersFor(day);
 
   return (
-    <section id="journey" className="py-15 md:py-40">
+    <section id="journey" className="py-12 md:py-28">
       <Container>
         <SectionHeading lead="Day 1 to pitch day.">
           Ten live classes to plan the quarter with you, then eighty days where the studio builds and launches it. Scroll it through—the spine counts the days, the pillars come online, and the customers start landing.
@@ -135,10 +135,24 @@ export default function Journey() {
             <span ref={startDot} className="border-dark absolute left-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 bg-white" />
             <span ref={endDot} className="bg-dark absolute left-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full" />
             <div ref={marker} className="absolute top-0 left-1/2 z-10 flex w-full -translate-x-1/2 -translate-y-1/2 justify-center transition-[top] duration-100 ease-linear">
-              <div className="bg-darker relative flex aspect-square w-full shrink-0 flex-col items-center justify-center rounded-full text-center text-white md:w-[12rem] lg:w-[13rem]">
+              <div className="bg-darker relative w-full shrink-0 rounded-xl px-3 py-5 text-center text-white md:w-[12rem] md:px-6 md:py-7 lg:w-[13rem]">
                 <p className="mono-text text-white/50">Day</p>
-                <p className="mt-0.5 text-3xl leading-none font-medium tabular-nums lg:text-4xl">{day}</p>
-                <ul className="mt-2 hidden space-y-1 md:block lg:mt-3 lg:space-y-1.5">
+                <p className="mt-1 flex items-baseline justify-center gap-2">
+                  <span className="text-4xl leading-none font-medium tracking-tight tabular-nums lg:text-5xl">{day}</span>
+                  <span className="mono-text font-mono text-white/40">/ 90</span>
+                </p>
+                {/* Ninety ticks, one a day — the quarter filling in the way the seat meter fills. */}
+                <div aria-hidden="true" className="mt-4 hidden grid-cols-15 gap-px md:grid lg:mt-5">
+                  {Array.from({ length: 90 }, (_, i) => (
+                    <span
+                      key={i}
+                      className={`ease-in-out-quart h-1.5 origin-bottom rounded-[1px] transition-all duration-500 ${
+                        i === day - 1 ? "scale-y-[1.7] bg-white" : i < day ? "bg-white" : "bg-white/15"
+                      }`}
+                    />
+                  ))}
+                </div>
+                <ul className="mt-4 hidden space-y-1 border-t border-white/15 pt-4 md:block lg:mt-5 lg:space-y-1.5 lg:pt-5">
                   {journeyPillars.map(([name, from]) => (
                     <li key={name} className={`mono-text flex items-center justify-center gap-1.5 transition-colors duration-500 ${day >= from ? "text-white" : "text-white/25"}`}>
                       <span className={`size-1.5 shrink-0 rounded-full transition-colors duration-500 ${day >= from ? "bg-white" : "bg-white/25"}`} />
@@ -146,7 +160,7 @@ export default function Journey() {
                     </li>
                   ))}
                 </ul>
-                <p className="mono-text mt-2 hidden text-white/50 tabular-nums md:block lg:mt-3">{customers} customers</p>
+                <p className="mono-text mt-4 hidden text-white/50 tabular-nums md:block lg:mt-5">{customers} customers</p>
                 <span className="mono-text text-dark absolute top-full left-1/2 mt-2 -translate-x-1/2 rounded-full bg-white px-3 py-1.5 whitespace-nowrap ring-1 ring-black/10">
                   {status}
                 </span>
