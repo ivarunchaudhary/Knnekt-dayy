@@ -128,25 +128,25 @@ export default function Journey() {
           Ten live classes to plan the quarter with you, then eighty days where the studio builds and launches it. Scroll it through—the spine counts the days, the pillars come online, and the customers start landing.
         </SectionHeading>
 
-        <div className="mt-10 grid grid-cols-[6rem_1fr] gap-x-2.5 md:grid-cols-[9rem_1fr] md:gap-x-4 lg:mt-16 lg:grid-cols-[12rem_1fr] lg:gap-x-6">
+        <div className="mt-10 grid grid-cols-[6rem_1fr] gap-x-2.5 md:grid-cols-[11rem_1fr] md:gap-x-4 lg:mt-16 lg:grid-cols-[12rem_1fr] lg:gap-x-6">
           <div ref={rail} className="relative">
             <span ref={line} className="absolute left-1/2 w-px -translate-x-1/2 rounded bg-black/10" />
             <span ref={fill} className="bg-dark absolute left-1/2 w-px -translate-x-1/2 rounded transition-[height] duration-100 ease-linear" />
             <span ref={startDot} className="border-dark absolute left-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 bg-white" />
             <span ref={endDot} className="bg-dark absolute left-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full" />
-            <div ref={marker} className="absolute top-0 left-1/2 z-10 w-full -translate-x-1/2 -translate-y-1/2 transition-[top] duration-100 ease-linear">
-              <div className="bg-darker relative rounded-lg p-3 text-white lg:rounded-xl lg:p-4">
+            <div ref={marker} className="absolute top-0 left-1/2 z-10 flex w-full -translate-x-1/2 -translate-y-1/2 justify-center transition-[top] duration-100 ease-linear">
+              <div className="bg-darker relative flex aspect-square w-full shrink-0 flex-col items-center justify-center rounded-full text-center text-white md:w-[12rem] lg:w-[13rem]">
                 <p className="mono-text text-white/50">Day</p>
-                <p className="mt-0.5 text-3xl leading-none font-medium tabular-nums md:text-4xl">{day}</p>
-                <ul className="mt-3 hidden space-y-1.5 md:block">
+                <p className="mt-0.5 text-3xl leading-none font-medium tabular-nums lg:text-4xl">{day}</p>
+                <ul className="mt-2 hidden space-y-1 md:block lg:mt-3 lg:space-y-1.5">
                   {journeyPillars.map(([name, from]) => (
-                    <li key={name} className={`mono-text flex items-center gap-1.5 transition-colors duration-500 ${day >= from ? "text-white" : "text-white/25"}`}>
+                    <li key={name} className={`mono-text flex items-center justify-center gap-1.5 transition-colors duration-500 ${day >= from ? "text-white" : "text-white/25"}`}>
                       <span className={`size-1.5 shrink-0 rounded-full transition-colors duration-500 ${day >= from ? "bg-white" : "bg-white/25"}`} />
                       {name}
                     </li>
                   ))}
                 </ul>
-                <p className="mono-text mt-3 hidden text-white/50 tabular-nums md:block">{customers} customers</p>
+                <p className="mono-text mt-2 hidden text-white/50 tabular-nums md:block lg:mt-3">{customers} customers</p>
                 <span className="mono-text text-dark absolute top-full left-1/2 mt-2 -translate-x-1/2 rounded-full bg-white px-3 py-1.5 whitespace-nowrap ring-1 ring-black/10">
                   {status}
                 </span>

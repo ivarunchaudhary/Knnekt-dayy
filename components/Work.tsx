@@ -77,7 +77,7 @@ export default function Work() {
   }, []);
 
   return (
-    <Container id="work" className="pt-10 pb-20 md:py-48">
+    <Container id="work" className="pt-12 pb-20 md:pt-24 md:pb-48">
       <SectionHeading lead="Proof, not promises.">
         What we’ve built—and what we refused to build. Real builds, scored on the same six pillars before and after, each one naming what we told the founder not to buy.
       </SectionHeading>

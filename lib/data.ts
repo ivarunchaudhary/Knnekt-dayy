@@ -1,14 +1,18 @@
 const cdn = "/sanity";
 
-/** Marquee claims under the intro headline — the studio in seven short facts. */
-export const proofPoints = [
-  "Built on 300+ startups",
-  "Every stage",
-  "Every industry",
-  "Only 15 founders",
-  "90 days",
-  "First 100 customers",
-  "One honest score",
+/**
+ * The ticker band under the intro headline: the studio in eight figures.
+ * `[figure, label]` — the figure carries the weight, the label gives it meaning.
+ */
+export const proofPoints: [string, string][] = [
+  ["300+", "startups behind the playbook"],
+  ["15", "founders a cohort, no more"],
+  ["90", "days, kickoff to pitch day"],
+  ["₹3L", "one fixed price, no surprises"],
+  ["100", "first customers, in market"],
+  ["6", "pillars in one honest score"],
+  ["4", "functions under one roof"],
+  ["Any", "stage, any industry"],
 ];
 
 export type WorkItem = {

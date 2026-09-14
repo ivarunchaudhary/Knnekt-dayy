@@ -1,41 +1,48 @@
 import { proofPoints } from "@/lib/data";
 import { containerClass } from "./Container";
 
-const fadeRight =
-  "relative z-10 flex w-full before:w-full before:bg-white after:w-full after:max-w-32 after:bg-[linear-gradient(to_right,rgba(255,255,255,1)_0%,rgba(255,255,255,0.9)_20%,rgba(255,255,255,0.7)_40%,rgba(255,255,255,0.4)_60%,rgba(255,255,255,0.2)_80%,rgba(255,255,255,0)_100%)]";
-const fadeLeft =
-  "relative z-10 flex w-full before:w-full before:max-w-32 before:bg-[linear-gradient(to_left,rgba(255,255,255,1)_0%,rgba(255,255,255,0.9)_20%,rgba(255,255,255,0.7)_40%,rgba(255,255,255,0.4)_60%,rgba(255,255,255,0.2)_80%,rgba(255,255,255,0)_100%)] after:w-full after:bg-white";
-
-function PointRow({ hidden }: { hidden?: boolean }) {
+/** One pass of the ticker. Three identical rows sit side by side so the loop is seamless. */
+function FactRow({ hidden }: { hidden?: boolean }) {
   return (
-    <ul className="flex shrink-0 gap-1.5 pr-1.5" aria-hidden={hidden}>
-      {proofPoints.map((point) => (
-        <li key={point} className="bg-dark/5 flex h-40 w-64 shrink-0 items-center justify-center rounded-xl px-8">
-          <span className="text-center text-lg leading-tight font-medium text-balance">{point}</span>
+    <ul className="flex shrink-0" aria-hidden={hidden}>
+      {proofPoints.map(([figure, label]) => (
+        <li key={label} className="shrink-0 border-l border-black/10 pr-14 pl-5 md:pr-24 md:pl-8">
+          <p className="text-3xl leading-none font-medium md:text-4xl">{figure}</p>
+          <p className="text-dark-subtle mt-3 max-w-48 text-sm leading-tight text-balance">{label}</p>
         </li>
       ))}
     </ul>
   );
 }
 
-/** Intro claim + infinitely scrolling marquee of the studio's facts, faded out on both edges. */
+/**
+ * Intro claim, then a full-bleed ticker of the studio's figures. The band is ruled
+ * top and bottom so it reads as a measured strip rather than cards adrift in white,
+ * and both edges fade to the page so items never hard-cut at the viewport.
+ */
 export default function Intro() {
   return (
-    <div className="isolate flex overflow-hidden pt-10 pb-15 md:py-20">
-      <div className={fadeRight} />
-      <section className={`${containerClass} shrink-0`}>
-        <h1 className="text-dark-subtle font-medium text-2xl lg:text-3xl max-w-[52.25rem]">
+    <section className="overflow-hidden pt-10 pb-14 md:pt-20 md:pb-20">
+      <div className={containerClass}>
+        <h1 className="text-dark-subtle max-w-[52.25rem] text-2xl font-medium lg:text-3xl">
           <span className="text-dark transition-colors duration-500">Your first 100 customers. Fund-ready in 90 days.</span> It starts with your Startup Operating Score. Then fifteen founders per cohort go all-in for one 90-day build—and come out with real customers and a company ready to raise.
         </h1>
-        <div className="mt-7 md:mt-20">
-          <div className="marquee flex">
-            <PointRow />
-            <PointRow hidden />
-            <PointRow hidden />
-          </div>
+      </div>
+      <div className="relative isolate mt-12 border-y border-black/10 py-8 md:mt-20 md:py-11">
+        <div className="marquee flex">
+          <FactRow />
+          <FactRow hidden />
+          <FactRow hidden />
         </div>
-      </section>
-      <div className={fadeLeft} />
-    </div>
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-white via-white/80 to-transparent sm:w-20 md:w-32"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-white via-white/80 to-transparent sm:w-20 md:w-32"
+        />
+      </div>
+    </section>
   );
 }
