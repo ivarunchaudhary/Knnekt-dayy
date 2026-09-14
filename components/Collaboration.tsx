@@ -14,7 +14,7 @@ const PlusIcon = () => (
 
 export default function Collaboration() {
   return (
-    <section id="about" className="overflow-hidden py-15 md:py-40">
+    <section id="about" className="overflow-hidden py-12 md:py-28">
       <Container>
         <SectionHeading lead="We’re not an agency. We’re an execution partner.">
           An agency takes your brief and bills the hours. We take a position on your business, build it with you, and own the outcome—same four functions under one roof, but on your side of the table.
