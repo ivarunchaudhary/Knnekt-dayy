@@ -68,7 +68,7 @@ const rowClass = "grid gap-x-1.5 gap-y-4 border-black/10 py-7 lg:grid-cols-2";
 
 export default function Facts() {
   return (
-    <Container className="py-15 md:py-40">
+    <Container className="py-12 md:py-28">
       <SectionHeading lead="Curious how the quarter actually works?">Here’s the studio in numbers—the cohort, the ninety days, the experience behind it, and the score that decides who we build with.</SectionHeading>
       <ul className="mt-8 space-y-5 md:mt-14">
         <li className={`${rowClass} sm:border-t`}>
