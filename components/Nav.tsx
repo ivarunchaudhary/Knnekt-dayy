@@ -8,6 +8,8 @@ const items = [
   { href: "#work", label: "Proof" },
   { href: "#services", label: "Services" },
   { href: "#about", label: "Studio" },
+  { href: "#pricing", label: "Pricing" },
+  { href: "#insights", label: "Insights" },
   { href: "#contact", label: "Contact" },
 ];
 
@@ -50,12 +52,13 @@ export default function Nav() {
   }, [onHome]);
 
   return (
-    <nav className="fixed bottom-7 left-1/2 isolate z-40 -translate-x-1/2 overflow-hidden rounded-full bg-gray-200/70 py-1.5 pr-5 pl-2.5 text-[0.9375rem] leading-[125%] font-medium tracking-[-0.00938rem] backdrop-blur-xl">
+    <nav className="fixed bottom-7 left-1/2 isolate z-40 max-w-[calc(100vw-1.5rem)] -translate-x-1/2 overflow-hidden rounded-full bg-gray-200/70 py-1.5 pr-5 pl-2.5 text-[0.9375rem] leading-[125%] font-medium tracking-[-0.00938rem] backdrop-blur-xl">
+      {/* Six items don't fit a phone: the row scrolls, and the mask doubles as the affordance. */}
       <div
-        className="-mr-4 -ml-1.5 pr-4 pl-1.5"
+        className="hide-scrollbars -mr-4 -ml-1.5 overflow-x-auto overscroll-x-contain pr-4 pl-1.5"
         style={{ maskImage: "linear-gradient(to right, transparent 0%, black 1.25rem, black calc(100% - 1.25rem), transparent 100%)" }}
       >
-        <ul className="flex select-none">
+        <ul className="flex w-max select-none">
           {items.map((item) => {
             const on = active === item.href;
             const className = `before:bg-dark flex items-center gap-1 rounded-full px-2 py-3 outline-black transition-colors before:size-2.5 before:rounded-full before:transition before:duration-200 ${spring} hover:text-dark focus-visible:text-dark ${
