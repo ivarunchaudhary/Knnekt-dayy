@@ -19,6 +19,9 @@
   --animate-grain: grain 8s steps(10) infinite;
   --animate-hero-reveal: hero-reveal 1.6s var(--ease-out-expo) both;
   --animate-hero-drift: hero-drift 48s var(--ease-in-out-quart) infinite alternate;
+  --animate-fog-a: fog-a 29s var(--ease-in-out-quart) -7s infinite alternate;
+  --animate-fog-b: fog-b 37s var(--ease-in-out-quart) -15s infinite alternate;
+  --animate-fog-c: fog-c 23s var(--ease-in-out-quart) -3s infinite alternate;
   --background-image-grain: url(/images/grain.png);
   --scale-102: 1.02;
 
@@ -77,6 +80,25 @@
   @keyframes hero-drift {
     from { transform: scale(1.03) translate3d(0.8%, 0.5%, 0); }
     to { transform: scale(1.08) translate3d(-0.8%, -0.5%, 0); }
+  }
+
+  /* Hero fog: three banks, drifting independently. A and B are deliberately
+     opposed on the vertical — one rises while the other sinks — which is what
+     keeps the haze's leading edge reshaping instead of sliding up and down as
+     one bar. The periods are primes (29/37/23) and each starts part-way in on a
+     negative delay, so the three never come back into phase on any cycle a
+     visitor will sit through. */
+  @keyframes fog-a {
+    from { transform: translate3d(-2%, 5%, 0) scale(1.08); }
+    to { transform: translate3d(1.5%, -4%, 0) scale(1.15); }
+  }
+  @keyframes fog-b {
+    from { transform: translate3d(2%, -4.5%, 0) scale(1.14); }
+    to { transform: translate3d(-1.5%, 5%, 0) scale(1.07); }
+  }
+  @keyframes fog-c {
+    from { transform: translate3d(-1%, 2.5%, 0) scale(1.1); }
+    to { transform: translate3d(2%, -3.5%, 0) scale(1.16); }
   }
 }
 
@@ -179,4 +201,40 @@ body {
   height: 100%;
   border: 0;
   pointer-events: none;
+}
+
+/* Hero fog, in three banks that drift on their own clocks (see the fog-a/b/c
+   keyframes). One field would give the haze a single, even leading edge that can
+   only slide; three, pulling against each other, give it an edge that is uneven
+   across the width and continuously reshaping — high on the left while it sags
+   on the right, then the other way about.
+
+   The hero picture is a pale warm grey, so the tints have to carry real
+   saturation — dusty rose, periwinkle, warm gold — or the haze lands on top of
+   it and simply disappears. Each bank is blurred on its own rather than through
+   a shared parent: blurring the parent would re-run the filter every frame the
+   children move, where this way each bank is painted once and the compositor
+   just moves the cached layer.
+
+   Every lobe closes to full transparency inside its own box, so the drift can
+   never pull a hard edge into the frame. Keep the rule when retuning: for a lobe
+   at `at x% y%` sized `w% h%`, the last stop lands at y% - (h% x last-stop), and
+   that has to stay above 0. */
+.hero-fog-a {
+  background:
+    radial-gradient(56% 58% at 10% 76%, rgba(212, 141, 112, 0.86) 0%, rgba(212, 141, 112, 0.4) 44%, rgba(212, 141, 112, 0) 76%),
+    radial-gradient(44% 46% at 34% 48%, rgba(206, 150, 124, 0.5) 0%, rgba(206, 150, 124, 0.2) 46%, rgba(206, 150, 124, 0) 78%);
+  filter: blur(56px);
+}
+.hero-fog-b {
+  background:
+    radial-gradient(52% 56% at 90% 66%, rgba(114, 143, 186, 0.82) 0%, rgba(114, 143, 186, 0.38) 46%, rgba(114, 143, 186, 0) 78%),
+    radial-gradient(46% 44% at 68% 42%, rgba(150, 166, 204, 0.52) 0%, rgba(150, 166, 204, 0.2) 46%, rgba(150, 166, 204, 0) 78%);
+  filter: blur(56px);
+}
+.hero-fog-c {
+  background:
+    radial-gradient(84% 54% at 46% 100%, rgba(226, 192, 134, 0.88) 0%, rgba(226, 192, 134, 0.46) 46%, rgba(226, 192, 134, 0) 80%),
+    radial-gradient(40% 42% at 52% 60%, rgba(219, 170, 142, 0.44) 0%, rgba(219, 170, 142, 0) 76%);
+  filter: blur(56px);
 }

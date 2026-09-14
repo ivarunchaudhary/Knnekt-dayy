@@ -1,4 +1,5 @@
 import HeroBackground from "./HeroBackground";
+import HeroFog from "./HeroFog";
 import Wordmark from "./Wordmark";
 import { containerClass } from "./Container";
 
@@ -13,6 +14,7 @@ export default function Hero() {
         </div>
       </div>
       <HeroBackground />
+      <HeroFog />
     </header>
   );
 }

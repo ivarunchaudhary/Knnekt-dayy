@@ -26,8 +26,11 @@ import Image from "next/image";
  *   1. the picture fades up with a slight push-in, once, on load;
  *   2. a Ken Burns drift on a separate wrapper, so it composes with the reveal's
  *      transform instead of fighting it for the same property.
- * The grain stays on this outer element so it never rides along with the drift, and
- * the foot of the frame dissolves into the white page below it.
+ * The grain stays on this outer element so it never rides along with the drift.
+ *
+ * Dissolving the foot of the frame into the white page belongs to <HeroFog/>, which
+ * paints above this one: a fade drawn here would sit under the fog and the hero would
+ * meet <Intro/> on a hard line of colour halfway through the scroll.
  */
 export default function HeroBackground() {
   return (
@@ -42,7 +45,6 @@ export default function HeroBackground() {
           className="motion-safe:animate-hero-reveal object-cover object-center"
         />
       </div>
-      <div className="absolute inset-x-0 bottom-0 h-[12%] bg-gradient-to-t from-white to-transparent" />
     </div>
   );
 }

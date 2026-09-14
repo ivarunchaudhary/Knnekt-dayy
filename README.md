@@ -20,6 +20,7 @@ npm run build && npm start
 - `app/globals.css` – the site's design tokens (colours, fluid type scale, grain animation) as a Tailwind v4 `@theme`
 - `app/fonts/` – FT System Blank / FT System Mono (self-hosted, loaded with `next/font/local`)
 - `public/sanity/` – every image from the original page, `public/images/` – hero still, grain and marks
+- `app/opengraph-image.tsx` – the 1200×630 link preview (hero frame + wordmark + claim), with `app/twitter-image.tsx` pointing X at the same card and `app/icon.svg` / `app/apple-icon.tsx` the favicon and home-screen icon; `assets/` holds what those generate from — ttf cuts of the brand font and a pre-cropped hero jpg, since Satori reads neither woff2 nor webp
 
 Engagement pages (`/en/case/<slug>`) render the full proof entry from `lib/data.ts`; legal pages are placeholders so no link 404s.
 
