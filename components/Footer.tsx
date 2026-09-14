@@ -31,6 +31,15 @@ export default function Footer() {
               <Link className={link} href="/en#about">Execution Studio</Link>
             </li>
             <li>
+              <Link className={link} href="/en#faculty">Faculty</Link>
+            </li>
+            <li>
+              <Link className={link} href="/en#pricing">Pricing</Link>
+            </li>
+            <li>
+              <Link className={link} href="/en/insights">Insights</Link>
+            </li>
+            <li>
               <Link className={link} href="/en#contact">Contact</Link>
             </li>
           </ul>
