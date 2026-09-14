@@ -489,3 +489,79 @@ export const faculty: FacultyGroup[] = [
     ],
   },
 ];
+
+/* ------------------------------------------------------------------------- *
+ * Testimonials — the ticker                                                  *
+ * ------------------------------------------------------------------------- */
+
+export type Testimonial = {
+  quote: string;
+  /** Attributed by role, the same way the case studies are, until founders consent to be named. */
+  attribution: string;
+  /** The one figure that backs the quote up. */
+  result: string;
+};
+
+/** Two rows of these scroll past each other, opposite directions. */
+export const testimonials: Testimonial[] = [
+  {
+    quote: "Knnekt gave me a clear vision to launch. Within two months I shipped my product and gained the traction that helped me understand my customers.",
+    attribution: "Founder · Athleisure · In market",
+    result: "45 → 71 score",
+  },
+  {
+    quote: "The platform was never the question. Knnekt made us answer who it’s really for.",
+    attribution: "Founder · Equity-firm SaaS · In market",
+    result: "2 pilots live",
+  },
+  {
+    quote: "They cut half my roadmap and I launched twice as fast. The no’s were the value.",
+    attribution: "Founder · Luxury commerce · Launched",
+    result: "52 → 79 score",
+  },
+  {
+    quote: "They talked me out of spending ₹50k I didn’t need to. I ran the roadmap myself and it worked.",
+    attribution: "Founder · D2C beverage · Roadmap",
+    result: "38 → 55 score",
+  },
+  {
+    quote: "I’d been quoted four vendors and three months just to get to a kickoff. Here it was one plan and one invoice.",
+    attribution: "Founder · Logistics SaaS · Building",
+    result: "One fixed price",
+  },
+  {
+    quote: "The score was brutal and it was the most useful hour of my year. I knew exactly what was broken before I spent a rupee.",
+    attribution: "Founder · Healthtech · Pre-launch",
+    result: "Free report, kept",
+  },
+  {
+    quote: "The weekly 1:1 is the part I’d pay for on its own. Someone senior, every week, who’d actually read my numbers.",
+    attribution: "Founder · Fintech · Building",
+    result: "12 weekly 1:1s",
+  },
+  {
+    quote: "Pitch day put me in front of people I’d been cold-emailing for a year. Two of those conversations are still going.",
+    attribution: "Founder · Marketplace · Raising",
+    result: "Warm intros, day 90",
+  },
+  {
+    quote: "We shipped the MVP in week seven and had paying users in week nine. Nothing about that was normal for us.",
+    attribution: "Founder · Vertical SaaS · In market",
+    result: "MVP by week 7",
+  },
+  {
+    quote: "Legal was the thing I kept putting off. It got handled in the first month, before it got expensive.",
+    attribution: "Founder · Consumer app · In market",
+    result: "Clean data room",
+  },
+  {
+    quote: "Fifteen founders in the same room, all one quarter deep. I stopped feeling like the only one having that week.",
+    attribution: "Founder · Edtech · Building",
+    result: "Cohort of 15",
+  },
+  {
+    quote: "I came in wanting a rebrand. I left with positioning, a product and customers. The rebrand never mattered.",
+    attribution: "Founder · B2B services · In market",
+    result: "100 customers",
+  },
+];
