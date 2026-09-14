@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { work, type WorkItem } from "@/lib/data";
+import CaseDialog from "./CaseDialog";
 import Container, { SectionHeading } from "./Container";
 import Parallax from "./Parallax";
 import Vimeo from "./Vimeo";
@@ -37,10 +38,20 @@ function Media({ item, variant, eager }: { item: WorkItem; variant: "mobile" | "
   );
 }
 
-function Card({ item, eager }: { item: WorkItem; eager: boolean }) {
+/**
+ * The card still points at the case's own URL — so it can be opened in a tab,
+ * copied, and crawled — but a plain click keeps the reader on the page and
+ * opens the case in the middle of it instead.
+ */
+function Card({ item, eager, onOpen }: { item: WorkItem; eager: boolean; onOpen: (item: WorkItem) => void }) {
   return (
     <Link
       href={`/en/case/${item.slug}`}
+      onClick={(e) => {
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+        e.preventDefault();
+        onOpen(item);
+      }}
       className={`group block rounded-t-xl text-left outline-offset-2 outline-black ${item.wide ? "lg:col-span-2" : ""}`}
     >
       <span
@@ -63,6 +74,7 @@ function Card({ item, eager }: { item: WorkItem; eager: boolean }) {
 
 export default function Work() {
   const grid = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState<WorkItem | null>(null);
 
   // Wide (2-column) cards match the height of a regular card's image: --asset-height
   useEffect(() => {
@@ -77,15 +89,16 @@ export default function Work() {
   }, []);
 
   return (
-    <Container id="work" className="pt-12 pb-20 md:pt-24 md:pb-48">
+    <Container id="work" className="pt-12 pb-14 md:pt-20 md:pb-28">
       <SectionHeading lead="Proof, not promises.">
         What we’ve built—and what we refused to build. Real builds, scored on the same six pillars before and after, each one naming what we told the founder not to buy.
       </SectionHeading>
       <div ref={grid} className="mt-14 space-y-10 gap-x-1.5 gap-y-10 sm:grid sm:grid-cols-2 sm:space-y-0 lg:grid-cols-3 lg:gap-y-16">
         {work.map((item, i) => (
-          <Card key={item.slug} item={item} eager={i < 3} />
+          <Card key={item.slug} item={item} eager={i < 3} onOpen={setOpen} />
         ))}
       </div>
+      {open && <CaseDialog key={open.slug} item={open} onClose={() => setOpen(null)} />}
     </Container>
   );
 }
