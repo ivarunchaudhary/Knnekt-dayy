@@ -1,22 +1,25 @@
 import Image from "next/image";
 
 /**
- * Hero backdrop: a full-bleed still — two figures meeting, lit, on an open dark plain —
- * under the site's film-grain overlay.
+ * Hero backdrop: a full-bleed still — two sculpted hands reaching for each other,
+ * not quite touching — under the site's film-grain overlay.
  *
- * The source frame is portrait, and cropping a portrait into a landscape hero costs
- * a 1.4× zoom, which is enough to march the figures up close and lose the distance
- * the picture is about. So the asset is widened instead of cropped: the frame sits at
- * its native proportion in the middle of a 16:9 canvas, and the empty plain is carried
- * out to either side from the outermost column of the original. The image varies by
- * four levels out of 255 across its whole width, so an extension drawn that way holds
- * the horizon edge to edge with nothing to see at the joins — and the figures keep the
- * size they have in the original, small against a lot of nothing.
+ * The source frame is portrait, with the two hands stacked and the gesture running
+ * top-right to bottom-left. Turned a quarter clockwise it becomes the horizontal
+ * reach it always wanted to be: one hand entering from the left, one from the right,
+ * the gap between the fingertips landing dead centre.
+ *
+ * Rotating leaves a 5:4 frame, and cropping that into a landscape hero would cost a
+ * 1.4× zoom — enough to push the hands past the edges and lose the space the picture
+ * is about. So the asset is widened rather than cropped: the rotated frame sits at its
+ * native proportion in the middle of a 16:9 canvas, and the outermost column is carried
+ * out to either side. The backdrop is a soft, near-flat gradient and the forearms are
+ * already cut off by the frame, so the extension reads as the arms simply continuing
+ * out of shot, with nothing to see at the joins.
  *
  * Because the canvas now matches the shape of the viewport, `cover` barely scales at
- * all and plain `object-center` is the whole framing rule: the horizon lands around
- * two thirds down, the figures just under it, and the top half stays clear sky for
- * the wordmark and the claim to sit straight on.
+ * all and plain `object-center` is the whole framing rule: the hands sit across the
+ * middle band, and the top of the frame stays clear for the wordmark and the claim.
  *
  * Two motions, both slow enough to read as atmosphere rather than animation, and both
  * behind `motion-safe` so a reduced-motion visitor gets the still frame:
@@ -31,7 +34,7 @@ export default function HeroBackground() {
     <div className="after:animate-grain after:bg-grain absolute inset-0 overflow-hidden bg-gray-200 after:absolute after:top-0 after:left-0 after:size-[140%] after:opacity-[0.04]">
       <div className="motion-safe:animate-hero-drift relative size-full">
         <Image
-          src="/images/hero--plain.webp"
+          src="/images/hero--hands.webp"
           alt=""
           fill
           priority

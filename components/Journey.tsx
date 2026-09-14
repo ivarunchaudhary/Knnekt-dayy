@@ -10,11 +10,27 @@ const statusFor = (day: number) => (day <= 3 ? 0 : day <= 10 ? 1 : day <= 16 ? 2
 /** Customers only start landing once what we built is in market. */
 const customersFor = (day: number) => Math.max(0, Math.min(100, Math.round(((day - 45) / 37) * 100)));
 
+/** Every day of the quarter, stacked once so the readout can scroll to one of them. */
+const allDays = Array.from({ length: 90 }, (_, i) => String(i + 1).padStart(2, "0"));
+/** Decade marks on the spine, so the eye has something to measure the travel against. */
+const decades = [10, 20, 30, 40, 50, 60, 70, 80];
+/** Height of one cell in the day reel, in ems of the number's own size. */
+const CELL = "1em";
+
 /**
- * The 90 days as a spine: a rail that fills as you scroll, a marker that counts
- * Day 1 → Day 90 beside it, and the four phases lighting up as it passes them.
+ * The 90 days as a spine: a ruled rail that fills as you scroll, a readout that counts
+ * Day 1 → Day 90 alongside it, and the four phases lighting up as it passes them.
  * Position is written straight to the DOM; only the day and the active phase
  * (which change a few dozen times across the whole section) go through state.
+ *
+ * The readout is drawn as an instrument rather than a card — no fill, no border, just
+ * two hairlines and a block of white wide enough to interrupt the spine where it sits,
+ * so the rail reads as one continuous measure with a cursor riding it. The count itself
+ * is a mechanical reel: all ninety numbers stacked in a one-line window, the strip
+ * translated to bring the current day into view. Scrolling the page spins it, in either
+ * direction, with no wrap to fake — which is the whole conceit of the section made
+ * literal. Everything else in the readout is hairline and mono; the only solid mass is
+ * the status slug, so the last phase card stays the one black thing on the page.
  */
 export default function Journey() {
   const rail = useRef<HTMLDivElement>(null);
@@ -23,9 +39,13 @@ export default function Journey() {
   const fill = useRef<HTMLSpanElement>(null);
   const startDot = useRef<HTMLSpanElement>(null);
   const endDot = useRef<HTMLSpanElement>(null);
+  const ticks = useRef<(HTMLSpanElement | null)[]>([]);
   const cards = useRef<(HTMLLIElement | null)[]>([]);
   const [day, setDay] = useState(1);
   const [active, setActive] = useState(0);
+  // How many days either side of the readout the marker physically covers, so a decade
+  // mark can get out of the way before the cursor clips it rather than after.
+  const [reach, setReach] = useState(11);
 
   useEffect(() => {
     const railEl = rail.current;
@@ -57,6 +77,14 @@ export default function Journey() {
         const q = last.getBoundingClientRect();
         pitchStart = Math.max(0.05, Math.min(0.985, (q.top - r.top) / railH));
       }
+      // Days 1–89 are spread over the run up to pitch day, so each decade mark lands on
+      // exactly the point where the counter reads it. Day 90 is the end dot already.
+      const span = lineBot - lineTop;
+      decades.forEach((d, i) => {
+        const tick = ticks.current[i];
+        if (tick) tick.style.top = `${lineTop + ((d - 1) / 88) * pitchStart * span}%`;
+      });
+      setReach((half * 88) / Math.max(0.0001, pitchStart * span) + 1);
     };
 
     const settle = () => {
@@ -132,38 +160,83 @@ export default function Journey() {
           <div ref={rail} className="relative">
             <span ref={line} className="absolute left-1/2 w-px -translate-x-1/2 rounded bg-black/10" />
             <span ref={fill} className="bg-dark absolute left-1/2 w-px -translate-x-1/2 rounded transition-[height] duration-100 ease-linear" />
+            {/* Decade marks: the rail as a ruler, so the travel is measured and not just long. */}
+            {decades.map((d, i) => (
+              <span
+                key={d}
+                aria-hidden="true"
+                ref={(el) => {
+                  ticks.current[i] = el;
+                }}
+                className={`ease-in-out-quart absolute left-1/2 -translate-x-1/2 -translate-y-1/2 transition-opacity duration-500 ${
+                  Math.abs(day - d) < reach ? "opacity-0" : "opacity-100"
+                }`}
+              >
+                <span className={`ease-in-out-quart block h-px w-2.5 transition-colors duration-500 md:w-3 ${day >= d ? "bg-dark" : "bg-black/15"}`} />
+                <span
+                  className={`mono-text ease-in-out-quart absolute top-1/2 left-5 hidden -translate-y-1/2 tabular-nums transition-colors duration-500 md:block ${
+                    day >= d ? "text-dark-subtle" : "text-dark-very-subtle"
+                  }`}
+                >
+                  {d}
+                </span>
+              </span>
+            ))}
             <span ref={startDot} className="border-dark absolute left-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 bg-white" />
             <span ref={endDot} className="bg-dark absolute left-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full" />
-            <div ref={marker} className="absolute top-0 left-1/2 z-10 flex w-full -translate-x-1/2 -translate-y-1/2 justify-center transition-[top] duration-100 ease-linear">
-              <div className="bg-darker relative w-full shrink-0 rounded-xl px-3 py-5 text-center text-white md:w-[12rem] md:px-6 md:py-7 lg:w-[13rem]">
-                <p className="mono-text text-white/50">Day</p>
-                <p className="mt-1 flex items-baseline justify-center gap-2">
-                  <span className="text-4xl leading-none font-medium tracking-tight tabular-nums lg:text-5xl">{day}</span>
-                  <span className="mono-text font-mono text-white/40">/ 90</span>
+
+            <div ref={marker} className="absolute top-0 left-0 z-10 w-full -translate-y-1/2 transition-[top] duration-100 ease-linear">
+              {/* No fill and no border — just white wide enough to break the spine, ruled top and bottom. */}
+              <div className="relative bg-white py-3.5 md:py-4">
+                <span className="bg-dark block h-px w-full" />
+                <p className="mono-text text-dark-very-subtle mt-3">Day</p>
+                <p className="mt-0.5 flex items-end gap-2">
+                  <span className="text-4xl leading-none font-medium tracking-tight tabular-nums lg:text-5xl">
+                    <span className="sr-only">Day {day} of 90</span>
+                    {/* The reel: ninety numbers in a one-line window, scrolled to today. */}
+                    <span aria-hidden="true" className="block overflow-hidden" style={{ height: CELL }}>
+                      <span
+                        className="ease-in-out-quart block transition-transform duration-500 motion-reduce:transition-none"
+                        style={{ transform: `translateY(calc(${CELL} * ${1 - day}))` }}
+                      >
+                        {allDays.map((d) => (
+                          <span key={d} className="block" style={{ height: CELL, lineHeight: CELL }}>
+                            {d}
+                          </span>
+                        ))}
+                      </span>
+                    </span>
+                  </span>
+                  <span className="mono-text text-dark-very-subtle pb-0.5">/ 90</span>
                 </p>
-                {/* Ninety ticks, one a day — the quarter filling in the way the seat meter fills. */}
-                <div aria-hidden="true" className="mt-4 hidden grid-cols-15 gap-px md:grid lg:mt-5">
-                  {Array.from({ length: 90 }, (_, i) => (
-                    <span
-                      key={i}
-                      className={`ease-in-out-quart h-1.5 origin-bottom rounded-[1px] transition-all duration-500 ${
-                        i === day - 1 ? "scale-y-[1.7] bg-white" : i < day ? "bg-white" : "bg-white/15"
-                      }`}
-                    />
-                  ))}
-                </div>
-                <ul className="mt-4 hidden space-y-1 border-t border-white/15 pt-4 md:block lg:mt-5 lg:space-y-1.5 lg:pt-5">
-                  {journeyPillars.map(([name, from]) => (
-                    <li key={name} className={`mono-text flex items-center justify-center gap-1.5 transition-colors duration-500 ${day >= from ? "text-white" : "text-white/25"}`}>
-                      <span className={`size-1.5 shrink-0 rounded-full transition-colors duration-500 ${day >= from ? "bg-white" : "bg-white/25"}`} />
-                      {name}
-                    </li>
-                  ))}
+
+                <ul className="mt-4 hidden space-y-1.5 md:block lg:mt-5">
+                  {journeyPillars.map(([name, from]) => {
+                    const on = day >= from;
+                    return (
+                      <li key={name} className={`mono-text ease-in-out-quart flex items-center gap-2 transition-colors duration-500 ${on ? "text-dark" : "text-dark-very-subtle"}`}>
+                        {/* The dot is always an empty ring; it fills the moment the pillar comes online. */}
+                        <span className={`ease-in-out-quart relative size-2.5 shrink-0 rounded-full border transition-colors duration-500 ${on ? "border-dark" : "border-black/15"}`}>
+                          <span
+                            className={`bg-dark absolute inset-0 rounded-full transition-transform duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${on ? "scale-100" : "scale-0"}`}
+                          />
+                        </span>
+                        {name}
+                      </li>
+                    );
+                  })}
                 </ul>
-                <p className="mono-text mt-4 hidden text-white/50 tabular-nums md:block lg:mt-5">{customers} customers</p>
-                <span className="mono-text text-dark absolute top-full left-1/2 mt-2 -translate-x-1/2 rounded-full bg-white px-3 py-1.5 whitespace-nowrap ring-1 ring-black/10">
-                  {status}
-                </span>
+
+                <p
+                  className={`mono-text ease-in-out-quart mt-4 hidden tabular-nums transition-colors duration-500 md:block lg:mt-5 ${
+                    customers > 0 ? "text-dark-subtle" : "text-dark-very-subtle"
+                  }`}
+                >
+                  {customers} customers
+                </p>
+
+                <span className="bg-dark mt-3.5 block h-px w-full md:mt-4" />
+                <span className="bg-dark mono-text absolute top-full left-0 mt-2 rounded-full px-3 py-1.5 whitespace-nowrap text-white">{status}</span>
               </div>
             </div>
           </div>

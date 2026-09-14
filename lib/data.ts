@@ -279,6 +279,13 @@ export type JourneyPhase = {
   tag: string;
   title: string;
   body: string;
+  /**
+   * The slice of the quarter this movement owns, so the strip and the rows agree on
+   * which one is live. The labels overlap on purpose—"Days 11–90" and "By day 90"
+   * are narrative, not sequential—so the boundaries are stated rather than parsed.
+   */
+  from: number;
+  to: number;
   bars: [string, string][];
 };
 
@@ -286,6 +293,8 @@ export const journeyPhases: JourneyPhase[] = [
   {
     days: "Days 1\u201310",
     tag: "Plan \u00b7 ten live classes",
+    from: 1,
+    to: 10,
     title: "We plan it with you.",
     body: "Ten live classes. We read your real constraints, then map all 90 days to the goal\u2014together.",
     bars: [
@@ -297,6 +306,8 @@ export const journeyPhases: JourneyPhase[] = [
   {
     days: "Days 11\u201390",
     tag: "Build & launch",
+    from: 11,
+    to: 82,
     title: "We build. You steer.",
     body: "The full studio ships across product, growth, AI, legal and compliance while you make the calls.",
     bars: [
@@ -308,6 +319,8 @@ export const journeyPhases: JourneyPhase[] = [
   {
     days: "By day 90",
     tag: "The outcome",
+    from: 83,
+    to: 89,
     title: "100 customers. Fund-ready. Real traction.",
     body: "At day 90 you have proof\u2014not a pretty deck. Customers using what we built.",
     bars: [
@@ -319,6 +332,8 @@ export const journeyPhases: JourneyPhase[] = [
   {
     days: "Day 90",
     tag: "Pitch day",
+    from: 90,
+    to: 90,
     title: "Then you pitch it live.",
     body: "The cohort\u2019s demo day\u2014you present 90 days of proof to a room of investors and operators.",
     bars: [
