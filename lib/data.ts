@@ -654,3 +654,239 @@ export const ledgerOut: [string, string][] = [
   ["Shoots", "Only if the plan needs one."],
   ["Anything extra outside the roadmap", "No scope creep, no surprises."],
 ];
+
+/* ------------------------------------------------------------------------- *
+ * Insights                                                                   *
+ * ------------------------------------------------------------------------- */
+
+export type PostBlock =
+  | { h: string }
+  | { p: string }
+  | { list: string[] }
+  | { quote: string };
+
+export type Post = {
+  slug: string;
+  title: string;
+  excerpt: string;
+  category: string;
+  /** ISO date — formatted at render so the markup stays locale-stable. */
+  date: string;
+  readingTime: string;
+  author: string;
+  cover: { src: string; w: number; h: number; alt: string };
+  body: PostBlock[];
+};
+
+/** Newest first. The homepage shows the first three; /en/insights shows them all. */
+export const insights: Post[] = [
+  {
+    slug: "the-no-that-saved-the-quarter",
+    title: "The no that saved the quarter",
+    excerpt:
+      "Four of the last ten founders who came to us wanted to buy something they weren’t ready to use. Here’s how we decide when to refuse the work.",
+    category: "Operating",
+    date: "2026-08-28",
+    readingTime: "6 min read",
+    author: "Knnekt Studios",
+    cover: {
+      src: `${cdn}/99281afbb83464441f7ec29f3f025202d7000443-1200x849.webp`,
+      w: 2000,
+      h: 1414,
+      alt: "Two people standing indoors near large windows, engaged in conversation",
+    },
+    body: [
+      { p: "An agency’s incentive is to say yes. You arrive with a brief and a budget, and the brief becomes the scope, and the scope becomes the invoice. Nobody in that chain is paid to ask whether the brief was right." },
+      { p: "We price a quarter, not a deliverable, which means a bad brief costs us as much as it costs you. That one structural fact is why we can afford to refuse work — and why we do, roughly four times in ten." },
+      { h: "The three refusals we make most" },
+      { p: "They’re always the same shapes. Once you’ve seen a few hundred startups, the pattern is almost boring." },
+      { list: [
+        "Paid acquisition before positioning is proven. Spending to grow before you know who it’s for just buys the wrong customers faster, and teaches you nothing you can act on.",
+        "Every feature in v1. The roadmap is usually a list of things the founder is afraid to cut. We ship the one that proves the model and park the rest until it earns its place.",
+        "A full build for a company that needs a plan. Sometimes the honest sell is a ₹10,000 roadmap and six calls. We’d rather you came back ready than paid us for execution you couldn’t use.",
+      ] },
+      { h: "What refusing actually looks like" },
+      { p: "It isn’t a lecture. It’s a number. The Startup Operating Score puts six pillars on the table before anyone talks about scope, and the conversation stops being about what you want to buy and starts being about which constraint is actually binding." },
+      { quote: "They talked me out of spending ₹50k I didn’t need to. I ran the roadmap myself and it worked." },
+      { p: "That founder is not a customer this quarter. They will be, and the version of them that comes back will be worth building with. That’s the whole trade." },
+      { h: "The cost of saying yes anyway" },
+      { p: "Every studio has the engagement it took because the quarter looked thin. It never ends well: the work is fine, the outcome isn’t, and the case study quietly never gets written. Fifteen founders a quarter is a small number partly because it keeps us from needing the sixteenth." },
+    ],
+  },
+  {
+    slug: "what-a-startup-operating-score-actually-measures",
+    title: "What a Startup Operating Score actually measures",
+    excerpt:
+      "Six pillars, five minutes, no card. What each one is looking for, why founders consistently mis-score themselves on two of them, and what the report is for.",
+    category: "The score",
+    date: "2026-08-12",
+    readingTime: "8 min read",
+    author: "Knnekt Studios",
+    cover: {
+      src: `${cdn}/9c6ad38a21c66d2f9c66155cc8ba04f7f11fbba6-1200x849.webp`,
+      w: 2000,
+      h: 1414,
+      alt: "Person working at a desk with a laptop, with awards and certificates on a shelf behind them",
+    },
+    body: [
+      { p: "Every startup has a number. Most of the ones on offer measure how fundable you look. Ours measures how well the company runs — which is a different question, and a more useful one if you’re the person who has to run it on Monday." },
+      { h: "The six pillars" },
+      { list: [
+        "Clarity — can you say who it’s for and why they switch, in one sentence, without a deck?",
+        "Product — does the thing exist, does it work, and is anyone using it without being asked?",
+        "Demand — do customers arrive through a channel you can describe and repeat?",
+        "Economics — do you know what a customer costs, what they’re worth, and how long the money lasts?",
+        "Structure — cap table, contracts, IP and compliance: would a data room survive contact with a lawyer?",
+        "Execution — the gap between what you said you’d do last month and what happened.",
+      ] },
+      { h: "The two everyone gets wrong" },
+      { p: "Founders over-score Clarity and under-score Structure, almost without exception." },
+      { p: "Clarity feels solved because you’ve said the sentence a hundred times — to friends, to your co-founder, to yourself in the shower. Fluency isn’t clarity. The test isn’t whether you can say it; it’s whether a stranger can repeat it back and get it right." },
+      { p: "Structure gets under-scored because nothing has broken yet. Cap tables, IP assignment and contractor agreements are invisible right up until a term sheet makes them the only thing anyone wants to talk about. By then the cheap fix is gone." },
+      { h: "What you get back" },
+      { p: "A free report: your archetype, your top three constraints in order, and one clear next move. It’s yours whether or not we ever work together, and it’s deliberately written so you could hand it to someone else to execute." },
+      { h: "What it’s not" },
+      { p: "It isn’t a lead magnet with a score glued on, and it doesn’t flatter you — the average first score is in the forties. If it comes back low, that isn’t a sales hook. It’s usually the roadmap conversation, not the cohort one." },
+    ],
+  },
+  {
+    slug: "why-ninety-days",
+    title: "Why ninety days, and not six months",
+    excerpt:
+      "A quarter is long enough to build something real and short enough that nobody can hide in it. What we learned trying both.",
+    category: "The method",
+    date: "2026-07-30",
+    readingTime: "5 min read",
+    author: "Knnekt Studios",
+    cover: {
+      src: `${cdn}/185dc8311ae3dd2ab6f7344a60e642a552b94a91-1200x849.webp`,
+      w: 2000,
+      h: 1414,
+      alt: "Three people standing and arranging sticky notes on a whiteboard during a team workshop",
+    },
+    body: [
+      { p: "Ninety days is not a marketing number. It’s the shortest window in which a company can go from a plan to customers using something real, and the longest one in which nobody loses the thread." },
+      { h: "Six months lets everyone hide" },
+      { p: "On a six-month engagement, month two feels early and month five feels late, and the only month anyone remembers is the last one. Scope drifts because there’s room for it to. The founder stops making hard calls because there’s always next month. We’ve run it. It produces better-looking work and worse outcomes." },
+      { h: "Thirty days is a sprint, not a company" },
+      { p: "You can ship something in thirty days. You cannot ship something, put it in front of customers, learn from what they do, and fix it. The learning loop is the product; thirty days buys you exactly one pass through it, which is a coin toss." },
+      { h: "The shape of the ninety" },
+      { list: [
+        "Days 1–10 — ten live classes. We read the real constraints and map all ninety days to one goal, together.",
+        "Days 11–90 — the studio ships across product, growth, AI and legal while the founder makes the calls.",
+        "By day 90 — customers in market, the metrics and the narrative to raise on, and a pitch day to say it out loud.",
+      ] },
+      { h: "The forcing function" },
+      { p: "The thing that makes a quarter work isn’t the length. It’s that the end date is fixed and public — fifteen founders, one pitch day, a room of investors who are already in the calendar. Nobody renegotiates a deadline that other people are flying in for." },
+    ],
+  },
+  {
+    slug: "the-four-vendor-problem",
+    title: "The four-vendor problem",
+    excerpt:
+      "A brand agency, a dev shop, a growth consultant and a lawyer. Each one competent, none of them in the same room. Why that arrangement fails so reliably.",
+    category: "Operating",
+    date: "2026-07-09",
+    readingTime: "6 min read",
+    author: "Knnekt Studios",
+    cover: {
+      src: `${cdn}/26923509ab3eb9c18db9333b483f2198c570ef6a-1200x849.webp`,
+      w: 2000,
+      h: 1414,
+      alt: "Three people collaborating in front of a whiteboard, with one person seated at a table with a laptop",
+    },
+    body: [
+      { p: "The default way to build a startup in India is to hire four specialists who never meet. It’s defensible on paper — each one is good at their thing, each one is replaceable, and you keep control. In practice it puts the hardest job in the company on the least experienced person in it: you." },
+      { h: "The integration tax" },
+      { p: "Nobody quotes you for integration, and integration is most of the work. The brand agency’s positioning doesn’t reach the dev shop, so the product says something different from the website. The growth consultant optimises a funnel built on a promise the product doesn’t keep. The lawyer papers a structure nobody told them was about to change." },
+      { quote: "Four vendors who never meet. One studio, four functions." },
+      { h: "The escalation problem" },
+      { p: "When two vendors disagree, there’s no forum. There’s you, forwarding emails between two people who are each right within their own scope. The decision gets made by whoever is more insistent, or it doesn’t get made at all — which is worse, because the work continues either way." },
+      { h: "What one roof actually changes" },
+      { list: [
+        "One plan, prioritised across all four functions — so growth and product are never solving different quarters.",
+        "One dashboard, so you can see the whole quarter rather than four status calls.",
+        "One price, so nobody’s incentive is to expand their slice.",
+        "One partner in the middle who owns the outcome instead of their scope.",
+      ] },
+      { p: "None of this is magic. It’s just that the coordination work gets done by someone who has done it three hundred times, instead of by a founder doing it for the first time while also running the company." },
+    ],
+  },
+  {
+    slug: "shipping-an-mvp-you-dont-rebuild",
+    title: "Shipping an MVP you don’t rebuild in year two",
+    excerpt:
+      "Most MVPs get thrown away — not because they were built badly, but because they answered the wrong question. The four decisions that decide which kind you get.",
+    category: "Technology",
+    date: "2026-06-18",
+    readingTime: "7 min read",
+    author: "Knnekt Studios",
+    cover: {
+      src: `${cdn}/146fe6a793fd3671a74e623447f36b2cc5abf929-1200x849.webp`,
+      w: 2000,
+      h: 1414,
+      alt: "Person sitting at a workbench with a 3D printer and tools organised on a pegboard wall",
+    },
+    body: [
+      { p: "“Minimum viable” has been read as “cheap and disposable” for so long that founders now budget for the rewrite before they’ve shipped the original. That’s a choice, not a law." },
+      { h: "The rebuild is almost never technical" },
+      { p: "When a product gets rewritten in year two, the reason is rarely the framework. It’s that the data model encoded an assumption about the business that turned out to be wrong — one user per account, one currency, one kind of customer — and every screen inherited it." },
+      { h: "Four decisions that survive" },
+      { list: [
+        "Model the business, not the screens. Get the nouns right — what is an account, an order, a member — and the UI can change a dozen times without a migration.",
+        "Boring infrastructure. Managed database, managed auth, one hosting platform. Novelty in the stack buys nothing and costs you the whole quarter when it breaks.",
+        "Instrument from day one. If you ship without knowing what people do, your first month of customer data is gone and you can’t get it back.",
+        "Put AI where it’s the point, not everywhere. Inside the product when it’s the reason someone switches; behind it when it saves you a hire. Anywhere else it’s a demo.",
+      ] },
+      { h: "What you should throw away" },
+      { p: "Plenty — just not the foundation. The onboarding flow, the pricing page, half the features: all of that should be cheap to replace, and will be replaced. Build those fast and loose on purpose. The distinction that matters isn’t quality, it’s which parts you’ve committed to." },
+      { h: "The test" },
+      { p: "Before we ship anything, we ask one question: if this works, what breaks first? If the answer is “the code,” we didn’t build it properly. If the answer is “we’ll need to hire,” we built the right thing." },
+    ],
+  },
+  {
+    slug: "fundraising-is-a-metrics-problem",
+    title: "Fundraising is a metrics problem before it’s a story problem",
+    excerpt:
+      "Founders rewrite the deck when the numbers are what’s failing. What investors actually check, and the order they check it in.",
+    category: "Funding",
+    date: "2026-05-27",
+    readingTime: "7 min read",
+    author: "Knnekt Studios",
+    cover: {
+      src: `${cdn}/954a137137d858217286a7dd6b315e23ad4121d6-1200x849.webp`,
+      w: 2000,
+      h: 1414,
+      alt: "Two people having a discussion in a meeting room with a laptop and a large screen displaying a diagram",
+    },
+    body: [
+      { p: "After a round of rejections, the instinct is always to rewrite the deck. Sometimes that’s right. Usually the deck was fine and it was carrying numbers that couldn’t hold it up." },
+      { h: "The order of checks" },
+      { p: "A partner meeting runs the same sequence almost every time, and it isn’t the sequence in your deck." },
+      { list: [
+        "Is anyone using this, and did they choose to? Retention before growth, always.",
+        "Where do customers come from, and can you do it again? One repeatable channel beats four experiments.",
+        "What does a customer cost and what are they worth? Approximate is fine. Unknown is not.",
+        "How long does the money last? Runway is the question behind every other question.",
+        "Is the company cleanly owned? Cap table, IP, contracts — the check that quietly kills deals after the handshake.",
+      ] },
+      { h: "The story’s actual job" },
+      { p: "The narrative doesn’t substitute for those answers. It sequences them — it tells the investor which number to look at first and what it implies about the next one. A great story on weak metrics reads as evasion. Honest metrics with no story read as a spreadsheet nobody champions internally." },
+      { h: "Build the data room before you need it" },
+      { p: "The founders who raise quickly are rarely the ones with the best numbers. They’re the ones who could answer every question in the room and produce the document within an hour. Diligence is a speed test, and a slow answer reads as a bad one." },
+      { quote: "The platform was never the question. Knnekt made us answer who it’s really for." },
+      { h: "Ninety days of proof" },
+      { p: "This is most of why the quarter is shaped the way it is. At day 90 you have customers using what we built, the economics that come with them, and a structure that survives a lawyer — and then you pitch it live, to a room that has already been briefed." },
+    ],
+  },
+];
+
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+/** Formatted by hand rather than with `Intl`, so server and client always agree. */
+export function formatPostDate(iso: string) {
+  const [y, m, d] = iso.split("-").map(Number);
+  return `${d} ${MONTHS[m - 1]} ${y}`;
+}
+
+export const getPost = (slug: string) => insights.find((p) => p.slug === slug);
