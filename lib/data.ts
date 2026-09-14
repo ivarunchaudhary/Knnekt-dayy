@@ -343,18 +343,6 @@ export const scoreVimeo = "1184110361";
 export const scoreVimeoAspect = 1280 / 536;
 export const founderPortrait = `${cdn}/b6c4df15de20e1699da43919380d4d3516666aca-400x400.webp`;
 
-/** Everything the 90 days gives you — included, no line items to chase. */
-export const culture = [
-  { title: "The full studio team", text: "Growth, technology, AI and legal as one prioritised plan — one partner in the middle, not five vendors to manage.", width: "lg:w-[31.5vw]", sizes: "31.5vw", alt: "Several people working at computers in a bright, modern office space", src: `${cdn}/485eab86632782a606942f1209ba6c34d2668eda-1200x1601.webp`, w: 2000, h: 2668 },
-  { title: "Three months at WeWork", text: "Build beside the cohort from a real studio, not alone at home. Included for the whole quarter.", width: "lg:w-[25vw]", sizes: "25vw", alt: "Two people in a gym setting, one preparing to lift a barbell while the other observes", src: `${cdn}/f431370f13af511e64fc9b36094824ba966cd6d3-1200x1601.webp`, w: 2000, h: 2668 },
-  { title: "Weekly masterclasses", text: "A working operator, live, every week — funding, growth, legal and tech from people who do it for a living.", width: "lg:w-[31.5vw]", sizes: "31.5vw", alt: "Person preparing food at a kitchen counter with pastries and bottles, next to a large plant", src: `${cdn}/a7836cfbeb7410fcc0226cd2f630461ff0199920-1200x1601.webp`, w: 2000, h: 2668 },
-  { title: "Website & MVP", text: "A real product with AI inside — built properly, shipped inside the quarter, yours to keep and grow.", width: "lg:w-[25vw]", sizes: "25vw", alt: "Person seated at a workbench, reaching for tools on a pegboard wall with a 3D printer nearby", src: `${cdn}/4ba968d2595fbd0923b413c381b2d5b7577d3215-1200x1599.webp`, w: 2000, h: 2664 },
-  { title: "A cohort of fifteen", text: "Fifteen founders per quarter, building and learning in parallel — the people who understand the week you’re having.", width: "lg:w-[33.5vw]", sizes: "33.5vw", alt: "Person working with a vise and hand tools at a wooden workbench in a workshop", src: `${cdn}/2e36adf958deec74eccfb3384d2da6277f206d96-1200x1601.webp`, w: 2000, h: 2668 },
-  { title: "One live dashboard", text: "Every function, one plan, one place — you always know exactly where the 90 days stand.", width: "lg:w-[30vw]", sizes: "30vw", alt: "Person with green hair working at a desk with an Apple computer and laptop in a sunlit office", src: `${cdn}/131a923cb1ee419e62639e344a4d1a0ce6913048-1200x1601.webp`, w: 2000, h: 2668 },
-  { title: "Weekly 1:1s", text: "One honest conversation a week about the decisions only you can make. We build with you, not for you.", width: "lg:w-[35vw]", sizes: "35vw", alt: "Person sitting on a white metal chair outdoors, working on a laptop surrounded by greenery", src: `${cdn}/273b9c06149127d309bae39b8cb47ff3d371be0c-1200x1601.webp`, w: 2000, h: 2668 },
-  { title: "Pitch day", text: "The cohort’s demo day — you present 90 days of proof to a room of investors and operators, then take the conversations that follow.", width: "lg:w-[27.5vw]", sizes: "27.5vw", alt: "Group of people attending a presentation in a room with a presenter using a laptop", src: `${cdn}/681ad599c470d0e5757e221d3c6a359b73d52269-1200x1601.webp`, w: 2000, h: 2668 },
-];
-
 /* ------------------------------------------------------------------------- *
  * Faculty — who actually takes the classes                                   *
  * ------------------------------------------------------------------------- */
