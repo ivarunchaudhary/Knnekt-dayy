@@ -37,7 +37,7 @@ export default function HeroBackground() {
     <div className="after:animate-grain after:bg-grain absolute inset-0 overflow-hidden bg-gray-200 after:absolute after:top-0 after:left-0 after:size-[140%] after:opacity-[0.04]">
       <div className="motion-safe:animate-hero-drift relative size-full">
         <Image
-          src="/images/hero--hands.webp"
+          src="/images/knnekthero.png"
           alt=""
           fill
           priority

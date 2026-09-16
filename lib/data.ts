@@ -617,7 +617,7 @@ export const paymentSteps: PaymentStep[] = [
 /** What the fee covers, as `[the thing, what it means]`. */
 export const feeIncludes: [string, string][] = [
   ["Ten live planning classes", "your 90-day roadmap, built with you in days 1–10"],
-  ["Website and MVP development", "real product, with AI inside it"],
+  ["Website and product development", "real product, with AI inside it"],
   ["Growth and marketing", "positioning through to demand"],
   ["Legal and compliance", "from incorporation to data room, whatever the build needs"],
   ["The full studio team", "plus vetted partners on call"],
@@ -640,7 +640,7 @@ export const pricing = {
 /** Clarity both ways: what the fee buys, and what deliberately stays on your card. */
 export const ledgerIn: string[] = [
   "Website development",
-  "MVP development",
+  "Product development",
   "Marketing strategy",
   "Legal & compliance",
   "The full studio team",

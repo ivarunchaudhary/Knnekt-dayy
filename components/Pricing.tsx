@@ -105,7 +105,7 @@ export default function Pricing() {
                 <li key={thing} className="flex gap-3">
                   {check}
                   <span className="text-white/60">
-                    <span className="font-medium text-white">{thing}</span> — {note}
+                    <span className="font-medium text-white">{thing}</span>, {note}
                   </span>
                 </li>
               ))}
