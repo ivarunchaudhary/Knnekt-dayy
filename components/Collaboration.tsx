@@ -33,7 +33,7 @@ export default function Collaboration() {
             <SwiperSlide key={p.a} className="w-[23.25rem] max-w-[23.25rem] xl:w-auto xl:max-w-none">
               <button
                 type="button"
-                className="group flex aspect-[1/1.23] w-full cursor-[inherit] flex-col overflow-hidden rounded-lg border border-black/5 bg-gray-100 text-left outline-offset-2 outline-black transition-all duration-300 hover:rounded-2xl"
+                className="group flex aspect-[1/1.23] w-full cursor-[inherit] flex-col overflow-hidden rounded-lg border border-dark/5 bg-gray-100 text-left outline-offset-2 outline-dark transition-all duration-300 hover:rounded-2xl"
               >
                 <span className="block w-full overflow-hidden">
                   <Parallax
