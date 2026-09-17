@@ -61,7 +61,7 @@ export default function Nav() {
         <ul className="flex w-max select-none">
           {items.map((item) => {
             const on = active === item.href;
-            const className = `before:bg-dark flex items-center gap-1 rounded-full px-2 py-3 outline-black transition-colors before:size-2.5 before:rounded-full before:transition before:duration-200 ${spring} hover:text-dark focus-visible:text-dark ${
+            const className = `before:bg-dark flex items-center gap-1 rounded-full px-2 py-3 outline-dark transition-colors before:size-2.5 before:rounded-full before:transition before:duration-200 ${spring} hover:text-dark focus-visible:text-dark ${
               on
                 ? "text-dark before:opacity-100 motion-safe:before:translate-y-0"
                 : "text-dark-subtle before:opacity-0 motion-safe:before:translate-y-2"
