@@ -52,11 +52,11 @@ export default function Pricing() {
               ))}
             </ul>
 
-            <ul className="mt-10 grid border-t border-black/10 sm:grid-cols-2">
+            <ul className="mt-10 grid border-t border-dark/10 sm:grid-cols-2">
               {pricingFacts.map(([title, body], i) => (
                 <li
                   key={title}
-                  className={`border-b border-black/10 py-6 ${i % 2 === 0 ? "sm:border-r sm:pr-7" : "sm:pl-7"}`}
+                  className={`border-b border-dark/10 py-6 ${i % 2 === 0 ? "sm:border-r sm:pr-7" : "sm:pl-7"}`}
                 >
                   <p className="font-medium">{title}</p>
                   <p className="text-dark-subtle mt-1.5 max-w-[34ch] text-xs leading-tight">{body}</p>
@@ -72,7 +72,7 @@ export default function Pricing() {
                 {paymentSteps.map((step, i) => (
                   <li
                     key={step.title}
-                    className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-4 gap-y-2 border-b border-black/10 py-6 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:gap-x-5"
+                    className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-4 gap-y-2 border-b border-dark/10 py-6 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:gap-x-5"
                   >
                     <span className="mono-text border-dark mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full border font-mono tabular-nums">
                       {i + 1}
@@ -138,21 +138,21 @@ export default function Pricing() {
               <p className="text-dark-subtle mt-2 text-xs leading-tight">Everything the roadmap needs to hit the goal.</p>
               <ul className="mt-6 sm:columns-2 sm:gap-x-7">
                 {ledgerIn.map((item) => (
-                  <li key={item} className="flex gap-2.5 border-t border-black/10 py-3 text-sm leading-tight break-inside-avoid">
+                  <li key={item} className="flex gap-2.5 border-t border-dark/10 py-3 text-sm leading-tight break-inside-avoid">
                     <span aria-hidden="true" className="bg-dark mt-[0.4rem] size-1.5 shrink-0 rounded-full" />
                     {item}
                   </li>
                 ))}
               </ul>
             </section>
-            <section className="rounded-xl border border-black/10 bg-gray-200 p-6 md:p-10">
+            <section className="rounded-xl border border-dark/10 bg-gray-200 p-6 md:p-10">
               <h4 className="flex flex-wrap items-baseline gap-3 text-xl font-medium lg:text-2xl">
                 Not included <span className="mono-text text-dark-very-subtle font-mono">your call</span>
               </h4>
               <p className="text-dark-subtle mt-2 text-xs leading-tight">Kept out—so you stay in control.</p>
               <ul className="mt-6">
                 {ledgerOut.map(([item, why]) => (
-                  <li key={item} className="border-t border-black/10 py-3 text-sm leading-tight">
+                  <li key={item} className="border-t border-dark/10 py-3 text-sm leading-tight">
                     <span className="flex gap-2.5">
                       <span aria-hidden="true" className="text-dark-very-subtle mt-px shrink-0 font-mono text-xs">
                         ✕
