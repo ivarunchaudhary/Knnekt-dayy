@@ -30,7 +30,7 @@ const CELL = "1em";
  * translated to bring the current day into view. Scrolling the page spins it, in either
  * direction, with no wrap to fake — which is the whole conceit of the section made
  * literal. Everything else in the readout is hairline and mono; the only solid mass is
- * the status slug, so the last phase card stays the one black thing on the page.
+ * the status slug, so the last phase card stays the one dark thing on the page.
  */
 export default function Journey() {
   const rail = useRef<HTMLDivElement>(null);
@@ -158,7 +158,7 @@ export default function Journey() {
 
         <div className="mt-10 grid grid-cols-[6rem_1fr] gap-x-2.5 md:grid-cols-[11rem_1fr] md:gap-x-4 lg:mt-16 lg:grid-cols-[12rem_1fr] lg:gap-x-6">
           <div ref={rail} className="relative">
-            <span ref={line} className="absolute left-1/2 w-px -translate-x-1/2 rounded bg-black/10" />
+            <span ref={line} className="absolute left-1/2 w-px -translate-x-1/2 rounded bg-dark/10" />
             <span ref={fill} className="bg-dark absolute left-1/2 w-px -translate-x-1/2 rounded transition-[height] duration-100 ease-linear" />
             {/* Decade marks: the rail as a ruler, so the travel is measured and not just long. */}
             {decades.map((d, i) => (
@@ -172,7 +172,7 @@ export default function Journey() {
                   Math.abs(day - d) < reach ? "opacity-0" : "opacity-100"
                 }`}
               >
-                <span className={`ease-in-out-quart block h-px w-2.5 transition-colors duration-500 md:w-3 ${day >= d ? "bg-dark" : "bg-black/15"}`} />
+                <span className={`ease-in-out-quart block h-px w-2.5 transition-colors duration-500 md:w-3 ${day >= d ? "bg-dark" : "bg-dark/15"}`} />
                 <span
                   className={`mono-text ease-in-out-quart absolute top-1/2 left-5 hidden -translate-y-1/2 tabular-nums transition-colors duration-500 md:block ${
                     day >= d ? "text-dark-subtle" : "text-dark-very-subtle"
@@ -216,7 +216,7 @@ export default function Journey() {
                     return (
                       <li key={name} className={`mono-text ease-in-out-quart flex items-center gap-2 transition-colors duration-500 ${on ? "text-dark" : "text-dark-very-subtle"}`}>
                         {/* The dot is always an empty ring; it fills the moment the pillar comes online. */}
-                        <span className={`ease-in-out-quart relative size-2.5 shrink-0 rounded-full border transition-colors duration-500 ${on ? "border-dark" : "border-black/15"}`}>
+                        <span className={`ease-in-out-quart relative size-2.5 shrink-0 rounded-full border transition-colors duration-500 ${on ? "border-dark" : "border-dark/15"}`}>
                           <span
                             className={`bg-dark absolute inset-0 rounded-full transition-transform duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${on ? "scale-100" : "scale-0"}`}
                           />
@@ -252,7 +252,7 @@ export default function Journey() {
                     cards.current[i] = el;
                   }}
                   className={`ease-in-out-quart border p-6 transition-all duration-500 md:p-10 ${on ? "rounded-2xl" : "rounded-lg"} ${
-                    dark ? "bg-darker border-transparent text-white" : on ? "border-black/15 bg-white" : "border-black/5 bg-gray-100"
+                    dark ? "bg-darker border-transparent text-white" : on ? "border-dark/15 bg-white" : "border-dark/5 bg-gray-100"
                   }`}
                 >
                   <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-3">
@@ -261,7 +261,7 @@ export default function Journey() {
                     </h3>
                     <span
                       className={`mono-text rounded-full border px-3 py-1.5 transition-colors duration-500 ${
-                        dark ? "border-white/25 text-white/70" : on ? "text-dark border-black/20" : "text-dark-very-subtle border-black/10"
+                        dark ? "border-white/25 text-white/70" : on ? "text-dark border-dark/20" : "text-dark-very-subtle border-dark/10"
                       }`}
                     >
                       {phase.tag}
