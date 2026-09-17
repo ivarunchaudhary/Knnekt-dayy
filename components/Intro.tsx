@@ -6,7 +6,7 @@ function FactRow({ hidden }: { hidden?: boolean }) {
   return (
     <ul className="flex shrink-0" aria-hidden={hidden}>
       {proofPoints.map(([figure, label]) => (
-        <li key={label} className="shrink-0 border-l border-black/10 pr-14 pl-5 md:pr-24 md:pl-8">
+        <li key={label} className="shrink-0 border-l border-dark/10 pr-14 pl-5 md:pr-24 md:pl-8">
           <p className="text-3xl leading-none font-medium md:text-4xl">{figure}</p>
           <p className="text-dark-subtle mt-3 max-w-48 text-sm leading-tight text-balance">{label}</p>
         </li>
@@ -28,7 +28,7 @@ export default function Intro() {
           <span className="text-dark transition-colors duration-500">Your first 100 customers. Fund-ready in 90 days.</span> It starts with your Startup Operating Score. Then fifteen founders per cohort go all-in for one 90-day build—and come out with real customers and a company ready to raise.
         </h1>
       </div>
-      <div className="relative isolate mt-12 border-y border-black/10 py-8 md:mt-20 md:py-11">
+      <div className="relative isolate mt-12 border-y border-dark/10 py-8 md:mt-20 md:py-11">
         <div className="marquee flex">
           <FactRow />
           <FactRow hidden />
