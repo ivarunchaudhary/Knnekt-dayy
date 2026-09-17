@@ -29,8 +29,8 @@ const [semibold, regular, hero] = await Promise.all([
   asset("og-hero.jpg"),
 ]);
 
-const dark = "#141a22";
-const subtle = "#141a2280";
+const dark = "#102232";
+const subtle = "#10223280";
 
 export default function OpengraphImage() {
   return new ImageResponse(
