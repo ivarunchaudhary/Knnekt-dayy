@@ -83,7 +83,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
             <span>{post.readingTime}</span>
           </p>
           <h1 className="mt-5 max-w-[22ch] text-3xl font-medium md:text-4xl">{post.title}</h1>
-          <div className="mt-10 grid gap-x-1.5 gap-y-7 border-t border-black/10 pt-8 lg:grid-cols-[minmax(0,36rem)_auto]">
+          <div className="mt-10 grid gap-x-1.5 gap-y-7 border-t border-dark/10 pt-8 lg:grid-cols-[minmax(0,36rem)_auto]">
             <p className="text-lg leading-tight">{post.excerpt}</p>
             <div className="lg:justify-self-end lg:text-right">
               <p className="mono-text text-dark-very-subtle font-mono">Written by</p>
@@ -118,7 +118,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
         {/* Never a dead end: hand the reader the next piece. */}
         <Link
           href={`/en/insights/${next.slug}`}
-          className="group mt-16 flex items-center gap-5 rounded-b-xl border-t border-black/10 pt-8 outline-offset-4 outline-black md:mt-24 md:gap-8 md:pt-10"
+          className="group mt-16 flex items-center gap-5 rounded-b-xl border-t border-dark/10 pt-8 outline-offset-4 outline-dark md:mt-24 md:gap-8 md:pt-10"
         >
           <span className="block size-24 shrink-0 overflow-hidden rounded-lg bg-gray-200 transition-all duration-300 group-hover:rounded-2xl md:size-32">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -152,7 +152,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
         <p className="mt-16 md:mt-24">
           <Link
             href="/en#contact"
-            className="mono-text group inline-flex items-center gap-2.5 font-mono outline-offset-2 outline-black"
+            className="mono-text group inline-flex items-center gap-2.5 font-mono outline-offset-2 outline-dark"
           >
             <span className="bg-dark group-hover:bg-dark/80 rounded-full px-7 py-3 text-white transition-colors">Take the score</span>
             <span className="text-dark/50 group-hover:text-dark transition-colors">Free, five minutes, no card</span>
