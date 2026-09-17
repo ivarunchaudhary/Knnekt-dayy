@@ -74,7 +74,7 @@ export default function CaseDialog({ item, onClose }: { item: WorkItem; onClose:
       onClick={(e) => {
         if (e.target === ref.current) dismiss();
       }}
-      className={`ease-in-out-quart m-auto w-[min(64rem,calc(100vw-1.5rem))] max-w-none rounded-xl bg-white p-0 text-inherit backdrop:bg-black/60 backdrop:backdrop-blur-[2px] motion-safe:transition motion-safe:duration-200 ${
+      className={`ease-in-out-quart m-auto w-[min(64rem,calc(100vw-1.5rem))] max-w-none rounded-xl bg-white p-0 text-inherit backdrop:bg-darker/60 backdrop:backdrop-blur-[2px] motion-safe:transition motion-safe:duration-200 ${
         shown ? "opacity-100" : "scale-[0.98] opacity-0"
       }`}
     >
@@ -97,7 +97,7 @@ export default function CaseDialog({ item, onClose }: { item: WorkItem; onClose:
           {item.title}
         </h2>
 
-        <div className="mt-8 grid gap-x-1.5 gap-y-6 border-t border-black/10 pt-7 lg:grid-cols-[minmax(0,36rem)_auto]">
+        <div className="mt-8 grid gap-x-1.5 gap-y-6 border-t border-dark/10 pt-7 lg:grid-cols-[minmax(0,36rem)_auto]">
           <p className="text-lg leading-tight">{item.blurb}</p>
           <div className="lg:justify-self-end lg:text-right">
             <p className="mono-text text-dark-very-subtle font-mono">Engagement</p>
@@ -107,7 +107,7 @@ export default function CaseDialog({ item, onClose }: { item: WorkItem; onClose:
 
         <Asset item={item} />
 
-        <ul className="mt-10 grid divide-y divide-black/10 border-y border-black/10 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+        <ul className="mt-10 grid divide-y divide-dark/10 border-y border-dark/10 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
           {item.results.map(([value, label]) => (
             <li key={label} className="py-6 sm:px-7 sm:first:pl-0 sm:last:pr-0">
               <p className="text-3xl leading-none font-medium">{value}</p>
@@ -119,7 +119,7 @@ export default function CaseDialog({ item, onClose }: { item: WorkItem; onClose:
         <div className="mt-10 grid gap-x-1.5 gap-y-10 lg:grid-cols-2">
           <section>
             <h3 className="mono-text text-dark/80 font-mono">How it ran</h3>
-            <ol className="mt-6 border-l border-black/10 pl-7">
+            <ol className="mt-6 border-l border-dark/10 pl-7">
               {item.timeline.map(([when, what]) => (
                 <li key={when} className="relative pb-7 last:pb-0">
                   <span aria-hidden="true" className="bg-dark absolute top-[0.3rem] -left-8 size-2 rounded-full" />
@@ -154,7 +154,7 @@ export default function CaseDialog({ item, onClose }: { item: WorkItem; onClose:
           </div>
         </section>
 
-        <figure className="mt-10 border-t border-black/10 pt-8">
+        <figure className="mt-10 border-t border-dark/10 pt-8">
           <blockquote className="text-2xl leading-tight font-medium">
             <span className="text-dark-very-subtle">“</span>
             {item.quote}
