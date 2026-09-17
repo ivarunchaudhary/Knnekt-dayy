@@ -54,11 +54,11 @@ export default function Faculty() {
             return (
               <div
                 key={group.id}
-                className={`rounded-xl border p-6 md:p-10 lg:p-14 ${dark ? "bg-darker border-transparent text-white" : "border-black/10 bg-gray-100"}`}
+                className={`rounded-xl border p-6 md:p-10 lg:p-14 ${dark ? "bg-darker border-transparent text-white" : "border-dark/10 bg-gray-100"}`}
               >
                 <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-3">
                   <h3 className="max-w-[20ch] text-3xl font-medium md:text-4xl">{group.title}</h3>
-                  <span className={`mono-text rounded-full border px-3 py-1.5 ${dark ? "border-white/25 text-white/70" : "text-dark border-black/20"}`}>
+                  <span className={`mono-text rounded-full border px-3 py-1.5 ${dark ? "border-white/25 text-white/70" : "text-dark border-dark/20"}`}>
                     {group.kicker}
                   </span>
                 </div>
