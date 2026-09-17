@@ -31,7 +31,7 @@ function validate(f: Fields): Errors {
 }
 
 const fieldClass =
-  "mt-2 w-full rounded-lg border border-black/10 bg-gray-100 px-4 py-3 text-sm outline-none transition-colors placeholder:text-dark-very-subtle focus:border-dark/40 focus:bg-white";
+  "mt-2 w-full rounded-lg border border-dark/10 bg-gray-100 px-4 py-3 text-sm outline-none transition-colors placeholder:text-dark-very-subtle focus:border-dark/40 focus:bg-white";
 const labelClass = "mono-text text-dark/80 block font-mono";
 const errorClass = "mono-text mt-2 block font-mono text-[#b3261e]";
 
@@ -103,7 +103,7 @@ export default function ContactForm() {
               setFields(empty);
               setSent(false);
             }}
-            className="mono-text bg-dark hover:bg-dark/80 rounded-full px-7 py-3 font-mono text-white outline-offset-2 outline-black transition-colors"
+            className="mono-text bg-dark hover:bg-dark/80 rounded-full px-7 py-3 font-mono text-white outline-offset-2 outline-dark transition-colors"
           >
             Send another
           </button>
@@ -224,7 +224,7 @@ export default function ContactForm() {
       <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3">
         <button
           type="submit"
-          className="mono-text bg-dark hover:bg-dark/80 rounded-full px-7 py-3 font-mono text-white outline-offset-2 outline-black transition-colors"
+          className="mono-text bg-dark hover:bg-dark/80 rounded-full px-7 py-3 font-mono text-white outline-offset-2 outline-dark transition-colors"
         >
           Send it
         </button>
