@@ -20,7 +20,7 @@ export default function AppleIcon() {
           width: "100%",
           height: "100%",
           background: "#fff",
-          color: "#141a22",
+          color: "#102232",
           fontFamily: "FT System Blank",
           fontSize: 116,
           fontWeight: 600,
