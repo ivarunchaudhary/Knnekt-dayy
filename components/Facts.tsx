@@ -64,7 +64,7 @@ function JourneyBox() {
   );
 }
 
-const rowClass = "grid gap-x-1.5 gap-y-4 border-black/10 py-7 lg:grid-cols-2";
+const rowClass = "grid gap-x-1.5 gap-y-4 border-dark/10 py-7 lg:grid-cols-2";
 
 export default function Facts() {
   return (
