@@ -12,7 +12,7 @@ export default function PostCard({ post, eager = false, level = 3 }: { post: Pos
   const Heading = level === 2 ? "h2" : "h3";
   return (
     <article>
-      <Link href={`/en/insights/${post.slug}`} className="group block rounded-t-xl text-left outline-offset-2 outline-black">
+      <Link href={`/en/insights/${post.slug}`} className="group block rounded-t-xl text-left outline-offset-2 outline-dark">
         <span className="pointer-events-none block aspect-[16/10] overflow-hidden rounded-xl bg-gray-200 transition-all duration-300 group-hover:rounded-2xl">
           <Parallax className="ease-in-out-quart size-full transition-transform duration-300 motion-safe:group-hover:scale-102 motion-safe:group-focus-visible:scale-102">
             {/* eslint-disable-next-line @next/next/no-img-element */}
