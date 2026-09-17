@@ -52,7 +52,7 @@ function Card({ item, eager, onOpen }: { item: WorkItem; eager: boolean; onOpen:
         e.preventDefault();
         onOpen(item);
       }}
-      className={`group block rounded-t-xl text-left outline-offset-2 outline-black ${item.wide ? "lg:col-span-2" : ""}`}
+      className={`group block rounded-t-xl text-left outline-offset-2 outline-dark ${item.wide ? "lg:col-span-2" : ""}`}
     >
       <span
         className={`pointer-events-none block aspect-[1/1.04] overflow-hidden rounded-xl transition-all duration-300 group-hover:rounded-2xl md:aspect-[1/1.3] ${
