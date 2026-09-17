@@ -3,13 +3,13 @@ import { containerClass, SectionHeading } from "./Container";
 
 function Card({ t }: { t: Testimonial }) {
   return (
-    <figure className="flex h-full w-[19rem] shrink-0 flex-col justify-between rounded-xl border border-black/10 bg-gray-100 p-6 md:w-[25rem] md:p-8">
+    <figure className="flex h-full w-[19rem] shrink-0 flex-col justify-between rounded-xl border border-dark/10 bg-gray-100 p-6 md:w-[25rem] md:p-8">
       <blockquote className="text-md leading-tight text-balance">
         <span className="text-dark-very-subtle">“</span>
         {t.quote}
         <span className="text-dark-very-subtle">”</span>
       </blockquote>
-      <figcaption className="mt-8 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-black/10 pt-5">
+      <figcaption className="mt-8 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-dark/10 pt-5">
         <span className="mono-text text-dark-very-subtle font-mono">{t.attribution}</span>
         <span className="mono-text text-dark rounded-full bg-gray-200 px-2.5 py-1.5 font-mono whitespace-nowrap">{t.result}</span>
       </figcaption>
