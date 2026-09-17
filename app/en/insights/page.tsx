@@ -33,7 +33,7 @@ export default function InsightsIndex() {
         <header className="mt-14 md:mt-20">
           <p className="mono-text text-dark-very-subtle font-mono">Insights · {insights.length} pieces</p>
           <h1 className="mt-5 max-w-[20ch] text-3xl font-medium md:text-4xl">What we’ve learned, written down.</h1>
-          <p className="text-dark-subtle mt-10 max-w-[36rem] border-t border-black/10 pt-8 text-lg leading-tight">
+          <p className="text-dark-subtle mt-10 max-w-[36rem] border-t border-dark/10 pt-8 text-lg leading-tight">
             The refusals, the scores, the raises that went sideways. Everything here comes out of engagements we actually
             ran—no gated PDFs, no newsletter wall.
           </p>
