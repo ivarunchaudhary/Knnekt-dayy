@@ -1,4 +1,6 @@
 const cdn = "/sanity";
+/** The clients' own assets — a mark, a frame from their shoot — rather than something bought in. */
+const own = "/cases";
 
 /**
  * The ticker band under the intro headline: the studio in eight figures.
@@ -41,8 +43,9 @@ export type WorkItem = {
 };
 
 /**
- * Representative engagements. Real founder photos, quotes and scorecards go live
- * as founders consent — the imagery here stands in until they do.
+ * Representative engagements. Where the client has given us their own mark or
+ * photography, the card carries it; the rest stand in until those founders
+ * consent to their own photos, quotes and scorecards.
  */
 export const work: WorkItem[] = [
   {
@@ -130,9 +133,9 @@ export const work: WorkItem[] = [
       ["52 → 79", "Startup Operating Score"],
       ["+27", "operating points"],
     ],
-    alt: "A tablet displaying a storefront with colourful products, placed on a textured surface",
-    mobile: { src: `${cdn}/bbff6ed0309689de764e93892703550fadad9282-1200x1249.webp`, w: 2500, h: 2600 },
-    desktop: { src: `${cdn}/b8eceb16e50d10afb9000094a5bb048d19b394de-1200x1560.webp`, w: 2500, h: 3250 },
+    alt: "The Qolorr wordmark, white on black",
+    mobile: { src: `${own}/qolorr-mobile.webp`, w: 2500, h: 2600 },
+    desktop: { src: `${own}/qolorr-desktop.webp`, w: 2500, h: 3250 },
   },
   {
     slug: "khoj",
@@ -158,9 +161,9 @@ export const work: WorkItem[] = [
       ["+17", "operating points"],
     ],
     wide: true,
-    alt: "Close-up of a hand holding a smartphone displaying a drinks ordering app",
-    mobile: { src: `${cdn}/61bf8880b19c1615bd75b1d3c26e955fbf61d6d0-1200x1249.webp`, w: 2500, h: 2600 },
-    desktop: { src: `${cdn}/83c6a0d8ba17e548268a785223b31db9a5fa87a3-1200x780.webp`, w: 2500, h: 1625 },
+    alt: "A woman in Punjabi jewellery drinking from a brass glass, in front of a shelf of spice jars",
+    mobile: { src: `${own}/khoj-mobile.webp`, w: 2500, h: 2600 },
+    desktop: { src: `${own}/khoj-desktop.webp`, w: 2500, h: 1625 },
   },
 ];
 
