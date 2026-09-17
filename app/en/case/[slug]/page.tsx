@@ -14,7 +14,7 @@ export function generateStaticParams() {
 const chipClass =
   "before:bg-dark relative items-baseline gap-2 rounded-lg bg-gray-200 px-2.5 pt-1.5 pb-2 lg:flex lg:pt-2.5 lg:pb-3 lg:before:size-2 lg:before:shrink-0 lg:before:-translate-y-[20%] lg:before:rounded-full";
 
-const ruleClass = "mt-16 border-t border-black/10 pt-8 md:mt-24 md:pt-10";
+const ruleClass = "mt-16 border-t border-dark/10 pt-8 md:mt-24 md:pt-10";
 
 /** The case's own asset: a Vimeo loop where there is one, otherwise the widest still we hold. */
 function Hero({ item }: { item: WorkItem }) {
@@ -72,7 +72,7 @@ export default async function CasePage({ params }: { params: Promise<{ slug: str
             {item.client} · {item.sector}
           </p>
           <h1 className="mt-5 max-w-[20ch] text-3xl font-medium md:text-4xl">{item.title}</h1>
-          <div className="mt-10 grid gap-x-1.5 gap-y-7 border-t border-black/10 pt-8 lg:grid-cols-[minmax(0,36rem)_auto]">
+          <div className="mt-10 grid gap-x-1.5 gap-y-7 border-t border-dark/10 pt-8 lg:grid-cols-[minmax(0,36rem)_auto]">
             <p className="text-lg leading-tight">{item.blurb}</p>
             <div className="lg:justify-self-end lg:text-right">
               <p className="mono-text text-dark-very-subtle font-mono">Engagement</p>
@@ -84,7 +84,7 @@ export default async function CasePage({ params }: { params: Promise<{ slug: str
         <Hero item={item} />
 
         {/* What came out of it. */}
-        <ul className="mt-16 grid divide-y divide-black/10 border-y border-black/10 sm:grid-cols-3 sm:divide-x sm:divide-y-0 md:mt-24">
+        <ul className="mt-16 grid divide-y divide-dark/10 border-y border-dark/10 sm:grid-cols-3 sm:divide-x sm:divide-y-0 md:mt-24">
           {item.results.map(([value, label]) => (
             <li key={label} className="py-8 sm:px-9 sm:first:pl-0 sm:last:pr-0 md:py-10">
               <p className="text-3xl leading-none font-medium md:text-4xl">{value}</p>
@@ -97,7 +97,7 @@ export default async function CasePage({ params }: { params: Promise<{ slug: str
         <div className="mt-16 grid gap-x-1.5 gap-y-14 md:mt-24 lg:grid-cols-2">
           <section>
             <h2 className="mono-text text-dark/80 font-mono">How it ran</h2>
-            <ol className="mt-7 border-l border-black/10 pl-7">
+            <ol className="mt-7 border-l border-dark/10 pl-7">
               {item.timeline.map(([when, what]) => (
                 <li key={when} className="relative pb-8 last:pb-0">
                   <span aria-hidden="true" className="bg-dark absolute top-[0.3rem] -left-8 size-2 rounded-full" />
@@ -145,7 +145,7 @@ export default async function CasePage({ params }: { params: Promise<{ slug: str
         {/* Never a dead end: hand the reader the next build. */}
         <Link
           href={`/en/case/${next.slug}`}
-          className={`${ruleClass} group flex items-center gap-5 rounded-b-xl outline-offset-4 outline-black md:gap-8`}
+          className={`${ruleClass} group flex items-center gap-5 rounded-b-xl outline-offset-4 outline-dark md:gap-8`}
         >
           {nextStill && (
             <span className="block size-24 shrink-0 overflow-hidden rounded-lg bg-gray-200 transition-all duration-300 group-hover:rounded-2xl md:size-32">
