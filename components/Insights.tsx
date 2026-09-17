@@ -18,10 +18,10 @@ export default function Insights() {
           ))}
         </div>
 
-        <p className="mt-14 border-t border-black/10 pt-10">
+        <p className="mt-14 border-t border-dark/10 pt-10">
           <Link
             href="/en/insights"
-            className="mono-text group inline-flex items-center gap-2.5 font-mono outline-offset-2 outline-black"
+            className="mono-text group inline-flex items-center gap-2.5 font-mono outline-offset-2 outline-dark"
           >
             <span className="bg-dark hover:bg-dark/80 group-hover:bg-dark/80 rounded-full px-7 py-3 text-white transition-colors">
               All insights
