@@ -9,6 +9,7 @@ import Intro from "@/components/Intro";
 import Journey from "@/components/Journey";
 import Nav from "@/components/Nav";
 import Pricing from "@/components/Pricing";
+import Score from "@/components/Score";
 import Services from "@/components/Services";
 import Testimonials from "@/components/Testimonials";
 
@@ -27,6 +28,7 @@ export default function HomePage() {
           <main>
             <Hero />
             <Intro />
+            <Score />
             <Services />
             <Collaboration />
             <Facts />

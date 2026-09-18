@@ -36,23 +36,27 @@
   --color-dark: #16253f;
   --color-dark-subtle: #16253f80;
   --color-dark-very-subtle: #16253f59;
-  --color-gray-100: #f3f8fd;
-  --color-gray-200: #e2edf8;
+  --color-gray-100: #e9f1fb;
+  --color-gray-200: #d3e3f6;
 
-  /* The feature panel: the sky at roughly 45% down the photograph, and the
-     deepest fill on the page. It is one clear step below `gray-200` in
+  /* The feature panel: the sky at roughly 40% down the photograph (the top of
+     the services card's own gradient), and the deepest fill on the page. It is one clear step below `gray-200` in
      lightness, which is what lets a chip sit on a panel and still be seen, and
      it holds the ink at 10.4:1 — so the panels carry body copy, and their
      secondary labels sit at `text-dark/70` (4.7:1) rather than at the 50% that
      white-on-navy could afford. Anything paler than this stops reading as a
      panel at all and the card dissolves into the page.
 
-     It is the same value as `sky-soft` and spelt out rather than pointed at it,
-     for the reason the sky block gives: Tailwind prunes unused theme variables,
-     and a `var()` reference between two of them can be dropped on one side. The
-     two are free to drift apart anyway — one is a component fill, the other is
-     the hero's shell. */
-  --color-panel: #b9d8f9;
+     It sits one step under `sky-soft` on the same ramp; the two are free to
+     drift apart — one is a component fill, the other is the hero's shell.
+
+     The whole light set was taken one step deeper in Sept 2026: at the old
+     values (#F3F8FD / #E2EDF8 / #B9D8F9) everything under the hero read as a
+     white page with faint chips, and the site split into a blue top and a
+     grey-white body. These carry enough of the sky that the sections stay in
+     the same picture as the hero. `dark` still holds 13:1 on `gray-100` and
+     9:1 on `panel`. */
+  --color-panel: #a8cef4;
 
   /* The sky at full strength, for the few places that have to read as blue
      rather than as ink: the hero's haze, the ground behind the contact card,
@@ -67,7 +71,7 @@
   --color-sky-deep: #2d6fae;
   --color-sky: #3b81e3;
   --color-sky-soft: #b9d8f9;
-  --color-horizon: #eef4fc;
+  --color-horizon: #e9f1fb;
 
   --ease-in-out-quart: cubic-bezier(0.455, 0.03, 0.515, 0.955);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -154,6 +158,22 @@
   @keyframes fog-c {
     from { transform: translate3d(-1%, 2.5%, 0) scale(1.1); }
     to { transform: translate3d(2%, -3.5%, 0) scale(1.16); }
+  }
+
+  /* Score card: each page of the sample report rises in; the CTA breathes once the
+     visitor has answered the first question; the live pip pulses. */
+  @keyframes score-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes score-pulse {
+    0%, 100% { transform: none; }
+    50% { transform: translateY(-2px); }
+  }
+  @keyframes score-pip {
+    0% { box-shadow: 0 0 0 0 rgba(45, 111, 174, 0.5); }
+    70% { box-shadow: 0 0 0 7px rgba(45, 111, 174, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(45, 111, 174, 0); }
   }
 }
 

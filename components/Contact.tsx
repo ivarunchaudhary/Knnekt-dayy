@@ -60,7 +60,7 @@ export default function Contact() {
                     className="mono-text group flex items-center gap-5 rounded-full pr-4 font-mono outline-offset-2 outline-dark"
                     href={`mailto:${CONTACT_EMAIL}`}
                   >
-                    <span className="rounded-full bg-dark px-7 py-3 text-white transition-colors group-hover:bg-dark/80 group-focus-visible:bg-dark/80 lg:px-5">
+                    <span className="rounded-full bg-sky-deep px-7 py-3 text-white transition-colors group-hover:bg-dark group-focus-visible:bg-dark lg:px-5">
                       Or just email us
                     </span>
                     <span className="text-dark/50 group-hover:text-dark group-focus-visible:text-dark transition-colors">{CONTACT_EMAIL}</span>

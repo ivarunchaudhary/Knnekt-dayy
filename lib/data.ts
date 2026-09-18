@@ -69,7 +69,7 @@ export const work: WorkItem[] = [
     delivered: ["Brand & positioning system", "Shopify storefront", "First product drop", "Demand-gen playbook"],
     results: [
       ["Live", "product in market"],
-      ["45 → 71", "Startup Operating Score"],
+      ["71", "Startup Operating Score"],
       ["+26", "operating points"],
     ],
     wide: true,
@@ -103,7 +103,7 @@ export const work: WorkItem[] = [
     ],
     results: [
       ["2 pilots", "live with equity firms"],
-      ["61 → 74", "Startup Operating Score"],
+      ["74", "Startup Operating Score"],
       ["+13", "operating points"],
     ],
     alt: "Person holding a tablet displaying an AI assistant interface",
@@ -130,7 +130,7 @@ export const work: WorkItem[] = [
     delivered: ["Ownership-tag platform", "Creator storefront system", "Brand & positioning", "Launch campaign"],
     results: [
       ["Launched", "storefronts live"],
-      ["52 → 79", "Startup Operating Score"],
+      ["79", "Startup Operating Score"],
       ["+27", "operating points"],
     ],
     alt: "The Qolorr wordmark, white on black",
@@ -157,7 +157,7 @@ export const work: WorkItem[] = [
     delivered: ["Personalised 90-day roadmap", "Operating manuals & library", "Six 1:1 guidance calls", "Founder community"],
     results: [
       ["Self-run", "they executed it"],
-      ["38 → 55", "Startup Operating Score"],
+      ["55", "Startup Operating Score"],
       ["+17", "operating points"],
     ],
     wide: true,
@@ -896,3 +896,41 @@ export function formatPostDate(iso: string) {
 }
 
 export const getPost = (slug: string) => insights.find((p) => p.slug === slug);
+
+/**
+ * The Startup Operating Score section: the six pillars and the sample report the
+ * card cycles through — a founder scored at 61, what it flagged, where that puts
+ * them on the climb, and the first lines of the roadmap it hands back.
+ */
+export const scorePillars = ["Clarity", "Evidence", "Product", "Traction", "Ops", "Invest"];
+
+export const scoreSample = {
+  score: 61,
+  archetype: "The Builder",
+  /** Bar heights per pillar, in percent, in `scorePillars` order. */
+  bars: [78, 42, 72, 64, 48, 66],
+  /** Which pillars the report flags as the weak ones. */
+  weak: [1, 4],
+  question: {
+    label: "Question 01 / 21 · start here",
+    text: "How do you know customers actually want this?",
+    options: ["They’ve paid or pre-ordered", "A few said they would", "I’m confident they will", "I haven’t really asked yet"],
+    remaining: "20 questions to go",
+  },
+  constraints: [
+    ["Customer Evidence", "You’re building before demand is proven."],
+    ["Operational Readiness", "Too much still depends on you."],
+    ["Commercial Traction", "Revenue isn’t repeatable yet."],
+  ] as [string, string][],
+  /** Where the sample founder sits on the track, in percent, and the marks they climb past. */
+  climb: { you: 34, marks: [[46, "Median"], [68, "Scale-ready"], [87, "Investor-ready"]] as [number, string][] },
+  roadmap: [
+    ["Prove demand before building further", true],
+    ["Ship the pre-order page", true],
+    ["Run 10 problem interviews", false],
+    ["Get delivery out of your hands", false],
+  ] as [string, boolean][],
+};
+
+/** Edit from the admin panel as the real count comes in. */
+export const scoredThisMonth = 1284;

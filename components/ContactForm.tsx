@@ -103,7 +103,7 @@ export default function ContactForm() {
               setFields(empty);
               setSent(false);
             }}
-            className="mono-text bg-dark hover:bg-dark/80 rounded-full px-7 py-3 font-mono text-white outline-offset-2 outline-dark transition-colors"
+            className="mono-text bg-sky-deep hover:bg-dark rounded-full px-7 py-3 font-mono text-white outline-offset-2 outline-dark transition-colors"
           >
             Send another
           </button>
@@ -224,7 +224,7 @@ export default function ContactForm() {
       <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3">
         <button
           type="submit"
-          className="mono-text bg-dark hover:bg-dark/80 rounded-full px-7 py-3 font-mono text-white outline-offset-2 outline-dark transition-colors"
+          className="mono-text bg-sky-deep hover:bg-dark rounded-full px-7 py-3 font-mono text-white outline-offset-2 outline-dark transition-colors"
         >
           Send it
         </button>

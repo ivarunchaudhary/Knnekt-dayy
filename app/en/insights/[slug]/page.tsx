@@ -151,10 +151,10 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
         <p className="mt-16 md:mt-24">
           <Link
-            href="/en#contact"
+            href="/en/score"
             className="mono-text group inline-flex items-center gap-2.5 font-mono outline-offset-2 outline-dark"
           >
-            <span className="bg-dark group-hover:bg-dark/80 rounded-full px-7 py-3 text-white transition-colors">Take the score</span>
+            <span className="bg-sky-deep group-hover:bg-dark rounded-full px-7 py-3 text-white transition-colors">Take the score</span>
             <span className="text-dark/50 group-hover:text-dark transition-colors">Free, five minutes, no card</span>
           </Link>
         </p>

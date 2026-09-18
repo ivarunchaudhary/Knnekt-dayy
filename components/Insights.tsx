@@ -23,7 +23,7 @@ export default function Insights() {
             href="/en/insights"
             className="mono-text group inline-flex items-center gap-2.5 font-mono outline-offset-2 outline-dark"
           >
-            <span className="bg-dark hover:bg-dark/80 group-hover:bg-dark/80 rounded-full px-7 py-3 text-white transition-colors">
+            <span className="bg-sky-deep hover:bg-dark group-hover:bg-dark rounded-full px-7 py-3 text-white transition-colors">
               All insights
             </span>
             <span className="text-dark/50 group-hover:text-dark transition-colors">{insights.length} pieces</span>
