@@ -30,7 +30,7 @@ const CELL = "1em";
  * translated to bring the current day into view. Scrolling the page spins it, in either
  * direction, with no wrap to fake — which is the whole conceit of the section made
  * literal. Everything else in the readout is hairline and mono; the only solid mass is
- * the status slug, so the last phase card stays the one dark thing on the page.
+ * the status slug, so the last phase card stays the one solid mass on the page.
  */
 export default function Journey() {
   const rail = useRef<HTMLDivElement>(null);
@@ -244,7 +244,12 @@ export default function Journey() {
           <ol className="flex flex-col gap-1.5 lg:gap-2">
             {journeyPhases.map((phase, i) => {
               const on = active === i;
-              const dark = i === journeyPhases.length - 1;
+              // The last phase is the one the section is driving at, so it gets the
+              // panel fill — the deepest step on the sky ramp — while its siblings sit on
+              // white or `gray-100`. It used to invert to navy instead, which is why the
+              // branches below collapsed once the page stopped having a dark plate: on a
+              // light panel the type is the page's own ink either way.
+              const feature = i === journeyPhases.length - 1;
               return (
                 <li
                   key={phase.title}
@@ -252,31 +257,31 @@ export default function Journey() {
                     cards.current[i] = el;
                   }}
                   className={`ease-in-out-quart border p-6 transition-all duration-500 md:p-10 ${on ? "rounded-2xl" : "rounded-lg"} ${
-                    dark ? "bg-darker border-transparent text-white" : on ? "border-dark/15 bg-white" : "border-dark/5 bg-gray-100"
+                    feature ? "bg-panel border-transparent" : on ? "border-dark/15 bg-white" : "border-dark/5 bg-gray-100"
                   }`}
                 >
                   <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-3">
-                    <h3 className={`text-3xl font-medium transition-colors duration-500 md:text-4xl ${dark ? "text-white" : on ? "text-dark" : "text-dark-very-subtle"}`}>
+                    <h3 className={`text-3xl font-medium transition-colors duration-500 md:text-4xl ${feature || on ? "text-dark" : "text-dark-very-subtle"}`}>
                       {phase.days}
                     </h3>
                     <span
                       className={`mono-text rounded-full border px-3 py-1.5 transition-colors duration-500 ${
-                        dark ? "border-white/25 text-white/70" : on ? "text-dark border-dark/20" : "text-dark-very-subtle border-dark/10"
+                        feature || on ? "text-dark border-dark/20" : "text-dark-very-subtle border-dark/10"
                       }`}
                     >
                       {phase.tag}
                     </span>
                   </div>
-                  <p className={`mt-5 text-xl font-medium lg:text-2xl ${dark ? "text-white" : ""}`}>{phase.title}</p>
-                  <p className={`mt-2 max-w-[36rem] text-sm ${dark ? "text-white/60" : "text-dark-subtle"}`}>{phase.body}</p>
+                  <p className="mt-5 text-xl font-medium lg:text-2xl">{phase.title}</p>
+                  <p className={`mt-2 max-w-[36rem] text-sm ${feature ? "text-dark/80" : "text-dark-subtle"}`}>{phase.body}</p>
                   <ul className="mt-8 grid gap-1.5 sm:grid-cols-3">
                     {phase.bars.map(([label, note]) => (
-                      <li key={label} className={`rounded-lg px-4 pt-4 pb-5 transition-colors duration-500 ${dark ? "bg-white/8" : "bg-gray-200"}`}>
+                      <li key={label} className={`rounded-lg px-4 pt-4 pb-5 transition-colors duration-500 ${feature ? "bg-white/60" : "bg-gray-200"}`}>
                         <p className="flex items-baseline gap-2 font-medium">
-                          <span className={`size-2 shrink-0 rounded-full ${dark ? "bg-white" : "bg-dark"}`} />
+                          <span className="bg-dark size-2 shrink-0 rounded-full" />
                           {label}
                         </p>
-                        <p className={`mt-1 text-xs ${dark ? "text-white/50" : "text-dark-subtle"}`}>{note}</p>
+                        <p className="text-dark-subtle mt-1 text-xs">{note}</p>
                       </li>
                     ))}
                   </ul>

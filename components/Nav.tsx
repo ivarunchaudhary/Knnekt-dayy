@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const items = [
-  { href: "#work", label: "Proof" },
   { href: "#services", label: "Services" },
   { href: "#about", label: "Studio" },
   { href: "#pricing", label: "Pricing" },
@@ -53,7 +52,7 @@ export default function Nav() {
 
   return (
     <nav className="fixed bottom-7 left-1/2 isolate z-40 max-w-[calc(100vw-1.5rem)] -translate-x-1/2 overflow-hidden rounded-full bg-gray-200/70 py-1.5 pr-5 pl-2.5 text-[0.9375rem] leading-[125%] font-medium tracking-[-0.00938rem] backdrop-blur-xl">
-      {/* Six items don't fit a phone: the row scrolls, and the mask doubles as the affordance. */}
+      {/* Five items don't fit a phone: the row scrolls, and the mask doubles as the affordance. */}
       <div
         className="hide-scrollbars -mr-4 -ml-1.5 overflow-x-auto overscroll-x-contain pr-4 pl-1.5"
         style={{ maskImage: "linear-gradient(to right, transparent 0%, black 1.25rem, black calc(100% - 1.25rem), transparent 100%)" }}

@@ -1,28 +1,25 @@
 import Image from "next/image";
 
 /**
- * Hero backdrop: a full-bleed still — two sculpted hands reaching for each other,
- * not quite touching — under the site's film-grain overlay.
+ * Hero backdrop: a full-bleed still — a studio crew at work on a white marble
+ * set, under an open azure sky — with the site's film-grain overlay above it.
  *
- * The source frame is portrait, with the two hands stacked and the gesture running
- * top-right to bottom-left. Turned a quarter clockwise it becomes the horizontal
- * reach it always wanted to be: one hand entering from the left, one from the right,
- * the gap between the fingertips landing dead centre.
+ * The frame is already the shape of a hero: a 1594x986 landscape, roughly 16:10,
+ * with every figure held along the bottom third and the whole upper half given
+ * over to empty sky. So `cover` barely scales at all and `object-bottom` is the
+ * whole framing rule — pinning the foot keeps the crew in shot at every viewport
+ * height, and the sky above them is what absorbs the crop on a tall screen. That
+ * empty sky is also the reason the wordmark and the claim can sit where they do:
+ * they land on flat colour rather than on anybody's head.
  *
- * Rotating leaves a 5:4 frame, and cropping that into a landscape hero would cost a
- * 1.4× zoom — enough to push the hands past the edges and lose the space the picture
- * is about. So the asset is widened rather than cropped: the rotated frame sits at its
- * native proportion in the middle of a 16:9 canvas, and the outermost column is carried
- * out to either side. The backdrop is a soft, near-flat gradient and the forearms are
- * already cut off by the frame, so the extension reads as the arms simply continuing
- * out of shot, with nothing to see at the joins.
+ * The picture is light, which is the point of it, but that means the top band is
+ * mid-luminance azure (#3B81E3) rather than something white type sits on
+ * comfortably — white holds only 3.9:1 there. <Hero/> lays a navy scrim over the
+ * top 60% for that, which brings the claim's blend to about 5:1 while leaving the
+ * lower two-thirds of the photograph untouched.
  *
- * Because the canvas now matches the shape of the viewport, `cover` barely scales at
- * all and plain `object-center` is the whole framing rule: the hands sit across the
- * middle band, and the top of the frame stays clear for the wordmark and the claim.
- *
- * Two motions, both slow enough to read as atmosphere rather than animation, and both
- * behind `motion-safe` so a reduced-motion visitor gets the still frame:
+ * Two motions, both slow enough to read as atmosphere rather than animation, and
+ * both behind `motion-safe` so a reduced-motion visitor gets the still frame:
  *   1. the picture fades up with a slight push-in, once, on load;
  *   2. a Ken Burns drift on a separate wrapper, so it composes with the reveal's
  *      transform instead of fighting it for the same property.
@@ -34,15 +31,15 @@ import Image from "next/image";
  */
 export default function HeroBackground() {
   return (
-    <div className="after:animate-grain after:bg-grain absolute inset-0 overflow-hidden bg-gray-200 after:absolute after:top-0 after:left-0 after:size-[140%] after:opacity-[0.04]">
+    <div className="after:animate-grain after:bg-grain absolute inset-0 overflow-hidden bg-sky-soft after:absolute after:top-0 after:left-0 after:size-[140%] after:opacity-[0.04]">
       <div className="motion-safe:animate-hero-drift relative size-full">
         <Image
-          src="/images/knnekthero.png"
+          src="/images/hero--studio.webp"
           alt=""
           fill
           priority
           sizes="100vw"
-          className="motion-safe:animate-hero-reveal object-cover object-center"
+          className="motion-safe:animate-hero-reveal object-cover object-bottom"
         />
       </div>
     </div>

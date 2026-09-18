@@ -5,45 +5,69 @@
   --font-sans: var(--font-ft-system-blank), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --font-mono: var(--font-ft-system-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
-  /* One colour, and its shades: the brand blue #2871B2 — hsl(208, 63%, 43%).
-     Every token below sits on that hue, at that saturation or under it, so the
-     dark boxes read as the brand taken down, the section fills as the brand
-     let out into white, and the ink as the brand taken nearly to black — one
-     picture rather than a neutral site with blue plates dropped into it.
+  /* One colour, and its shades: the studio blue #3B81E3 — the azure at the top
+     of the hero photograph, hsl(216, 75%, 56%). Every token below sits on that
+     hue, at that saturation or under it, so the pale section fills read as the
+     sky let down into white, the navy boxes as the same sky taken to the depth
+     of the clothes in the picture, and the ink as that navy carried nearly to
+     black — one picture rather than a neutral site with blue plates dropped
+     into it.
+
+     The palette is the photograph's, sampled off it: the sky ramps #3B81E3 →
+     #6CAEF5 → #B9D8F9 → #DFE9F8 down the frame, the marble is a blue-white, and
+     the figures wear a near-black navy. `gray-100` and `gray-200` are the foot
+     of that ramp; `dark` and `darker` are the clothes.
 
      The neutrals still behave as neutrals — `dark` is the ink, `gray-200` the
-     chip — they are simply on the brand's hue at a saturation low enough that
-     body copy never reads as coloured text. Measured on the rendered blends:
-     `dark` holds 16.2:1 on white, `dark-subtle` (50%) 3.2:1; on `darker`, white
-     holds 14.7:1 and the `text-white/50` labels 4.8:1.
+     chip — they are simply on the sky's hue at a saturation low enough that body
+     copy never reads as coloured text. Measured on the rendered blends: `dark`
+     holds 15.6:1 on white and 3.2:1 at `dark-subtle` (50%).
 
-     That last figure is what fixes `darker`'s lightness. The dark cards label
-     everything in `text-white/50`, and past about l18% on this hue that blend
-     falls under 4.5:1 — so the boxes stop at l16% rather than going anywhere
-     near the brand's own l43%, where white would hold only 5.1:1. */
+     There is no dark plate in the set any more. The feature panels — the fee
+     card, the contact card, the highlighted phase and faculty cards, the number
+     tiles — used to be a near-black navy with white type on them; they are now
+     `panel`, and they carry the ink like everything else. Which means the page
+     has no block that inverts: it is one light picture from the hero to the
+     footer, and emphasis is carried by how far down the sky ramp a block sits
+     rather than by flipping to black. */
   --color-black: #000;
   --color-white: #fff;
-  --color-brand: #2871b2;
-  --color-dark: #102232;
-  --color-dark-subtle: #10223280;
-  --color-dark-very-subtle: #10223259;
-  --color-darker: #0f2a43;
-  --color-gray-100: #f5f9fc;
-  --color-gray-200: #e6eff7;
+  --color-brand: #3b81e3;
+  --color-dark: #16253f;
+  --color-dark-subtle: #16253f80;
+  --color-dark-very-subtle: #16253f59;
+  --color-gray-100: #f3f8fd;
+  --color-gray-200: #e2edf8;
 
-  /* The brand at full strength, for the few places that have to read as blue
+  /* The feature panel: the sky at roughly 45% down the photograph, and the
+     deepest fill on the page. It is one clear step below `gray-200` in
+     lightness, which is what lets a chip sit on a panel and still be seen, and
+     it holds the ink at 10.4:1 — so the panels carry body copy, and their
+     secondary labels sit at `text-dark/70` (4.7:1) rather than at the 50% that
+     white-on-navy could afford. Anything paler than this stops reading as a
+     panel at all and the card dissolves into the page.
+
+     It is the same value as `sky-soft` and spelt out rather than pointed at it,
+     for the reason the sky block gives: Tailwind prunes unused theme variables,
+     and a `var()` reference between two of them can be dropped on one side. The
+     two are free to drift apart anyway — one is a component fill, the other is
+     the hero's shell. */
+  --color-panel: #b9d8f9;
+
+  /* The sky at full strength, for the few places that have to read as blue
      rather than as ink: the hero's haze, the ground behind the contact card,
-     the horizon glow where both photographs resolve into the white of the page.
+     the horizon glow where the photograph resolves into the white of the page.
      `sky` is the theme colour itself — spelt out rather than pointed at
      `--color-brand`, because Tailwind prunes unused theme variables and a
      `var()` reference between two of them can be dropped on one side. The other
-     two are it deepened and let out. The horizon stays warm on purpose: it is
-     the one note that isn't #2871B2, and it is what keeps the blue from closing
-     into a monochrome. */
-  --color-sky-deep: #19456c;
-  --color-sky: #2871b2;
-  --color-sky-soft: #90badf;
-  --color-horizon: #fffaf6;
+     two are it deepened and let out, and they are the photograph's own ramp:
+     #2D6FAE is the sky pushed under the figures, #B9D8F9 is it at 45% down the
+     frame. The horizon is the blue-white the picture lands on at its foot,
+     which is what hands the eye over to the white of the page. */
+  --color-sky-deep: #2d6fae;
+  --color-sky: #3b81e3;
+  --color-sky-soft: #b9d8f9;
+  --color-horizon: #eef4fc;
 
   --ease-in-out-quart: cubic-bezier(0.455, 0.03, 0.515, 0.955);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -240,39 +264,40 @@ body {
    across the width and continuously reshaping — high on the left while it sags
    on the right, then the other way about.
 
-   The three banks are the brand blue pulled apart and put back out of phase:
-   A is #2871B2 deepened, B the same blue let out towards the light, and C the
-   pale, faintly warm glow along the horizon. Two blues and a warm is the
-   whole trick — a third blue would flatten the haze into one wash, and the warm
-   lobe is also what hands the eye over to the warm white of the veil above it.
-   Each bank is blurred on its own rather than through
-   a shared parent: blurring the parent would re-run the filter every frame the
-   children move, where this way each bank is painted once and the compositor
-   just moves the cached layer.
+   The three banks are the photograph's own sky pulled apart and put back out of
+   phase: A is #3B81E3 pushed under towards #2D6FAE, B is the azure itself let
+   out towards #B9D8F9, and C is the blue-white the picture lands on at its foot.
+   Because the hero is now a light frame that already resolves to near-white
+   along the bottom, the banks are carried lighter and thinner than a haze over a
+   dark plate would need — they tint the foot of the picture rather than
+   swallowing it, and the white veil above does the actual dissolve. Each bank is
+   blurred on its own rather than through a shared parent: blurring the parent
+   would re-run the filter every frame the children move, where this way each
+   bank is painted once and the compositor just moves the cached layer.
 
    Every lobe closes to full transparency inside its own box, so the drift can
    never pull a hard edge into the frame. Keep the rule when retuning: for a lobe
    at `at x% y%` sized `w% h%`, the last stop lands at y% - (h% x last-stop), and
    that has to stay above 0. */
-/* A — the deep end of the blue, gathering from the left. */
+/* A — the sky pushed under, gathering from the left. */
 .hero-fog-a {
   background:
-    radial-gradient(56% 58% at 10% 76%, rgba(25, 69, 108, 0.86) 0%, rgba(25, 69, 108, 0.4) 44%, rgba(25, 69, 108, 0) 76%),
-    radial-gradient(44% 46% at 34% 48%, rgba(40, 113, 178, 0.5) 0%, rgba(40, 113, 178, 0.2) 46%, rgba(40, 113, 178, 0) 78%);
+    radial-gradient(56% 58% at 10% 76%, rgba(45, 111, 174, 0.62) 0%, rgba(45, 111, 174, 0.28) 44%, rgba(45, 111, 174, 0) 76%),
+    radial-gradient(44% 46% at 34% 48%, rgba(59, 129, 227, 0.38) 0%, rgba(59, 129, 227, 0.15) 46%, rgba(59, 129, 227, 0) 78%);
   filter: blur(56px);
 }
-/* B — #2871B2 itself and its light end, coming the other way. */
+/* B — #3B81E3 itself and its light end, coming the other way. */
 .hero-fog-b {
   background:
-    radial-gradient(52% 56% at 90% 66%, rgba(70, 142, 206, 0.82) 0%, rgba(70, 142, 206, 0.38) 46%, rgba(70, 142, 206, 0) 78%),
-    radial-gradient(46% 44% at 68% 42%, rgba(144, 186, 223, 0.52) 0%, rgba(144, 186, 223, 0.2) 46%, rgba(144, 186, 223, 0) 78%);
+    radial-gradient(52% 56% at 90% 66%, rgba(108, 174, 245, 0.66) 0%, rgba(108, 174, 245, 0.3) 46%, rgba(108, 174, 245, 0) 78%),
+    radial-gradient(46% 44% at 68% 42%, rgba(185, 216, 249, 0.5) 0%, rgba(185, 216, 249, 0.2) 46%, rgba(185, 216, 249, 0) 78%);
   filter: blur(56px);
 }
-/* C — the horizon: a pale warm light along the foot, with a periwinkle lobe
-   above it so the warm never sits on the blue as a hard band. */
+/* C — the horizon: the blue-white along the foot, with a pale azure lobe above
+   it so the light never sits on the blue as a hard band. */
 .hero-fog-c {
   background:
-    radial-gradient(84% 54% at 46% 100%, rgba(233, 219, 200, 0.88) 0%, rgba(233, 219, 200, 0.46) 46%, rgba(233, 219, 200, 0) 80%),
-    radial-gradient(40% 42% at 52% 60%, rgba(184, 211, 234, 0.44) 0%, rgba(184, 211, 234, 0) 76%);
+    radial-gradient(84% 54% at 46% 100%, rgba(238, 244, 252, 0.92) 0%, rgba(238, 244, 252, 0.5) 46%, rgba(238, 244, 252, 0) 80%),
+    radial-gradient(40% 42% at 52% 60%, rgba(223, 233, 248, 0.5) 0%, rgba(223, 233, 248, 0) 76%);
   filter: blur(56px);
 }

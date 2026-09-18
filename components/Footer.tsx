@@ -24,9 +24,6 @@ export default function Footer() {
           <nav className="grid grid-cols-2 sm:grid-cols-3 md:block md:space-y-6">
             <ul>
               <li>
-                <Link className={link} href="/en#work">Our Proof</Link>
-              </li>
-              <li>
                 <Link className={link} href="/en#services">Services</Link>
               </li>
               <li>

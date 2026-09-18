@@ -6,7 +6,7 @@ import Container, { SectionHeading } from "./Container";
  * what they are to the cohort — and carries a chip where the name will go. Add a
  * `name` in `lib/data.ts` and the card promotes it and drops the chip.
  */
-function Member({ person, dark }: { person: FacultyMember; dark: boolean }) {
+function Member({ person }: { person: FacultyMember }) {
   return (
     <li className="group">
       <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-200">
@@ -28,17 +28,20 @@ function Member({ person, dark }: { person: FacultyMember; dark: boolean }) {
         )}
       </div>
       <p className="mt-4 font-medium">{person.name ?? person.seat}</p>
-      {person.name && <p className={`-mt-0.5 text-sm ${dark ? "text-white/50" : "text-dark-very-subtle"}`}>{person.seat}</p>}
-      <p className={`mt-3 text-sm leading-tight ${dark ? "text-white/80" : "text-dark"}`}>{person.teaches}</p>
-      <p className={`mt-1 text-xs leading-tight ${dark ? "text-white/50" : "text-dark-subtle"}`}>{person.note}</p>
+      {person.name && <p className="text-dark-very-subtle -mt-0.5 text-sm">{person.seat}</p>}
+      <p className="text-dark mt-3 text-sm leading-tight">{person.teaches}</p>
+      <p className="text-dark-subtle mt-1 text-xs leading-tight">{person.note}</p>
     </li>
   );
 }
 
 /**
  * Who actually takes the classes: the investors who run the weekly masterclasses,
- * then the execution team that stays for the eighty days of building. Two panels,
- * light and dark, so the two rooms read as two different promises.
+ * then the execution team that stays for the eighty days of building. Two panels
+ * a step apart on the sky ramp — `gray-100` for the first room, the deeper
+ * `panel` for the second — so the two rooms read as two different promises. The
+ * second used to invert to navy for that, which is why <Member/> no longer needs
+ * to know which panel it is on: both carry the page's own ink now.
  */
 export default function Faculty() {
   return (
@@ -50,22 +53,22 @@ export default function Faculty() {
 
         <div className="mt-12 space-y-1.5 lg:mt-20">
           {faculty.map((group, i) => {
-            const dark = i === faculty.length - 1;
+            const feature = i === faculty.length - 1;
             return (
               <div
                 key={group.id}
-                className={`rounded-xl border p-6 md:p-10 lg:p-14 ${dark ? "bg-darker border-transparent text-white" : "border-dark/10 bg-gray-100"}`}
+                className={`rounded-xl border p-6 md:p-10 lg:p-14 ${feature ? "bg-panel border-transparent" : "border-dark/10 bg-gray-100"}`}
               >
                 <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-3">
                   <h3 className="max-w-[20ch] text-3xl font-medium md:text-4xl">{group.title}</h3>
-                  <span className={`mono-text rounded-full border px-3 py-1.5 ${dark ? "border-white/25 text-white/70" : "text-dark border-dark/20"}`}>
+                  <span className="mono-text text-dark rounded-full border border-dark/20 px-3 py-1.5">
                     {group.kicker}
                   </span>
                 </div>
-                <p className={`mt-5 max-w-[42rem] text-sm ${dark ? "text-white/60" : "text-dark-subtle"}`}>{group.text}</p>
+                <p className={`mt-5 max-w-[42rem] text-sm ${feature ? "text-dark/80" : "text-dark-subtle"}`}>{group.text}</p>
                 <ul className="mt-10 grid grid-cols-2 gap-x-1.5 gap-y-9 sm:gap-x-3 lg:mt-14 lg:grid-cols-3 lg:gap-x-6">
                   {group.people.map((person) => (
-                    <Member key={person.seat} person={person} dark={dark} />
+                    <Member key={person.seat} person={person} />
                   ))}
                 </ul>
               </div>

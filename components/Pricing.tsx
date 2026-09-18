@@ -17,15 +17,15 @@ const check = (
 function Seats() {
   const taken = pricing.seats - pricing.seatsLeft;
   return (
-    <div className="mt-7 border-t border-white/15 pt-6">
+    <div className="mt-7 border-t border-dark/15 pt-6">
       <div aria-hidden="true" className="grid grid-cols-15 gap-1">
         {Array.from({ length: pricing.seats }, (_, i) => (
-          <span key={i} className={`h-6 rounded-sm ${i < taken ? "bg-white" : "bg-white/15"}`} />
+          <span key={i} className={`h-6 rounded-sm ${i < taken ? "bg-dark" : "bg-dark/15"}`} />
         ))}
       </div>
       <p className="mt-3.5 flex flex-wrap items-baseline gap-2">
         <span className="text-2xl leading-none font-medium tabular-nums">{pricing.seatsLeft}</span>
-        <span className="mono-text font-mono text-white/50">
+        <span className="mono-text font-mono text-dark/70">
           of {pricing.seats} seats left · {pricing.cohort}
         </span>
       </p>
@@ -96,32 +96,32 @@ export default function Pricing() {
           </div>
 
           {/* The card: the number itself, what it covers, and the way in. */}
-          <aside className="bg-darker rounded-xl p-6 text-white md:p-10 lg:sticky lg:top-24">
+          <aside className="bg-panel rounded-xl p-6 md:p-10 lg:sticky lg:top-24">
             <h3 className="text-xl font-medium lg:text-2xl">What the fee covers</h3>
-            <p className="mono-text mt-2 font-mono text-white/50">{pricing.cohort}</p>
+            <p className="mono-text mt-2 font-mono text-dark/70">{pricing.cohort}</p>
 
             <ul className="mt-8 space-y-3 text-sm leading-tight">
               {feeIncludes.map(([thing, note]) => (
                 <li key={thing} className="flex gap-3">
                   {check}
-                  <span className="text-white/60">
-                    <span className="font-medium text-white">{thing}</span>, {note}
+                  <span className="text-dark/80">
+                    <span className="text-dark font-medium">{thing}</span>, {note}
                   </span>
                 </li>
               ))}
             </ul>
 
-            <div className="mt-9 border-t border-white/15 pt-6">
-              <p className="mono-text font-mono text-white/50">Program fee</p>
+            <div className="mt-9 border-t border-dark/15 pt-6">
+              <p className="mono-text font-mono text-dark/70">Program fee</p>
               <p className="mt-2.5 flex flex-wrap items-baseline gap-3">
                 <span className="text-4xl leading-none font-medium">{pricing.fee}</span>
-                <span className="mono-text font-mono text-white/50">{pricing.gst}</span>
+                <span className="mono-text font-mono text-dark/70">{pricing.gst}</span>
               </p>
             </div>
 
             <Seats />
 
-            <p className="mt-8 text-xs leading-tight text-white/50">{pricing.fine}</p>
+            <p className="mt-8 text-xs leading-tight text-dark/70">{pricing.fine}</p>
           </aside>
         </div>
 

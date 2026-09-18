@@ -11,32 +11,34 @@ const details: [string, string][] = [
 
 /**
  * The enquiry band. The claim, the person who reads it and how to reach them sit
- * on the left; the form sits on the right in a white card so the fields keep the
- * page's normal dark-on-white contrast instead of fighting the gradient.
+ * on the left; the form sits on the right in a white card, which is now a step
+ * up out of the band rather than a rescue from it — the ground went light with
+ * the rest of the page, so the band carries the ink at 8.4:1 at its deepest stop
+ * and the card reads as the near surface instead of as the only legible one.
  */
 export default function Contact() {
   return (
     <Container id="contact" className="pt-14 pb-24 md:py-20">
-      <div className="bg-darker relative isolate overflow-hidden rounded-xl text-white">
+      <div className="bg-panel relative isolate overflow-hidden rounded-xl">
         <GradientBackground />
         <div className="relative z-10 grid gap-x-1.5 gap-y-12 px-4 py-8 sm:p-8 lg:grid-cols-12 lg:gap-y-0 lg:p-12">
           <div className="flex flex-col justify-between lg:col-span-5 lg:pr-10">
             <div>
               <h2 className="font-medium text-2xl md:text-3xl">
-                <span className="block text-white/50">Take the score. Then the truth.</span>
+                <span className="block text-dark/60">Take the score. Then the truth.</span>
                 <span className="mt-1 block">Let’s talk about your next 90 days.</span>
               </h2>
-              <dl className="mt-10 grid gap-x-6 gap-y-6 border-t border-white/15 pt-8 sm:grid-cols-3 lg:grid-cols-1 lg:gap-y-5">
+              <dl className="mt-10 grid gap-x-6 gap-y-6 border-t border-dark/15 pt-8 sm:grid-cols-3 lg:grid-cols-1 lg:gap-y-5">
                 {details.map(([label, value]) => (
                   <div key={label}>
-                    <dt className="mono-text font-mono text-white/50">{label}</dt>
+                    <dt className="mono-text font-mono text-dark/75">{label}</dt>
                     <dd className="mt-1.5 text-sm leading-tight">{value}</dd>
                   </div>
                 ))}
               </dl>
             </div>
 
-            <div className="text-dark mt-12 rounded-xl bg-white p-4 sm:flex sm:justify-between md:p-2 lg:mt-10">
+            <div className="mt-12 rounded-xl bg-white p-4 sm:flex sm:justify-between md:p-2 lg:mt-10">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 alt="Portrait of a Knnekt studio partner"

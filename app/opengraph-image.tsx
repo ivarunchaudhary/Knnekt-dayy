@@ -6,14 +6,18 @@ import { join } from "node:path";
  * The link preview card — what a shared URL unfurls to in iMessage, Slack, X,
  * LinkedIn, WhatsApp.
  *
- * It is the hero, restaged for a 1200×630 frame: the same reaching hands, the
- * wordmark and the descriptor across the top, the claim sitting in the empty
- * pale space below the gesture. Generated rather than drawn so the copy stays a
- * single source of truth with the page, and set in FT System Blank so the
+ * It is the hero, restaged for a 1200×630 frame: the same studio crew under the
+ * same azure sky, the wordmark and the descriptor across the top, the claim
+ * sitting in the pale space below. Generated rather than drawn so the copy stays
+ * a single source of truth with the page, and set in FT System Blank so the
  * preview carries the brand's own letterforms.
  *
  * Satori can't read woff2 or webp, so `assets/` holds ttf cuts of the two weights
- * used here and a pre-cropped jpg of the hero frame. Nothing uses request-time
+ * used here and a pre-cropped jpg of the hero frame. That crop carries a white
+ * wash — heavier at the head and foot, lightest across the middle — because the
+ * card sets its type in the dark ink, and the picture's own sky holds only 3.9:1
+ * against it. Washed, both bands clear 8:1 while the frame stays recognisably
+ * the photograph. Nothing uses request-time
  * data, so Next renders this once at build and serves it as a static file.
  */
 
@@ -29,8 +33,8 @@ const [semibold, regular, hero] = await Promise.all([
   asset("og-hero.jpg"),
 ]);
 
-const dark = "#102232";
-const subtle = "#10223280";
+const dark = "#16253f";
+const subtle = "#16253f80";
 
 export default function OpengraphImage() {
   return new ImageResponse(

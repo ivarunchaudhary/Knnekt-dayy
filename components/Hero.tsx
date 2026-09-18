@@ -3,14 +3,31 @@ import HeroFog from "./HeroFog";
 import Wordmark from "./Wordmark";
 import { containerClass } from "./Container";
 
+/**
+ * The hero is a light frame now — an azure sky over a white set — so the shell
+ * behind it is `bg-sky-soft` rather than the old near-black plate: it is what
+ * shows for the frame before the photograph decodes, and a dark flash under a
+ * light picture is the one thing that reads as a fault.
+ *
+ * The wordmark and the claim stay white, because white is what belongs on sky.
+ * White on the picture's own top band (#3B81E3) holds only 3.9:1, though, so a
+ * navy scrim runs down the top 60% of the frame — `--color-dark` at 55%, closing
+ * to nothing — which brings the blend under the claim to about 5:1. It sits under
+ * the content and over the picture, and stops well short of the crew, so the
+ * lower two-thirds of the photograph are the photograph.
+ */
 export default function Hero() {
   return (
-    <header className="relative h-svh bg-darker">
+    <header className="relative h-svh bg-sky-soft">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 z-10 h-3/5 bg-[linear-gradient(to_bottom,color-mix(in_srgb,var(--color-dark)_55%,transparent)_0%,transparent_100%)]"
+      />
       <div className={`${containerClass} relative z-20 flex h-full items-start justify-between pt-[19vh] text-white`}>
         <Wordmark className="text-xl sm:text-2xl" />
         <div className="text-right text-xs sm:text-base">
           <p>India's first Startup Execution Studio</p>
-          <p className="-mt-1 text-white/70">Growth. Technology. AI. Legal.</p>
+          <p className="-mt-1 text-white/80">Growth. Technology. AI. Legal.</p>
         </div>
       </div>
       <HeroBackground />

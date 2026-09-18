@@ -11,7 +11,6 @@ import Nav from "@/components/Nav";
 import Pricing from "@/components/Pricing";
 import Services from "@/components/Services";
 import Testimonials from "@/components/Testimonials";
-import Work from "@/components/Work";
 
 export default function HomePage() {
   return (
@@ -28,7 +27,6 @@ export default function HomePage() {
           <main>
             <Hero />
             <Intro />
-            <Work />
             <Services />
             <Collaboration />
             <Facts />

@@ -79,7 +79,7 @@ export default function HeroFog() {
         <div className="hero-fog-c motion-safe:animate-fog-c absolute inset-0" />
       </div>
       <div
-        className="absolute inset-0 bg-[linear-gradient(to_top,#fff_0%,#fffcf7_46%,rgba(255,255,255,0)_100%)]"
+        className="absolute inset-0 bg-[linear-gradient(to_top,#fff_0%,#f6fafe_46%,rgba(255,255,255,0)_100%)]"
         style={{ opacity: "var(--veil)" }}
       />
       {/* The hero's foot, resolved to the white of the page. Last of the three, so

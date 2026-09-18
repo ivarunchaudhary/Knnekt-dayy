@@ -74,7 +74,7 @@ export default function CaseDialog({ item, onClose }: { item: WorkItem; onClose:
       onClick={(e) => {
         if (e.target === ref.current) dismiss();
       }}
-      className={`ease-in-out-quart m-auto w-[min(64rem,calc(100vw-1.5rem))] max-w-none rounded-xl bg-white p-0 text-inherit backdrop:bg-darker/60 backdrop:backdrop-blur-[2px] motion-safe:transition motion-safe:duration-200 ${
+      className={`ease-in-out-quart m-auto w-[min(64rem,calc(100vw-1.5rem))] max-w-none rounded-xl bg-white p-0 text-inherit backdrop:bg-dark/60 backdrop:backdrop-blur-[2px] motion-safe:transition motion-safe:duration-200 ${
         shown ? "opacity-100" : "scale-[0.98] opacity-0"
       }`}
     >
@@ -143,13 +143,13 @@ export default function CaseDialog({ item, onClose }: { item: WorkItem; onClose:
           </section>
         </div>
 
-        <section className="bg-darker relative isolate mt-10 overflow-hidden rounded-xl px-6 py-10 text-white md:px-12 md:py-14">
+        <section className="bg-panel relative isolate mt-10 overflow-hidden rounded-xl px-6 py-10 md:px-12 md:py-14">
           <div
             aria-hidden="true"
-            className="after:animate-grain after:bg-grain absolute inset-0 -z-10 overflow-hidden after:absolute after:top-0 after:left-0 after:size-[140%] after:opacity-5"
+            className="after:animate-grain after:bg-grain absolute inset-0 -z-10 overflow-hidden after:absolute after:top-0 after:left-0 after:size-[140%] after:opacity-[0.04]"
           />
           <div className="grid gap-x-12 gap-y-6 lg:grid-cols-[9rem_minmax(0,1fr)]">
-            <h3 className="mono-text font-mono text-white/50 lg:pt-2.5">What we refused</h3>
+            <h3 className="mono-text font-mono text-dark/70 lg:pt-2.5">What we refused</h3>
             <p className="text-xl leading-tight font-medium lg:text-2xl">{item.refused}</p>
           </div>
         </section>

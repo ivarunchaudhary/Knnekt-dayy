@@ -46,7 +46,7 @@ function JourneyBox() {
     return () => clearInterval(t);
   }, []);
   return (
-    <div className="aspect-square overflow-hidden rounded-lg bg-darker text-white">
+    <div className="bg-panel aspect-square overflow-hidden rounded-lg">
       <div className="relative flex size-full items-center justify-center p-3 text-center">
         {journey.map((stage, k) => (
           <span
@@ -58,7 +58,7 @@ function JourneyBox() {
             {stage}
           </span>
         ))}
-        <span className="mono-text absolute bottom-3 left-0 right-0 text-center text-white/50">{String(i + 1).padStart(2, "0")} / {String(journey.length).padStart(2, "0")}</span>
+        <span className="mono-text absolute bottom-3 left-0 right-0 text-center text-dark/70">{String(i + 1).padStart(2, "0")} / {String(journey.length).padStart(2, "0")}</span>
       </div>
     </div>
   );

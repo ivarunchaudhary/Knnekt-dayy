@@ -59,11 +59,11 @@ export default async function CasePage({ params }: { params: Promise<{ slug: str
       <Nav />
       <main className={`${containerClass} pt-14 pb-28 md:pt-20`}>
         <Link
-          href="/en#work"
+          href="/en"
           className="mono-text text-dark-subtle hover:text-dark group inline-flex items-center gap-2 font-mono transition-colors"
         >
           <span className="ease-in-out-quart inline-block transition-transform duration-300 group-hover:-translate-x-1">←</span>
-          All proof
+          Back home
         </Link>
 
         {/* Masthead: who it was, what we called it, and the shape of the engagement. */}
@@ -122,13 +122,13 @@ export default async function CasePage({ params }: { params: Promise<{ slug: str
         </div>
 
         {/* The point of the whole page: the thing we talked them out of. */}
-        <section className="bg-darker relative isolate mt-16 overflow-hidden rounded-xl px-6 py-12 text-white md:mt-24 md:px-14 md:py-16">
+        <section className="bg-panel relative isolate mt-16 overflow-hidden rounded-xl px-6 py-12 md:mt-24 md:px-14 md:py-16">
           <div
             aria-hidden="true"
-            className="after:animate-grain after:bg-grain absolute inset-0 -z-10 overflow-hidden after:absolute after:top-0 after:left-0 after:size-[140%] after:opacity-5"
+            className="after:animate-grain after:bg-grain absolute inset-0 -z-10 overflow-hidden after:absolute after:top-0 after:left-0 after:size-[140%] after:opacity-[0.04]"
           />
           <div className="grid gap-x-12 gap-y-7 lg:grid-cols-[9rem_minmax(0,1fr)]">
-            <h2 className="mono-text font-mono text-white/50 lg:pt-2.5">What we refused</h2>
+            <h2 className="mono-text font-mono text-dark/70 lg:pt-2.5">What we refused</h2>
             <p className="text-xl leading-tight font-medium lg:text-3xl">{item.refused}</p>
           </div>
         </section>
