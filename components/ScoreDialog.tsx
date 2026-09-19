@@ -51,7 +51,7 @@ export default function ScoreDialog({ onClose }: { onClose: () => void }) {
       <div className="max-h-[88vh] overflow-y-auto overscroll-contain p-6 md:p-9">
         <div className="flex items-start justify-between gap-6">
           <div>
-            <p className="mono-text text-dark-very-subtle font-mono">Free · 5 min · no card · nothing leaves your browser</p>
+            <p className="mono-text text-dark-very-subtle font-mono">Free · 5 min · no card · report emailed as a PDF · we call you</p>
             <h2 id="score-dialog-title" className="mt-3 text-2xl font-medium md:text-3xl">
               Startup Operating Score
             </h2>

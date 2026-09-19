@@ -912,10 +912,15 @@ export const scoreSample = {
   /** Which pillars the report flags as the weak ones. */
   weak: [1, 4],
   question: {
-    label: "Question 01 / 21 · start here",
-    text: "How do you know customers actually want this?",
-    options: ["They’ve paid or pre-ordered", "A few said they would", "I’m confident they will", "I haven’t really asked yet"],
-    remaining: "20 questions to go",
+    label: "Customer Evidence · 1 of 3",
+    text: "Which statement best represents the basis of your current customer understanding?",
+    options: [
+      "Our understanding is primarily internal.",
+      "We have validated through a limited number of conversations, mostly within our network.",
+      "We have validated through structured conversations with buyers outside our network.",
+      "We validate continuously, and can quote the exact language buyers use.",
+    ],
+    remaining: "One page per pillar · 5 min",
   },
   constraints: [
     ["Customer Evidence", "You’re building before demand is proven."],
