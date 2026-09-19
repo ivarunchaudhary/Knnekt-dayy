@@ -49,10 +49,10 @@ export function reportBlocks(r: Result, id: Identity, answers: Answers): Block[]
 
   b.push({ kind: "gap", size: 18 }, { kind: "rule" }, { kind: "h2", text: "Exactly what you told us" }, {
     kind: "small",
-    text: `${id.name} · ${id.email}${id.phone ? ` · ${id.phone}` : ""}`,
+    text: "Every question you were asked, in the order you answered it.",
   });
   let section = "";
-  for (const row of responses(answers, r.catOther)) {
+  for (const row of responses(answers, r.catOther, id)) {
     if (row.section !== section) {
       section = row.section;
       b.push({ kind: "eyebrow", text: section.toUpperCase() });

@@ -632,7 +632,7 @@ function Report({ result, identity, answers, delivery }: { result: Result; ident
           <span className="inline-block transition-transform group-open:rotate-90">›</span> Your answers — exactly what you told us
         </summary>
         <ul className="mt-4 space-y-3 border-t border-dark/15 pt-4">
-          {responses(answers, result.catOther).map((r, i) => (
+          {responses(answers, result.catOther, identity).map((r, i) => (
             <li key={i} className="text-xs leading-tight">
               <p className="mono-text font-mono text-dark/50">{r.section}</p>
               <p className="mt-0.5 text-dark/80">{r.question}</p>

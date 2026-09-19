@@ -544,9 +544,25 @@ export type Identity = { name: string; email: string; phone: string; optin: bool
 
 export type Response = { section: string; question: string; answer: string };
 
-/** Every question with the founder's answer in words. Read-only, for the report and the PDF. */
-export function responses(answers: Answers, catOther = ""): Response[] {
-  return questions.map((q, i) => {
+/** The intake step's label, sitting ahead of the bank's own sections. */
+export const INTAKE_SECTION = "Before we start";
+
+/** The four things the opening step asks. They score nothing, but the founder
+ *  answered them, so the report has to show them back the same way as the rest. */
+export function intakeResponses(id: Identity): Response[] {
+  const row = (question: string, answer: string): Response => ({ section: INTAKE_SECTION, question, answer: answer.trim() || "—" });
+  return [
+    row("Your name", id.name),
+    row("Email", id.email),
+    row("Contact number", id.phone),
+    row("Add me to the Knnekt founder WhatsApp community.", id.optin ? "Yes — add me" : "No thanks"),
+  ];
+}
+
+/** Every question with the founder's answer in words, the intake step first when
+ *  we know who answered. Read-only, for the report and the PDF. */
+export function responses(answers: Answers, catOther = "", id?: Identity): Response[] {
+  const bank = questions.map((q, i) => {
     const a = answers[i];
     let val: string;
     if (q.kind === "multi") val = Array.isArray(a) && a.length ? a.map((ix) => q.options[ix]?.label ?? "").join(", ") : "— none selected";
@@ -557,6 +573,7 @@ export function responses(answers: Answers, catOther = ""): Response[] {
     } else val = "—";
     return { section: SECTIONS[q.sec], question: q.q, answer: val };
   });
+  return id ? [...intakeResponses(id), ...bank] : bank;
 }
 
 /** What the founder's pillars shrink to for the bars: `scorePillars` order matches `pillars`. */
@@ -596,7 +613,7 @@ export function payload(r: Result, id: Identity, answers: Answers, event: "resul
     community_optin: id.optin,
     benchmark: { model: r.benchName, median: r.bench[0], top_third: r.bench[1], scale_ready: r.bench[2] },
     market_confidence: r.confidence.pct,
-    responses: responses(answers, r.catOther),
+    responses: responses(answers, r.catOther, id),
     retake_unlock_at: r.route === "STOP" ? r.unlock.toISOString() : null,
     submitted_at: new Date().toISOString(),
   };
