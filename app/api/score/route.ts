@@ -8,6 +8,8 @@ const looksLikeEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
 const looksLikePhone = (v: string) => v.replace(/\D/g, "").length >= 8;
 
 type Body = { identity?: Partial<Identity>; answers?: unknown; catOther?: unknown };
+/** What the webhook answers with. See the note where it is read. */
+type Reply = { ok?: boolean; message?: string } | null;
 
 /**
  * A finished score. Re-graded here from the raw answers so the number the
@@ -73,7 +75,20 @@ export async function POST(request: Request) {
     try {
       const data = { ...payload(result, id, clean, "result"), report_pdf_filename: filename, report_pdf_base64: pdf, emailed: mail.sent };
       const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
-      if (!res.ok) throw new Error(`Webhook responded ${res.status}`);
+      const text = await res.text().catch(() => "");
+      if (!res.ok) throw new Error(`Webhook responded ${res.status}: ${text.slice(0, 300)}`);
+      // A Google Apps Script web app always answers 200 — the platform gives it
+      // no way to set a status code. So the status tells us nothing and the body
+      // is the only place a rejected token or a thrown error can show up.
+      let said: Reply = null;
+      try {
+        said = JSON.parse(text.trim() || "null") as Reply;
+      } catch {
+        // Not JSON: almost always Google's sign-in page, i.e. the web app isn't
+        // deployed with "Who has access: Anyone".
+        throw new Error(`Webhook answered with ${text.slice(0, 200)}`);
+      }
+      if (said && said.ok === false) throw new Error(`Webhook refused: ${said.message}`);
       forwarded = true;
     } catch (err) {
       console.error("[score] webhook failed", err);
