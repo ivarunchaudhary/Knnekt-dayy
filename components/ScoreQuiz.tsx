@@ -14,6 +14,7 @@ import {
   pillars,
   questions,
   responses,
+  touched,
   verdicts,
   type Answers,
   type Identity,
@@ -340,16 +341,24 @@ function Page({
   const meta = pageMeta(pg.sec);
   const [missing, setMissing] = useState<number[]>([]);
   const footer = useRef<HTMLDivElement>(null);
+  /** The pending auto-advance scroll. It has to die with the page: left to run
+   *  it would centre the *next* page's footer and drop the founder at its last
+   *  question. */
+  const slide = useRef<number | undefined>(undefined);
+  useEffect(() => () => window.clearTimeout(slide.current), []);
   const pct = Math.round(((page + 1) / pages.length) * 100);
   const last = page === pages.length - 1;
   const still = missing.filter((qi) => !answered(qi, answers, catOther));
 
   /** Slides the page down to the next question still waiting, or to the
-   *  Continue button once this page has nothing left to ask. */
+   *  Continue button once this page has nothing left to ask. A blank multi is
+   *  still waiting even though the page would accept it, so `touched` — not
+   *  `answered` — decides, or we would scroll straight past it. */
   const advance = (qi: number) => {
-    const rest = pg.qs.slice(pg.qs.indexOf(qi) + 1).find((x) => !answered(x, answers, catOther));
+    const rest = pg.qs.slice(pg.qs.indexOf(qi) + 1).find((x) => !touched(x, answers, catOther));
     const smooth = !reduceMotion();
-    window.setTimeout(() => {
+    window.clearTimeout(slide.current);
+    slide.current = window.setTimeout(() => {
       const el = rest === undefined ? footer.current : document.getElementById(`score-q-${rest}-block`);
       el?.scrollIntoView({ behavior: smooth ? "smooth" : "auto", block: rest === undefined ? "center" : "start" });
     }, 180);
@@ -691,6 +700,7 @@ export default function ScoreQuiz({ bare = false }: { bare?: boolean }) {
       />
     ) : stage.at === "page" ? (
       <Page
+        key={stage.page}
         page={stage.page}
         answers={answers}
         catOther={catOther}

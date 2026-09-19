@@ -280,6 +280,18 @@ export function answered(i: number, answers: Answers, catOther = ""): boolean {
   return true;
 }
 
+/** Whether the founder has actually put something into a question. Same as
+ *  `answered`, except a blank multi counts as still waiting: the page will
+ *  accept it empty, but we must not scroll anyone past a question they have
+ *  not read. Use this to decide where to move next, never to gate Continue. */
+export function touched(i: number, answers: Answers, catOther = ""): boolean {
+  if (questions[i].kind === "multi") {
+    const a = answers[i];
+    return Array.isArray(a) && a.length > 0;
+  }
+  return answered(i, answers, catOther);
+}
+
 export type Gate = "COMMITMENT" | "CAPITAL" | "DEMAND" | "RESOURCING";
 export type Archetype = "Explorer" | "Visionary" | "Builder" | "Operator" | "Architect" | "Scaler";
 export type Route = "STOP" | "B" | "A" | "WAIT";
