@@ -3,14 +3,13 @@ const cdn = "/sanity";
 const own = "/cases";
 
 /**
- * The ticker band under the intro headline: the studio in eight figures.
- * `[figure, label]` — the figure carries the weight, the label gives it meaning.
+ * The ticker band under the intro headline: the studio in seven figures.
+ * `[figure, label]`, the figure carries the weight, the label gives it meaning.
  */
 export const proofPoints: [string, string][] = [
   ["300+", "startups behind the playbook"],
   ["15", "founders a cohort, no more"],
   ["90", "days, kickoff to pitch day"],
-  ["₹3L", "one fixed price, no surprises"],
   ["100", "first customers, in market"],
   ["6", "pillars in one honest score"],
   ["4", "functions under one roof"],
@@ -60,7 +59,7 @@ export const work: WorkItem[] = [
       "Knnekt gave me a clear vision to launch. Within two months I shipped my product and gained the traction that helped me understand my customers.",
     attribution: "Founder · Athleisure · In market",
     refused:
-      "They wanted a big paid launch on day one. We refused — proving the drop with organic demand first meant they didn’t burn cash on an audience they hadn’t earned.",
+      "They wanted a big paid launch on day one. We refused. Proving the drop with organic demand first meant they didn’t burn cash on an audience they hadn’t earned.",
     timeline: [
       ["Week 1–3", "Diagnosis: positioning before product."],
       ["Week 4–8", "Product line built, storefront shipped."],
@@ -84,11 +83,11 @@ export const work: WorkItem[] = [
     sector: "AI · equity-firm SaaS",
     tier: "Build & Scale",
     blurb:
-      "An AI data and client-management platform for equity firms — built, piloted, and repositioned for the round.",
+      "An AI data and client-management platform for equity firms: built, piloted, and repositioned for the round.",
     quote: "The platform was never the question. Knnekt made us answer who it’s really for.",
     attribution: "Founder · Equity-firm SaaS · In market",
     refused:
-      "They wanted a paid-acquisition push at pilot stage. We refused — spending to grow before positioning is proven just buys the wrong customers faster.",
+      "They wanted a paid-acquisition push at pilot stage. We refused. Spending to grow before positioning is proven just buys the wrong customers faster.",
     timeline: [
       ["Week 1–3", "Diagnosis: positioning, not product."],
       ["Week 4–8", "AI data pipeline and client management hardened."],
@@ -117,11 +116,11 @@ export const work: WorkItem[] = [
     sector: "Luxury content-commerce",
     tier: "Build & Scale",
     blurb:
-      "Luxury content-commerce with ownership tags and resale — scope cut to the one thing that proves the model.",
+      "Luxury content-commerce with ownership tags and resale: scope cut to the one thing that proves the model.",
     quote: "They cut half my roadmap and I launched twice as fast. The no’s were the value.",
     attribution: "Founder · Luxury commerce · Launched",
     refused:
-      "They wanted every feature in v1. We refused — we shipped the one that proves the model and parked the rest until it earned its place.",
+      "They wanted every feature in v1. We refused. We shipped the one that proves the model and parked the rest until it earned its place.",
     timeline: [
       ["Week 1–3", "Diagnosis: scope, not features."],
       ["Week 4–8", "Ownership-tag platform built."],
@@ -144,11 +143,11 @@ export const work: WorkItem[] = [
     sector: "D2C · beverage",
     tier: "The Founder’s Roadmap",
     blurb:
-      "Early-stage D2C beverage. The honest sell was a plan, not execution — so a ₹10k roadmap and six calls is what we gave them.",
+      "Early-stage D2C beverage. The honest sell was a plan, not execution, so a ₹10k roadmap and six calls is what we gave them.",
     quote: "They talked me out of spending ₹50k I didn’t need to. I ran the roadmap myself and it worked.",
     attribution: "Founder · D2C beverage · Roadmap",
     refused:
-      "They came for a full build. We refused — a ₹10k roadmap was the honest sell, and we’d rather they came back ready than pay for execution they couldn’t use.",
+      "They came for a full build. We refused. A ₹10k roadmap was the honest sell, and we’d rather they came back ready than pay for execution they couldn’t use.",
     timeline: [
       ["Week 1–3", "Diagnosis: not ready to build."],
       ["Roadmap", "90-day plan handed over."],
@@ -172,7 +171,7 @@ export const services = [
   {
     id: "growth",
     title: "Growth & Marketing",
-    text: "How you’re found, understood and remembered — turning attention into customers who come back and bring others. Positioning first, then demand: we don’t spend to grow before the story is proven.",
+    text: "How you’re found, understood and remembered, turning attention into customers who come back and bring others. Positioning first, then demand: we don’t spend to grow before the story is proven.",
     capabilities: ["Positioning", "Branding", "Marketing", "Content creation", "Demand generation", "Retention"],
     vimeo: "1184110361",
     vimeoAspect: 1280 / 536,
@@ -182,7 +181,7 @@ export const services = [
   {
     id: "technology",
     title: "Technology",
-    text: "The product and the systems behind it — built properly so they hold weight as you grow, without a rebuild later. Website and MVP inside the quarter, with the ops stack that keeps them running.",
+    text: "The product and the systems behind it, built properly so they hold weight as you grow, without a rebuild later. Website and MVP inside the quarter, with the ops stack that keeps them running.",
     capabilities: ["Website development", "App development", "Ops stack", "Integrations", "Analytics setup", "Automation"],
     vimeo: "1184110358",
     vimeoAspect: 1280 / 536,
@@ -192,7 +191,7 @@ export const services = [
   {
     id: "ai",
     title: "AI Enablement",
-    text: "AI put to work across the business — so the repeatable runs itself and your team spends its time on the rare. Inside the product where it earns its place, and behind it where it saves you hires.",
+    text: "AI put to work across the business, so the repeatable runs itself and your team spends its time on the rare. Inside the product where it earns its place, and behind it where it saves you hires.",
     capabilities: ["Workflow automation", "Sales & support AI", "Custom AI tools", "Data setup", "Prompt systems", "Agentic workflows"],
     vimeo: "1184110386",
     vimeoAspect: 1280 / 536,
@@ -202,7 +201,7 @@ export const services = [
   {
     id: "legal",
     title: "Legal & Compliance",
-    text: "The paperwork that decides whether a raise goes smoothly — handled early, before it gets expensive to fix. Incorporation, cap table and contracts done once, properly, and a data room that holds up.",
+    text: "The paperwork that decides whether a raise goes smoothly, handled early, before it gets expensive to fix. Incorporation, cap table and contracts done once, properly, and a data room that holds up.",
     capabilities: ["Incorporation", "Cap table", "Contracts", "IP assignment", "Compliance", "Data room"],
     vimeo: "1184110390",
     vimeoAspect: 1280 / 536,
@@ -359,7 +358,6 @@ export const studioVimeo = "1184110386";
 export const studioVimeoAspect = 1280 / 536;
 export const scoreVimeo = "1184110361";
 export const scoreVimeoAspect = 1280 / 536;
-export const founderPortrait = `${cdn}/b6c4df15de20e1699da43919380d4d3516666aca-400x400.webp`;
 
 /* ------------------------------------------------------------------------- *
  * Faculty — who actually takes the classes                                   *
@@ -398,7 +396,7 @@ export const faculty: FacultyGroup[] = [
     id: "investors",
     kicker: "Weekly masterclasses",
     title: "The people who write the cheques.",
-    text: "One working investor, live, every week of the quarter. Not a panel and not a fireside — a class, with your numbers on the table and the questions you’ll get asked in a real room.",
+    text: "One working investor, live, every week of the quarter. Not a panel and not a fireside: a class, with your numbers on the table and the questions you’ll get asked in a real room.",
     people: [
       {
         seat: "Seed investor · Consumer",
@@ -431,7 +429,7 @@ export const faculty: FacultyGroup[] = [
       {
         seat: "Family office · India",
         teaches: "Capital that isn’t venture",
-        note: "Revenue-based, strategic and patient money — and when it beats a VC.",
+        note: "Revenue-based, strategic and patient money, and when it beats a VC.",
         src: `${cdn}/a5591c65324bcacfd21cabe16ed535bd7853edd5-400x400.webp`,
         alt: "Person with long wavy brown hair, wearing a black turtleneck, standing in front of shelves",
       },
@@ -448,7 +446,7 @@ export const faculty: FacultyGroup[] = [
     id: "studio",
     kicker: "The execution team",
     title: "The people who build it with you.",
-    text: "The same four functions the studio runs, as named people you work with every week — not a resourcing pool. They take the ten planning classes, then stay for the eighty days of building.",
+    text: "The same four functions the studio runs, as named people you work with every week, not a resourcing pool. They take the ten planning classes, then stay for the eighty days of building.",
     people: [
       {
         seat: "Growth lead",
@@ -582,7 +580,7 @@ export const testimonials: Testimonial[] = [
  */
 export const pricingFacts: [string, string][] = [
   ["One partner, not five", "Four functions under one roof. No vendor management, no invoices you didn’t expect."],
-  ["We move scope, not price", "If the roadmap changes at day 40, we rebuild the plan — at the same fee."],
+  ["We move scope, not price", "If the roadmap changes at day 40, we rebuild the plan, at the same fee."],
   ["A desk, not a login", "Three months at WeWork, building beside the cohort and the studio team."],
   ["Fifteen founders, no more", "We take the number we can actually move. That’s the whole reason for the call."],
 ];
@@ -599,13 +597,13 @@ export type PaymentStep = {
 export const paymentSteps: PaymentStep[] = [
   {
     title: "Book your seat",
-    body: "Pay ₹15,000 within 48 hours of the call to book your seat. It counts against the fee — it holds the place, it isn’t extra.",
+    body: "Pay ₹15,000 within 48 hours of the call to book your seat. It counts against the fee, so it isn’t extra, and it is non-refundable once the seat is held.",
     amount: "₹15,000",
     when: "Within 48 hrs of the call",
   },
   {
     title: "Three payments while we build",
-    body: "The balance splits into three across the first 45 days — so you’re paying alongside the work, not ahead of it.",
+    body: "The balance splits into three across the first 45 days, so you’re paying alongside the work, not ahead of it.",
     amount: "3 × ₹95,000",
     when: "Within 45 days",
   },
@@ -637,7 +635,7 @@ export const pricing = {
   cohort: "The 90 · Q3 cohort",
   seats: 15,
   seatsLeft: 6,
-  fine: "You only pay after the call — and only if we both decide to build.",
+  fine: "You only pay after the call, and only if we both decide to build.",
 };
 
 /** Clarity both ways: what the fee buys, and what deliberately stays on your card. */
@@ -703,7 +701,7 @@ export const insights: Post[] = [
     },
     body: [
       { p: "An agency’s incentive is to say yes. You arrive with a brief and a budget, and the brief becomes the scope, and the scope becomes the invoice. Nobody in that chain is paid to ask whether the brief was right." },
-      { p: "We price a quarter, not a deliverable, which means a bad brief costs us as much as it costs you. That one structural fact is why we can afford to refuse work — and why we do, roughly four times in ten." },
+      { p: "We price a quarter, not a deliverable, which means a bad brief costs us as much as it costs you. That one structural fact is why we can afford to refuse work, and why we do, roughly four times in ten." },
       { h: "The three refusals we make most" },
       { p: "They’re always the same shapes. Once you’ve seen a few hundred startups, the pattern is almost boring." },
       { list: [
@@ -735,24 +733,24 @@ export const insights: Post[] = [
       alt: "Person working at a desk with a laptop, with awards and certificates on a shelf behind them",
     },
     body: [
-      { p: "Every startup has a number. Most of the ones on offer measure how fundable you look. Ours measures how well the company runs — which is a different question, and a more useful one if you’re the person who has to run it on Monday." },
+      { p: "Every startup has a number. Most of the ones on offer measure how fundable you look. Ours measures how well the company runs, which is a different question, and a more useful one if you’re the person who has to run it on Monday." },
       { h: "The six pillars" },
       { list: [
-        "Clarity — can you say who it’s for and why they switch, in one sentence, without a deck?",
-        "Product — does the thing exist, does it work, and is anyone using it without being asked?",
-        "Demand — do customers arrive through a channel you can describe and repeat?",
-        "Economics — do you know what a customer costs, what they’re worth, and how long the money lasts?",
-        "Structure — cap table, contracts, IP and compliance: would a data room survive contact with a lawyer?",
-        "Execution — the gap between what you said you’d do last month and what happened.",
+        "Clarity: can you say who it’s for and why they switch, in one sentence, without a deck?",
+        "Product: does the thing exist, does it work, and is anyone using it without being asked?",
+        "Demand: do customers arrive through a channel you can describe and repeat?",
+        "Economics: do you know what a customer costs, what they’re worth, and how long the money lasts?",
+        "Structure: cap table, contracts, IP and compliance: would a data room survive contact with a lawyer?",
+        "Execution: the gap between what you said you’d do last month and what happened.",
       ] },
       { h: "The two everyone gets wrong" },
       { p: "Founders over-score Clarity and under-score Structure, almost without exception." },
-      { p: "Clarity feels solved because you’ve said the sentence a hundred times — to friends, to your co-founder, to yourself in the shower. Fluency isn’t clarity. The test isn’t whether you can say it; it’s whether a stranger can repeat it back and get it right." },
+      { p: "Clarity feels solved because you’ve said the sentence a hundred times, to friends, to your co-founder, to yourself in the shower. Fluency isn’t clarity. The test isn’t whether you can say it; it’s whether a stranger can repeat it back and get it right." },
       { p: "Structure gets under-scored because nothing has broken yet. Cap tables, IP assignment and contractor agreements are invisible right up until a term sheet makes them the only thing anyone wants to talk about. By then the cheap fix is gone." },
       { h: "What you get back" },
       { p: "A free report: your archetype, your top three constraints in order, and one clear next move. It’s yours whether or not we ever work together, and it’s deliberately written so you could hand it to someone else to execute." },
       { h: "What it’s not" },
-      { p: "It isn’t a lead magnet with a score glued on, and it doesn’t flatter you — the average first score is in the forties. If it comes back low, that isn’t a sales hook. It’s usually the roadmap conversation, not the cohort one." },
+      { p: "It isn’t a lead magnet with a score glued on, and it doesn’t flatter you: the average first score is in the forties. If it comes back low, that isn’t a sales hook. It’s usually the roadmap conversation, not the cohort one." },
     ],
   },
   {
@@ -778,12 +776,12 @@ export const insights: Post[] = [
       { p: "You can ship something in thirty days. You cannot ship something, put it in front of customers, learn from what they do, and fix it. The learning loop is the product; thirty days buys you exactly one pass through it, which is a coin toss." },
       { h: "The shape of the ninety" },
       { list: [
-        "Days 1–10 — ten live classes. We read the real constraints and map all ninety days to one goal, together.",
-        "Days 11–90 — the studio ships across product, growth, AI and legal while the founder makes the calls.",
-        "By day 90 — customers in market, the metrics and the narrative to raise on, and a pitch day to say it out loud.",
+        "Days 1–10: ten live classes. We read the real constraints and map all ninety days to one goal, together.",
+        "Days 11–90: the studio ships across product, growth, AI and legal while the founder makes the calls.",
+        "By day 90: customers in market, the metrics and the narrative to raise on, and a pitch day to say it out loud.",
       ] },
       { h: "The forcing function" },
-      { p: "The thing that makes a quarter work isn’t the length. It’s that the end date is fixed and public — fifteen founders, one pitch day, a room of investors who are already in the calendar. Nobody renegotiates a deadline that other people are flying in for." },
+      { p: "The thing that makes a quarter work isn’t the length. It’s that the end date is fixed and public: fifteen founders, one pitch day, a room of investors who are already in the calendar. Nobody renegotiates a deadline that other people are flying in for." },
     ],
   },
   {
@@ -802,15 +800,15 @@ export const insights: Post[] = [
       alt: "Three people collaborating in front of a whiteboard, with one person seated at a table with a laptop",
     },
     body: [
-      { p: "The default way to build a startup in India is to hire four specialists who never meet. It’s defensible on paper — each one is good at their thing, each one is replaceable, and you keep control. In practice it puts the hardest job in the company on the least experienced person in it: you." },
+      { p: "The default way to build a startup in India is to hire four specialists who never meet. It’s defensible on paper: each one is good at their thing, each one is replaceable, and you keep control. In practice it puts the hardest job in the company on the least experienced person in it: you." },
       { h: "The integration tax" },
       { p: "Nobody quotes you for integration, and integration is most of the work. The brand agency’s positioning doesn’t reach the dev shop, so the product says something different from the website. The growth consultant optimises a funnel built on a promise the product doesn’t keep. The lawyer papers a structure nobody told them was about to change." },
       { quote: "Four vendors who never meet. One studio, four functions." },
       { h: "The escalation problem" },
-      { p: "When two vendors disagree, there’s no forum. There’s you, forwarding emails between two people who are each right within their own scope. The decision gets made by whoever is more insistent, or it doesn’t get made at all — which is worse, because the work continues either way." },
+      { p: "When two vendors disagree, there’s no forum. There’s you, forwarding emails between two people who are each right within their own scope. The decision gets made by whoever is more insistent, or it doesn’t get made at all, which is worse, because the work continues either way." },
       { h: "What one roof actually changes" },
       { list: [
-        "One plan, prioritised across all four functions — so growth and product are never solving different quarters.",
+        "One plan, prioritised across all four functions, so growth and product are never solving different quarters.",
         "One dashboard, so you can see the whole quarter rather than four status calls.",
         "One price, so nobody’s incentive is to expand their slice.",
         "One partner in the middle who owns the outcome instead of their scope.",
@@ -822,7 +820,7 @@ export const insights: Post[] = [
     slug: "shipping-an-mvp-you-dont-rebuild",
     title: "Shipping an MVP you don’t rebuild in year two",
     excerpt:
-      "Most MVPs get thrown away — not because they were built badly, but because they answered the wrong question. The four decisions that decide which kind you get.",
+      "Most MVPs get thrown away, not because they were built badly, but because they answered the wrong question. The four decisions that decide which kind you get.",
     category: "Technology",
     date: "2026-06-18",
     readingTime: "7 min read",
@@ -836,16 +834,16 @@ export const insights: Post[] = [
     body: [
       { p: "“Minimum viable” has been read as “cheap and disposable” for so long that founders now budget for the rewrite before they’ve shipped the original. That’s a choice, not a law." },
       { h: "The rebuild is almost never technical" },
-      { p: "When a product gets rewritten in year two, the reason is rarely the framework. It’s that the data model encoded an assumption about the business that turned out to be wrong — one user per account, one currency, one kind of customer — and every screen inherited it." },
+      { p: "When a product gets rewritten in year two, the reason is rarely the framework. It’s that the data model encoded an assumption about the business that turned out to be wrong: one user per account, one currency, one kind of customer. And every screen inherited it." },
       { h: "Four decisions that survive" },
       { list: [
-        "Model the business, not the screens. Get the nouns right — what is an account, an order, a member — and the UI can change a dozen times without a migration.",
+        "Model the business, not the screens. Get the nouns right: what is an account, an order, a member. Then the UI can change a dozen times without a migration.",
         "Boring infrastructure. Managed database, managed auth, one hosting platform. Novelty in the stack buys nothing and costs you the whole quarter when it breaks.",
         "Instrument from day one. If you ship without knowing what people do, your first month of customer data is gone and you can’t get it back.",
         "Put AI where it’s the point, not everywhere. Inside the product when it’s the reason someone switches; behind it when it saves you a hire. Anywhere else it’s a demo.",
       ] },
       { h: "What you should throw away" },
-      { p: "Plenty — just not the foundation. The onboarding flow, the pricing page, half the features: all of that should be cheap to replace, and will be replaced. Build those fast and loose on purpose. The distinction that matters isn’t quality, it’s which parts you’ve committed to." },
+      { p: "Plenty, just not the foundation. The onboarding flow, the pricing page, half the features: all of that should be cheap to replace, and will be replaced. Build those fast and loose on purpose. The distinction that matters isn’t quality, it’s which parts you’ve committed to." },
       { h: "The test" },
       { p: "Before we ship anything, we ask one question: if this works, what breaks first? If the answer is “the code,” we didn’t build it properly. If the answer is “we’ll need to hire,” we built the right thing." },
     ],
@@ -874,15 +872,15 @@ export const insights: Post[] = [
         "Where do customers come from, and can you do it again? One repeatable channel beats four experiments.",
         "What does a customer cost and what are they worth? Approximate is fine. Unknown is not.",
         "How long does the money last? Runway is the question behind every other question.",
-        "Is the company cleanly owned? Cap table, IP, contracts — the check that quietly kills deals after the handshake.",
+        "Is the company cleanly owned? Cap table, IP, contracts, the check that quietly kills deals after the handshake.",
       ] },
       { h: "The story’s actual job" },
-      { p: "The narrative doesn’t substitute for those answers. It sequences them — it tells the investor which number to look at first and what it implies about the next one. A great story on weak metrics reads as evasion. Honest metrics with no story read as a spreadsheet nobody champions internally." },
+      { p: "The narrative doesn’t substitute for those answers. It sequences them: it tells the investor which number to look at first and what it implies about the next one. A great story on weak metrics reads as evasion. Honest metrics with no story read as a spreadsheet nobody champions internally." },
       { h: "Build the data room before you need it" },
       { p: "The founders who raise quickly are rarely the ones with the best numbers. They’re the ones who could answer every question in the room and produce the document within an hour. Diligence is a speed test, and a slow answer reads as a bad one." },
       { quote: "The platform was never the question. Knnekt made us answer who it’s really for." },
       { h: "Ninety days of proof" },
-      { p: "This is most of why the quarter is shaped the way it is. At day 90 you have customers using what we built, the economics that come with them, and a structure that survives a lawyer — and then you pitch it live, to a room that has already been briefed." },
+      { p: "This is most of why the quarter is shaped the way it is. At day 90 you have customers using what we built, the economics that come with them, and a structure that survives a lawyer, and then you pitch it live, to a room that has already been briefed." },
     ],
   },
 ];

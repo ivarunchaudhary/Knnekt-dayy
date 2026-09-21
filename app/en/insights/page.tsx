@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 import Nav from "@/components/Nav";
 import PostCard from "@/components/PostCard";
 
-const title = "Insights — Knnekt Studios";
+const title = "Insights · Knnekt Studios";
 const description =
   "Three hundred startups’ worth of pattern: the refusals, the scores, the raises that went sideways. Written down, not gated.";
 
@@ -35,7 +35,7 @@ export default function InsightsIndex() {
           <h1 className="mt-5 max-w-[20ch] text-3xl font-medium md:text-4xl">What we’ve learned, written down.</h1>
           <p className="text-dark-subtle mt-10 max-w-[36rem] border-t border-dark/10 pt-8 text-lg leading-tight">
             The refusals, the scores, the raises that went sideways. Everything here comes out of engagements we actually
-            ran—no gated PDFs, no newsletter wall.
+            ran. No gated PDFs, no newsletter wall.
           </p>
         </header>
 

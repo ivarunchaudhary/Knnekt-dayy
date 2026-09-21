@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const post = insights.find((p) => p.slug === slug);
   if (!post) return {};
-  const title = `${post.title} — Knnekt Studios`;
+  const title = `${post.title} · Knnekt Studios`;
   return {
     title,
     description: post.excerpt,

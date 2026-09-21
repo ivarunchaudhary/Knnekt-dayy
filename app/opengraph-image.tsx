@@ -21,7 +21,7 @@ import { join } from "node:path";
  * data, so Next renders this once at build and serves it as a static file.
  */
 
-export const alt = "Knnekt Studios — India’s first Startup Execution Studio";
+export const alt = "Knnekt Studios · India’s first Startup Execution Studio";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -34,7 +34,6 @@ const [semibold, regular, hero] = await Promise.all([
 ]);
 
 const dark = "#16253f";
-const subtle = "#16253f80";
 
 export default function OpengraphImage() {
   return new ImageResponse(
@@ -60,7 +59,6 @@ export default function OpengraphImage() {
             <span style={{ fontSize: 40, fontWeight: 600, letterSpacing: "-0.03em" }}>Knnekt Studios</span>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", fontSize: 21, lineHeight: 1.3 }}>
               <span>India’s first Startup Execution Studio</span>
-              <span style={{ color: subtle }}>Growth. Technology. AI. Legal.</span>
             </div>
           </div>
           <div style={{ display: "flex", flexDirection: "column", fontSize: 56, fontWeight: 600, letterSpacing: "-0.03em", lineHeight: 1.12 }}>

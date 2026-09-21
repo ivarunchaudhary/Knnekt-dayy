@@ -69,13 +69,13 @@ const rowClass = "grid gap-x-1.5 gap-y-4 border-dark/10 py-7 lg:grid-cols-2";
 export default function Facts() {
   return (
     <Container className="py-12 md:py-28">
-      <SectionHeading lead="Curious how the quarter actually works?">Here’s the studio in numbers—the cohort, the ninety days, the experience behind it, and the score that decides who we build with.</SectionHeading>
+      <SectionHeading lead="Curious how the quarter actually works?">Here’s the studio in numbers: the cohort, the ninety days, the experience behind it, and the score that decides who we build with.</SectionHeading>
       <ul className="mt-8 space-y-5 md:mt-14">
         <li className={`${rowClass} sm:border-t`}>
           <h3 className="text-3xl font-medium md:text-4xl">15 Founders</h3>
           <div className="contents justify-between gap-8 sm:flex">
             <p className="text-dark-subtle text-sm md:max-w-[36rem]">
-              <span className="text-dark transition-colors duration-500">We take fifteen founders a quarter, and no more.</span> We choose them from the score, the report and the call—readiness, not polish. It’s a small number on purpose: the cohort builds in parallel, learns in parallel, and every founder gets the whole studio rather than a slice of it.
+              <span className="text-dark transition-colors duration-500">We take fifteen founders a quarter, and no more.</span> We choose them from the score, the report and the call, on readiness rather than polish. It’s a small number on purpose: the cohort builds in parallel, learns in parallel, and every founder gets the whole studio rather than a slice of it.
             </p>
             <div className="order-first w-[7.75rem] shrink-0 sm:order-none">
               <TeamStack />
@@ -97,7 +97,7 @@ export default function Facts() {
           <h3 className="text-3xl font-medium md:text-4xl">300+ Startups</h3>
           <div className="contents justify-between gap-8 sm:flex">
             <p className="text-dark-subtle text-sm md:max-w-[36rem]">
-              <span className="text-dark transition-colors duration-500">Everything here is built on what we learned across 300+ startups</span>—every stage, every industry, and plenty of expensive mistakes that weren’t ours to repeat. The wrong hires, the compliance surprises, the money that went nowhere: we’ve seen where they come from, and we build to keep you out of them.
+              <span className="text-dark transition-colors duration-500">Everything here is built on what we learned across 300+ startups</span>: every stage, every industry, and plenty of expensive mistakes that weren’t ours to repeat. The wrong hires, the compliance surprises, the money that went nowhere: we’ve seen where they come from, and we build to keep you out of them.
             </p>
             <div className="order-first w-[7.75rem] shrink-0 sm:order-none">
               <div className="overflow-hidden relative size-[7.75rem] rounded-lg bg-gray-200">
@@ -110,7 +110,7 @@ export default function Facts() {
           <h3 className="text-3xl font-medium md:text-4xl">One Honest Score</h3>
           <div className="contents justify-between gap-8 sm:flex">
             <p className="text-dark-subtle text-sm md:max-w-[36rem]">
-              <span className="text-dark transition-colors duration-500">Every startup has a number—we built the one that decides who we build with.</span> Six pillars, five minutes, no card and no flattery. You walk away with a free report: your archetype, your top constraints and a clear next move—yours to keep, even if we never work together.
+              <span className="text-dark transition-colors duration-500">Every startup has a number. We built the one that decides who we build with.</span> Six pillars, five minutes, no card and no flattery. You walk away with a free report: your archetype, your top constraints and a clear next move, yours to keep, even if we never work together.
             </p>
             <div className="order-first w-[7.75rem] shrink-0 sm:order-none">
               <div className="overflow-hidden relative size-[7.75rem] rounded-lg bg-gray-200">

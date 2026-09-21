@@ -1,5 +1,5 @@
 import { proofPoints } from "@/lib/data";
-import { containerClass } from "./Container";
+import { containerClass, SectionHeading } from "./Container";
 
 /** One pass of the ticker. Three identical rows sit side by side so the loop is seamless. */
 function FactRow({ hidden }: { hidden?: boolean }) {
@@ -16,7 +16,7 @@ function FactRow({ hidden }: { hidden?: boolean }) {
 }
 
 /**
- * Intro claim, then a full-bleed ticker of the studio's figures. The band is ruled
+ * Intro hook, then a full-bleed ticker of the studio's figures. The band is ruled
  * top and bottom so it reads as a measured strip rather than cards adrift in white,
  * and both edges fade to the page so items never hard-cut at the viewport.
  */
@@ -24,9 +24,10 @@ export default function Intro() {
   return (
     <section className="overflow-hidden pt-10 pb-14 md:pt-20 md:pb-20">
       <div className={containerClass}>
-        <h1 className="text-dark-subtle max-w-[52.25rem] text-2xl font-medium lg:text-3xl">
-          <span className="text-dark transition-colors duration-500">Your first 100 customers. Fund-ready in 90 days.</span> It starts with your Startup Operating Score. Then fifteen founders per cohort go all-in for one 90-day build—and come out with real customers and a company ready to raise.
-        </h1>
+        <SectionHeading as="h1" lead="Your first 100 customers. Fund-ready in 90 days.">
+          It starts with your Startup Operating Score. Then fifteen founders per cohort go all-in for one 90-day build, and come
+          out with real customers and a company ready to raise.
+        </SectionHeading>
       </div>
       <div className="relative isolate mt-12 border-y border-dark/10 py-8 md:mt-20 md:py-11">
         <div className="marquee flex">

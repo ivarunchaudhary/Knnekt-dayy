@@ -9,7 +9,7 @@ export default function Insights() {
     <section id="insights" className="py-12 md:py-28">
       <Container>
         <SectionHeading lead="What we’ve learned, written down.">
-          Three hundred startups’ worth of pattern—the refusals, the scores, the raises that went sideways. No gated PDFs.
+          Three hundred startups’ worth of pattern: the refusals, the scores, the raises that went sideways. No gated PDFs.
         </SectionHeading>
 
         <div className="mt-12 grid gap-x-1.5 gap-y-14 sm:grid-cols-2 lg:mt-20 lg:grid-cols-3">

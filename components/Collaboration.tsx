@@ -6,18 +6,17 @@ import { principles } from "@/lib/data";
 import Container, { SectionHeading } from "./Container";
 import Parallax from "./Parallax";
 
-const PlusIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
-    <path d="M4.07,10v-4.07H0v-1.89h4.07V0h1.89v4.04h4.04v1.89h-4.04v4.07h-1.89Z" />
-  </svg>
-);
-
+/**
+ * Six cards, each holding an agency habit against what we do instead. They sit a
+ * little under square-and-a-tenth now rather than the taller 1:1.23 they were:
+ * the copy is two short lines, so the extra height only read as empty card.
+ */
 export default function Collaboration() {
   return (
     <section id="about" className="overflow-hidden py-12 md:py-28">
       <Container>
         <SectionHeading lead="We’re not an agency. We’re an execution partner.">
-          An agency takes your brief and bills the hours. We take a position on your business, build it with you, and own the outcome—same four functions under one roof, but on your side of the table.
+          An agency takes your brief and bills the hours. We take a position on your business, build it with you, and own the outcome. Same four functions under one roof, but on your side of the table.
         </SectionHeading>
         <Swiper
           modules={[FreeMode, Mousewheel]}
@@ -33,7 +32,7 @@ export default function Collaboration() {
             <SwiperSlide key={p.a} className="w-[23.25rem] max-w-[23.25rem] xl:w-auto xl:max-w-none">
               <button
                 type="button"
-                className="group flex aspect-[1/1.23] w-full cursor-[inherit] flex-col overflow-hidden rounded-lg border border-dark/5 bg-gray-100 text-left outline-offset-2 outline-dark transition-all duration-300 hover:rounded-2xl"
+                className="group flex aspect-[1/1.1] w-full cursor-[inherit] flex-col overflow-hidden rounded-lg border border-dark/5 bg-gray-100 text-left outline-offset-2 outline-dark transition-all duration-300 hover:rounded-2xl"
               >
                 <span className="block w-full overflow-hidden">
                   <Parallax
@@ -44,14 +43,13 @@ export default function Collaboration() {
                     <img alt={p.alt} loading="lazy" decoding="async" width={2000} height={1414} className="size-full object-cover" sizes="23.25rem" src={p.src} />
                   </Parallax>
                 </span>
-                <span className="flex w-full grow flex-col justify-between px-5 py-6">
+                <span className="flex w-full grow flex-col justify-between px-5 py-5">
                   <span className="font-medium [@media(min-width:1440px)]:text-lg">
                     <span className="text-dark-very-subtle group-hover:text-dark-subtle block transition-colors">{p.a}</span>
                     <span className="-mt-0.5 block [@media(min-width:1440px)]:mt-0.5">{p.b}</span>
                   </span>
-                  <span className="flex cursor-pointer justify-between">
-                    <span className="mono-text text-dark/50 group-hover:text-dark group-focus-visible:text-dark font-mono">0{i + 1}</span>
-                    <PlusIcon />
+                  <span className="mono-text text-dark/50 group-hover:text-dark group-focus-visible:text-dark mt-4 block font-mono">
+                    0{i + 1}
                   </span>
                 </span>
               </button>

@@ -5,9 +5,9 @@ import Footer from "@/components/Footer";
 import Nav from "@/components/Nav";
 import ScoreQuiz from "@/components/ScoreQuiz";
 
-const title = "Startup Operating Score — Knnekt Studios";
+const title = "Startup Operating Score · Knnekt Studios";
 const description =
-  "Six pillars, one page each, five minutes, no card. See exactly what’s in your way — your archetype, your top constraints and your next move. The report lands in your inbox as a PDF, and we call you to walk through it.";
+  "Six pillars, one page each, five minutes, no card. See exactly what’s in your way: your archetype, your top constraints and your next move. The report lands in your inbox as a PDF, and we call you to walk through it.";
 
 export const metadata: Metadata = {
   title,
@@ -32,7 +32,7 @@ export default function ScorePage() {
         <p className="mono-text mt-16 font-mono text-dark/75">Every startup has a number. We built the one that decides who we build with.</p>
         <h1 className="mt-5 max-w-[16ch] text-3xl font-medium md:text-4xl">See exactly what’s in your way.</h1>
         <p className="mt-4 max-w-[52ch] text-lg text-dark/80 lg:text-xl">
-          Six pillars, one page each. One honest score — and the verdict we’d give you on the call, before we call.
+          Six pillars, one page each. One honest score, and the verdict we’d give you on the call, before we call.
         </p>
         <p className="mono-text mt-4 font-mono text-dark/60">Free · 5 min · no card · your report emailed as a PDF · we call you</p>
 

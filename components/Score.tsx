@@ -132,7 +132,7 @@ function QuestionSlide({ onStart }: { onStart: () => void }) {
       </ul>
       {picked !== null && (
         <p className="mt-4 flex flex-wrap items-center justify-between gap-2 rounded-lg bg-panel px-4 py-3 text-sm">
-          <span className="font-medium">Nice — you’ve started.</span>
+          <span className="font-medium">Nice. You’ve started.</span>
           <span className="mono-text font-mono text-dark/70">{q.remaining} →</span>
         </p>
       )}
@@ -194,7 +194,7 @@ function ClimbSlide() {
         </span>
       </div>
       <p className="text-sm leading-tight text-dark/80">
-        Past the idea stage — <span className="font-medium text-sky-deep">three milestones</span> from investor-ready. The Score names your next one.
+        Past the idea stage, <span className="font-medium text-sky-deep">three milestones</span> from investor-ready. The Score names your next one.
       </p>
     </>
   );
@@ -217,13 +217,13 @@ function RoadmapSlide() {
                 {done && check}
               </span>
               {item}
-              <span className="sr-only">{done ? " — done" : " — next"}</span>
+              <span className="sr-only">{done ? ", done" : ", next"}</span>
             </li>
           ))}
         </ul>
       </div>
       <p className="mt-4 text-sm leading-tight text-dark/80">
-        The full 90-day plan to your first 100 customers — <span className="font-medium text-sky-deep">solo (₹20k), or built with you if you’re one of the 15.</span>
+        The full 90-day plan to your first 100 customers: <span className="font-medium text-sky-deep">solo (₹20k), or built with you if you’re one of the 15.</span>
       </p>
     </>
   );
@@ -342,18 +342,26 @@ export default function Score() {
             <h2 className="mt-5 max-w-[14ch] text-3xl font-medium md:text-4xl">See exactly what’s in your way.</h2>
             <p className="mt-4 max-w-[30ch] text-lg text-dark/80 lg:text-xl">Six pillars. One honest score. No flattery.</p>
             <p className="mono-text mt-3 max-w-[52ch] font-mono text-dark/60">
-              Wherever you’re starting from, it’s step one — and the first read we use to choose the 15 we build with.
+              Wherever you’re starting from, it’s step one, and the first read we use to choose the 15 we build with.
             </p>
 
+            {/*
+              The one thing this section is asking for, so the pill is sized like it:
+              the label steps up from the 11px `mono-text` the rest of the page runs on
+              to 14px on a phone and 17px from `sm`, with the padding opened to match.
+              A 32-character label will not hold one line inside 311px, so on a phone
+              the pill goes full width and centres over two lines rather than sitting
+              in a lopsided lozenge; from `sm` there is room and it goes inline again.
+            */}
             <p className="mt-8">
               <button
                 type="button"
                 onClick={() => setOpen(true)}
-                className={`mono-text group inline-flex items-center gap-4 rounded-full text-left font-mono outline-offset-2 outline-dark ${
+                className={`mono-text group flex w-full flex-col items-stretch gap-3 rounded-full text-center font-mono outline-offset-2 outline-dark sm:inline-flex sm:w-auto sm:flex-row sm:items-center sm:gap-5 sm:text-left ${
                   pulse ? "motion-safe:animate-[score-pulse_1.6s_ease-in-out_infinite]" : ""
                 }`}
               >
-                <span className="rounded-full bg-sky-deep px-7 py-3 text-white transition-colors group-hover:bg-dark group-focus-visible:bg-dark">
+                <span className="rounded-full bg-sky-deep px-6 py-4 text-xs text-white transition-colors group-hover:bg-dark group-focus-visible:bg-dark sm:px-9 sm:py-5 sm:text-sm">
                   Take the Startup Operating Score
                 </span>
                 <span className="text-dark/60 transition-colors group-hover:text-dark group-focus-visible:text-dark">Free · 5 min →</span>
@@ -370,8 +378,8 @@ export default function Score() {
             </p>
 
             <p className="mt-6 max-w-[56ch] border-t border-dark/15 pt-5 text-xs leading-tight text-dark/70">
-              You walk away with your <span className="font-medium text-dark">free report</span> — your <span className="font-medium text-dark">archetype</span>, your{" "}
-              <span className="font-medium text-dark">top constraints</span> and a <span className="font-medium text-dark">clear next move</span> — yours to keep, even if we never
+              You walk away with your <span className="font-medium text-dark">free report</span>: your <span className="font-medium text-dark">archetype</span>, your{" "}
+              <span className="font-medium text-dark">top constraints</span> and a <span className="font-medium text-dark">clear next move</span>, yours to keep, even if we never
               work together.
             </p>
           </div>

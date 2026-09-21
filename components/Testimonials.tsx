@@ -45,7 +45,7 @@ export default function Testimonials() {
     <section id="testimonials" className="overflow-hidden py-12 md:py-28">
       <div className={containerClass}>
         <SectionHeading lead="What founders say after the ninety days.">
-          Attributed by stage and sector until founders consent to be named—each one sitting next to the number it earned.
+          Attributed by stage and sector until founders consent to be named, each one sitting next to the number it earned.
         </SectionHeading>
       </div>
 

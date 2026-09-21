@@ -38,7 +38,7 @@ export default function Pricing() {
     <section id="pricing" className="py-12 md:py-28">
       <Container>
         <SectionHeading lead="One price, published.">
-          One fee for the whole studio—growth, tech, AI and legal—for one quarter. The scope moves when your business needs it to. The number doesn’t.
+          One fee for the whole studio, growth, tech, AI and legal, for one quarter. The scope moves when your business needs it to. The number doesn’t.
         </SectionHeading>
 
         <div className="mt-12 grid items-start gap-x-1.5 gap-y-12 lg:mt-20 lg:grid-cols-[1.06fr_0.94fr] lg:gap-x-12">
@@ -89,7 +89,7 @@ export default function Pricing() {
                 ))}
               </ol>
               <p className="text-dark-subtle mt-5 max-w-[56ch] text-xs leading-tight">
-                Total <span className="text-dark font-medium">{pricing.total}</span>. Every rupee is scheduled before you start—no
+                Total <span className="text-dark font-medium">{pricing.total}</span>. Every rupee is scheduled before you start: no
                 milestone invoices, no change orders, no surprise line at day 70.
               </p>
             </div>
@@ -149,7 +149,7 @@ export default function Pricing() {
               <h4 className="flex flex-wrap items-baseline gap-3 text-xl font-medium lg:text-2xl">
                 Not included <span className="mono-text text-dark-very-subtle font-mono">your call</span>
               </h4>
-              <p className="text-dark-subtle mt-2 text-xs leading-tight">Kept out—so you stay in control.</p>
+              <p className="text-dark-subtle mt-2 text-xs leading-tight">Kept out, so you stay in control.</p>
               <ul className="mt-6">
                 {ledgerOut.map(([item, why]) => (
                   <li key={item} className="border-t border-dark/10 py-3 text-sm leading-tight">

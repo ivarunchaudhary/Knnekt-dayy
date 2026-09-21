@@ -8,7 +8,7 @@ const link = "inline-flex min-h-6 items-center outline-offset-2 outline-dark hov
 export default function Footer() {
   return (
     <footer className="mono-text relative flex flex-col overflow-hidden font-mono">
-      <div className={`${containerClass} relative z-10 flex flex-col justify-between gap-x-20 gap-y-10 pt-16 pb-14 md:pb-0`}>
+      <div className={`${containerClass} relative z-10 flex flex-col justify-between gap-x-20 gap-y-10 pt-16 pb-14 md:pb-12`}>
         <div className="grid gap-x-1.5 gap-y-10 md:grid-cols-4">
           <div>
             <Wordmark className="text-dark text-lg" />
@@ -21,27 +21,7 @@ export default function Footer() {
               <span className="text-dark-subtle block">+91 00000 00000</span>
             </address>
           </div>
-          <nav className="grid grid-cols-2 sm:grid-cols-3 md:block md:space-y-6">
-            <ul>
-              <li>
-                <Link className={link} href="/en#services">Services</Link>
-              </li>
-              <li>
-                <Link className={link} href="/en#about">Execution Studio</Link>
-              </li>
-              <li>
-                <Link className={link} href="/en#faculty">Faculty</Link>
-              </li>
-              <li>
-                <Link className={link} href="/en#pricing">Pricing</Link>
-              </li>
-              <li>
-                <Link className={link} href="/en/insights">Insights</Link>
-              </li>
-              <li>
-                <Link className={link} href="/en#contact">Contact</Link>
-              </li>
-            </ul>
+          <nav className="grid grid-cols-2 md:block md:space-y-6">
             <ul>
               <li>
                 <a className={link} href="https://www.instagram.com/knnektstudios/" target="_blank" rel="noopener noreferrer">Instagram</a>
@@ -58,9 +38,6 @@ export default function Footer() {
                 <Link className={`text-dark-subtle hover:text-dark ${link}`} href="/en/privacy-policy">Privacy Policy</Link>
               </li>
               <li>
-                <Link className={`text-dark-subtle hover:text-dark ${link}`} href="/en/imprint">Imprint</Link>
-              </li>
-              <li>
                 <Link className={`text-dark-subtle hover:text-dark ${link}`} href="/en/terms-and-conditions">Terms &amp; Conditions</Link>
               </li>
             </ul>
@@ -69,10 +46,24 @@ export default function Footer() {
             <p>
               <a className={link} href="mailto:hello@knnekt.studio">hello@knnekt.studio</a>
             </p>
-            <p>Knnekt® — Startup Operating Partner</p>
+            <p>Knnekt® · Startup Operating Partner</p>
             <p className="text-dark-subtle">©{new Date().getFullYear()} All rights reserved</p>
           </div>
         </div>
+      </div>
+      {/* The sign-off, the last words before the picture. It is set in the sans
+          because the rest of the footer is mono housekeeping and this is not
+          housekeeping — `normal-case` undoes the footer's mono uppercasing. It
+          is sized off the container rather than the viewport (`cqi`) so the
+          single line always fits the measure it is given — `nowrap` is then
+          safe at every width. From md up the picture is pulled up 14% of the
+          width, which would otherwise bring its top-left foliage in behind the
+          line; the 15% foot cancels that pull and leaves the line a whole
+          percent of clear white to sit on. */}
+      <div className={`${containerClass} @container relative z-10 pb-10 md:pb-[15%]`}>
+        <p className="text-dark font-sans text-[min(4.6cqi,4rem)] leading-none font-medium tracking-tight whitespace-nowrap normal-case">
+          Every Startup Needs One Friend
+        </p>
       </div>
       {/* The picture keeps its own 2100x747 ratio from md up, so nothing is
           cropped — both figures, the books, the print and the dog all stay in

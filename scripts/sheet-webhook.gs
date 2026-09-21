@@ -20,7 +20,10 @@
  *  5. Copy the /exec URL. In Vercel → Settings → Environment Variables set
  *       SCORE_WEBHOOK_URL = <that URL>?token=<the TOKEN you chose>
  *     Redeploy the site so the variable is picked up.
- *  6. Share the Sheet, and the Drive folder named below, with whoever reads it.
+ *  6. Check it. Open the /exec URL in a browser with ?token=<your TOKEN> on the
+ *     end. It prints, in plain words, whether the Sheet and the Drive folder are
+ *     reachable. Every line has to read normally before a submission can land.
+ *  7. Share the Sheet, and the Drive folder named below, with whoever reads it.
  *
  * ── Changing the quiz ───────────────────────────────────────────────────────
  *  Nothing to do. Columns are found by their header text and created on demand,
@@ -30,6 +33,15 @@
 
 /** Any long random string. Must match the ?token= on SCORE_WEBHOOK_URL. */
 var TOKEN = 'CHANGE-ME-to-a-long-random-string';
+
+/**
+ * Only needed when this script is not attached to the Sheet — i.e. it was made
+ * at script.google.com rather than from the Sheet's Extensions → Apps Script.
+ * Paste the long id out of the Sheet's own address:
+ *   docs.google.com/spreadsheets/d/THIS-PART-HERE/edit
+ * Leave it empty when the script lives inside the Sheet.
+ */
+var SHEET_ID = '';
 
 /** Tab that collects submissions, created if absent. */
 var SHEET_NAME = 'Submissions';
@@ -96,6 +108,52 @@ function doPost(e) {
     console.error('sheet-webhook failed: ' + (err && err.stack ? err.stack : err));
     return reply(false, String(err));
   }
+}
+
+/**
+ * Opening the /exec URL in a browser runs this: a read-only check that says, in
+ * plain words, whether the pieces a submission needs are actually reachable.
+ * It is the quickest way to find out why rows have stopped appearing, because
+ * it needs nothing but a browser — no deploy, no logs. Put the same ?token= on
+ * the end that the webhook uses; nothing is disclosed until that token matches.
+ */
+function doGet(e) {
+  var token = e && e.parameter ? e.parameter.token : '';
+  if (!token) {
+    return text('Put ?token=... on the end of this address — the same one SCORE_WEBHOOK_URL finishes with.');
+  }
+  if (token !== TOKEN) {
+    return text(
+      'That token does not match this script, so every submission is being turned away.\n\n' +
+        'Fix: make the ?token= at the end of SCORE_WEBHOOK_URL in Vercel character-for-character\n' +
+        'the same as TOKEN near the top of this script, then Deploy → Manage deployments →\n' +
+        'pencil → Version: New version → Deploy.'
+    );
+  }
+
+  var out = ['Startup Operating Score — self-test', '', 'Token: matches.'];
+
+  try {
+    var sheet = getSheet();
+    var book = sheet.getParent();
+    out.push(
+      'Sheet: “' + book.getName() + '”, tab “' + sheet.getName() + '”, ' +
+        Math.max(sheet.getLastRow() - 1, 0) + ' submission(s) recorded.'
+    );
+    out.push('       ' + book.getUrl());
+  } catch (err) {
+    out.push('Sheet: FAILED — ' + err);
+  }
+
+  try {
+    out.push('Reports folder: “' + getFolder().getName() + '” is reachable.');
+  } catch (err) {
+    out.push('Reports folder: FAILED — ' + err);
+  }
+
+  out.push('', 'Every line has to read normally for a submission to land.');
+  out.push('The Sheet address above is the one to be watching.');
+  return text(out.join('\n'));
 }
 
 function appendSubmission(data) {
@@ -200,7 +258,12 @@ function writeRow(sheet, row) {
 }
 
 function getSheet() {
-  var ss = SpreadsheetApp.getActive();
+  var ss = SHEET_ID ? SpreadsheetApp.openById(SHEET_ID) : SpreadsheetApp.getActive();
+  if (!ss) {
+    throw new Error(
+      'No spreadsheet: this script is not attached to one. Set SHEET_ID at the top of this file to the id in the Sheet’s address.'
+    );
+  }
   return ss.getSheetByName(SHEET_NAME) || ss.insertSheet(SHEET_NAME);
 }
 
@@ -219,11 +282,17 @@ function title(key) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
+/** Plain words, for the self-test a person reads in a browser. */
+function text(s) {
+  return ContentService.createTextOutput(s).setMimeType(ContentService.MimeType.TEXT);
+}
+
 /**
  * Apps Script web apps always answer 200 — there is no way to set a status code.
  * So the caller's `res.ok` check can't see a failure here, and a bad token or a
  * thrown error shows up only in this body and in Extensions → Apps Script →
- * Executions. That's the place to look if rows stop appearing.
+ * Executions — where a caught failure still reads “Completed”. Open the /exec
+ * address in a browser instead; doGet above answers the same question in words.
  */
 function reply(ok, message) {
   return ContentService.createTextOutput(JSON.stringify({ ok: ok, message: message })).setMimeType(

@@ -74,9 +74,9 @@ export const questions: Question[] = [
     ["Creator or personal brand moving into products", 0],
     ["Something else", 0],
   ], { key: "cat", specify: 6 }),
-  { kind: "short", sec: 0, key: "venName", q: "What’s the name of your venture?", h: "A working name is fine — it goes on your report.", placeholder: "e.g. Glow Labs", min: 2, max: 60 },
+  { kind: "short", sec: 0, key: "venName", q: "What’s the name of your venture?", h: "A working name is fine, it goes on your report.", placeholder: "e.g. Glow Labs", min: 2, max: 60 },
   single(0, "How many founders are building this?", "", [
-    ["Just me — solo founder", 0],
+    ["Just me, solo founder", 0],
     ["Two founders", 0],
     ["Three or more", 0],
   ], { key: "founders" }),
@@ -86,7 +86,7 @@ export const questions: Question[] = [
     key: "built",
     q: "What have you already put in place?",
     h: "Tick anything that’s true. Leave it blank if you’re still at the idea stage.",
-    options: ["Registered / incorporated the company", "Built a website or store", "Built a working product or MVP", "Set your pricing", "Got your first paying customers", "Raised outside funding", "None — still at the idea stage"].map((label) => ({ label })),
+    options: ["Registered / incorporated the company", "Built a website or store", "Built a working product or MVP", "Set your pricing", "Got your first paying customers", "Raised outside funding", "None, still at the idea stage"].map((label) => ({ label })),
     excl: 6,
   },
   {
@@ -107,8 +107,8 @@ export const questions: Question[] = [
     ["I’ve scaled or exited a company previously.", 0],
   ], { key: "exp" }),
   single(0, "What level of weekly commitment does the founding team currently give this venture?", "", [
-    ["Occasional — this runs alongside other primary commitments.", 0],
-    ["Part-time — a meaningful but secondary allocation.", 1],
+    ["Occasional: this runs alongside other primary commitments.", 0],
+    ["Part-time: a meaningful but secondary allocation.", 1],
     ["Substantially full-time across the founding team.", 2],
     ["Full-time and primary for all founders.", 3],
   ], { key: "g1" }),
@@ -147,7 +147,7 @@ export const questions: Question[] = [
     ["We validate continuously, and can quote the exact language buyers use.", 8],
   ], { pillar: 1, sub: "Evidence Base" }),
   single(2, "What best describes your understanding of why prospective buyers decline?", "", [
-    ["No one has declined — we have not yet put the proposition in front of buyers.", 0],
+    ["No one has declined; we have not yet put the proposition in front of buyers.", 0],
     ["Prospects go quiet, and we are not certain why.", 2],
     ["We understand the general reasons for hesitation.", 4],
     ["We can state the precise objection, and what we changed in response to it.", 6],
@@ -156,7 +156,7 @@ export const questions: Question[] = [
     ["It has not.", 0],
     ["More than three months ago.", 2],
     ["Within the last month.", 4],
-    ["Continuously — it is how decisions are made here.", 6],
+    ["Continuously: it is how decisions are made here.", 6],
   ], { pillar: 1, sub: "Learning Cadence" }),
 
   // 3 · Product Execution
@@ -182,9 +182,9 @@ export const questions: Question[] = [
   // 4 · Commercial Traction
   single(4, "Which best describes your sales today?", "", [
     ["No sales yet.", 0],
-    ["Sales happen, but only when I personally push — discounts, my own network.", 2],
+    ["Sales happen, but only when I personally push: discounts, my own network.", 2],
     ["A repeatable channel brings sales without me, but I’m not sure they’re profitable.", 4],
-    ["Repeatable and profitable — customers come back and each sale makes money.", 8],
+    ["Repeatable and profitable: customers come back and each sale makes money.", 8],
   ], { pillar: 3, sub: "Commercial Validation" }),
   single(4, "Which statement best represents your current revenue position?", "", [
     ["Pre-revenue.", 0],
@@ -213,7 +213,7 @@ export const questions: Question[] = [
     ["The business executes independently of the founders.", 6],
   ], { pillar: 4, sub: "Founder Dependency" }),
   single(5, "How much repeatable work has been systemised or automated?", "", [
-    ["Very little — work is handled as it arises.", 0],
+    ["Very little: work is handled as it arises.", 0],
     ["Some processes are documented but not consistently followed.", 2],
     ["Core repeatable work is systemised and followed.", 4],
     ["Repeatable work is systemised and progressively automated.", 6],
@@ -297,12 +297,12 @@ export type Archetype = "Explorer" | "Visionary" | "Builder" | "Operator" | "Arc
 export type Route = "STOP" | "B" | "A" | "WAIT";
 
 export const archetypes: Record<Archetype, { name: string; sub: string }> = {
-  Explorer: { name: "The Explorer", sub: "Idea-rich, evidence-poor. You have a thesis and no proof of anything yet — including that the problem is real." },
+  Explorer: { name: "The Explorer", sub: "Idea-rich, evidence-poor. You have a thesis and no proof of anything yet, including that the problem is real." },
   Visionary: { name: "The Visionary", sub: "You can describe this business precisely, which is rarer than you’d think. Nobody outside the building has confirmed it." },
   Builder: { name: "The Builder", sub: "You are investing in product faster than the market is validating demand. Your execution isn’t the problem. Your evidence is." },
   Operator: { name: "The Operator", sub: "You are selling faster than the business can deliver. Growth is now the risk, not the goal." },
   Architect: { name: "The Architect", sub: "The business is right and under-levered. You are currently the integration layer between functions, and that is the ceiling." },
-  Scaler: { name: "The Scaler", sub: "Nothing here is the constraint except capacity. The decision is which functions to resource properly — and it is fewer than you think." },
+  Scaler: { name: "The Scaler", sub: "Nothing here is the constraint except capacity. The decision is which functions to resource properly, and it is fewer than you think." },
 };
 
 /** Why a pillar is the bottleneck, when it is. */
@@ -330,7 +330,7 @@ export const POINTS: Record<PillarKey, string> = {
   clarity: "A single written positioning line that survives contact with a buyer",
   evidence: "Structured conversations with buyers outside your own network",
   product: "Something a stranger can use without you in the room",
-  traction: "Commercial proof — someone paying, or a clear reason they didn’t",
+  traction: "Commercial proof: someone paying, or a clear reason they didn’t",
   ops: "Knowing what breaks first if volume doubles",
   investment: "A data room that exists before anyone asks for it",
 };
@@ -350,13 +350,13 @@ export const verdicts: Record<Route, { band: string; bandSub: string; title: str
     band: "Direction",
     bandSub: "Clarity is the constraint",
     title: "You have a direction problem, not an execution one.",
-    body: "What stands between you and progress isn’t hands — it’s the absence of someone asking, every week, whether you did what you said. On the call we’ll walk your score, then map the fastest route to launch-ready.",
+    body: "What stands between you and progress isn’t hands. It’s the absence of someone asking, every week, whether you did what you said. On the call we’ll walk your score, then map the fastest route to launch-ready.",
   },
   A: {
     band: "Execution",
     bandSub: "You’re short of hands",
     title: "You know what you’re building. You’re short of hands.",
-    body: "The problem isn’t clarity — it’s fragmentation: work scattered across freelancers and tools with nobody joining the dots. On the call we’ll pinpoint which capabilities you actually need next, and how we’d operate beside you.",
+    body: "The problem isn’t clarity. It’s fragmentation: work scattered across freelancers and tools with nobody joining the dots. On the call we’ll pinpoint which capabilities you actually need next, and how we’d operate beside you.",
   },
   WAIT: {
     band: "Ready",
@@ -375,7 +375,7 @@ export const gateCopy: Record<Exclude<Gate, "RESOURCING">, [string, string]> = {
 /** What happens after the last answer. The founder does nothing; we call. */
 export const next = {
   h: "What happens next",
-  intro: "Your report is on its way to your inbox — the full breakdown, every answer, attached as a PDF. In the meantime, we’ll:",
+  intro: "Your report is on its way to your inbox: the full breakdown, every answer, attached as a PDF. In the meantime, we’ll:",
   bullets: [
     "Call you on the number you gave us to walk through your score and where it comes from",
     "Pressure-test your venture, your stage and your next moves",
@@ -384,7 +384,7 @@ export const next = {
   ],
   fine: "Free · Yours to keep · We call you, you don’t book anything",
   note: (route: Route) =>
-    route === "STOP" ? "Nothing to buy on the call. If now isn’t the right time, we’ll say so." : "No pressure to join. If now isn’t the right time — or the roadmap is the better fit — we’ll tell you straight.",
+    route === "STOP" ? "Nothing to buy on the call. If now isn’t the right time, we’ll say so." : "No pressure to join. If now isn’t the right time, or the roadmap is the better fit, we’ll tell you straight.",
 };
 
 /** Benchmarks per business model: median, top third, scale-ready. */
@@ -550,12 +550,12 @@ export const INTAKE_SECTION = "Before we start";
 /** The four things the opening step asks. They score nothing, but the founder
  *  answered them, so the report has to show them back the same way as the rest. */
 export function intakeResponses(id: Identity): Response[] {
-  const row = (question: string, answer: string): Response => ({ section: INTAKE_SECTION, question, answer: answer.trim() || "—" });
+  const row = (question: string, answer: string): Response => ({ section: INTAKE_SECTION, question, answer: answer.trim() || "-" });
   return [
     row("Your name", id.name),
     row("Email", id.email),
     row("Contact number", id.phone),
-    row("Add me to the Knnekt founder WhatsApp community.", id.optin ? "Yes — add me" : "No thanks"),
+    row("Add me to the Knnekt founder WhatsApp community.", id.optin ? "Yes, add me" : "No thanks"),
   ];
 }
 
@@ -565,12 +565,12 @@ export function responses(answers: Answers, catOther = "", id?: Identity): Respo
   const bank = questions.map((q, i) => {
     const a = answers[i];
     let val: string;
-    if (q.kind === "multi") val = Array.isArray(a) && a.length ? a.map((ix) => q.options[ix]?.label ?? "").join(", ") : "— none selected";
-    else if (q.kind === "text" || q.kind === "short") val = str(a) || "—";
+    if (q.kind === "multi") val = Array.isArray(a) && a.length ? a.map((ix) => q.options[ix]?.label ?? "").join(", ") : "none selected";
+    else if (q.kind === "text" || q.kind === "short") val = str(a) || "-";
     else if (typeof a === "number" && q.options[a]) {
       val = q.options[a].label;
       if (q.specify !== undefined && a === q.specify && catOther.trim()) val += ` (${catOther.trim()})`;
-    } else val = "—";
+    } else val = "-";
     return { section: SECTIONS[q.sec], question: q.q, answer: val };
   });
   return id ? [...intakeResponses(id), ...bank] : bank;

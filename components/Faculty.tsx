@@ -85,7 +85,7 @@ export default function Faculty() {
     <section id="faculty" className="py-12 md:py-28">
       <Container>
         <SectionHeading lead="You don’t just get a studio. You get the room.">
-          Ten live classes to plan the quarter, then a working investor in front of the cohort every week—and the same four named leads building beside you the whole time.
+          Ten live classes to plan the quarter, then a working investor in front of the cohort every week, and the same four named leads building beside you the whole time.
         </SectionHeading>
 
         <div className="mt-12 space-y-1.5 lg:mt-20">
@@ -117,7 +117,7 @@ export default function Faculty() {
         </div>
 
         <p className="text-dark-very-subtle mt-8 max-w-[42rem] text-xs">
-          Faculty is confirmed six weeks before each kickoff. Names and photographs go live as each person signs—the portraits above stand in until they do.
+          Faculty is confirmed six weeks before each kickoff. Names and photographs go live as each person signs; the portraits above stand in until they do.
         </p>
       </Container>
     </section>

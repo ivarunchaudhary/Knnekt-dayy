@@ -24,10 +24,10 @@ export function reportBlocks(r: Result, id: Identity, answers: Answers): Block[]
   for (const g of r.gates) {
     if (g === "RESOURCING") continue;
     const [name, why] = gateCopy[g];
-    b.push({ kind: "h2", text: `${name} — this outweighs your score` }, { kind: "p", text: why });
+    b.push({ kind: "h2", text: `${name}: this outweighs your score` }, { kind: "p", text: why });
   }
 
-  b.push({ kind: "h2", text: `Verdict: ${v.band} — ${v.bandSub}` }, { kind: "p", text: v.title }, { kind: "p", text: v.body });
+  b.push({ kind: "h2", text: `Verdict: ${v.band}, ${v.bandSub}` }, { kind: "p", text: v.title }, { kind: "p", text: v.body });
 
   b.push({ kind: "rule" }, { kind: "h2", text: "Your six pillars (0–100)" });
   pillars.forEach((p, i) => b.push({ kind: "li", text: `${p.name}: ${r.pct[i]}${r.pct[i] < 42 ? "  (constraint)" : ""}` }));
@@ -39,7 +39,7 @@ export function reportBlocks(r: Result, id: Identity, answers: Answers): Block[]
 
   b.push({ kind: "rule" }, { kind: "h2", text: "Your top constraints" });
   for (const c of r.constraints) {
-    b.push({ kind: "p", text: `${c.label} — ${c.name}. ${c.why}` });
+    b.push({ kind: "p", text: `${c.label}: ${c.name}. ${c.why}` });
     b.push({ kind: "small", text: `What it costs you: ${c.cost.join("; ")}.` });
   }
 

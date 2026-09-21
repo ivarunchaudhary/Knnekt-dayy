@@ -115,7 +115,7 @@ function IdentityForm({ initial, onNext }: { initial: Identity; onNext: (id: Ide
     e.preventDefault();
     const found: Errors = {};
     if (id.name.trim().length < 2) found.name = "Tell us who you are.";
-    if (!looksLikeEmail(id.email)) found.email = "That address doesn’t look right — it’s where the report goes.";
+    if (!looksLikeEmail(id.email)) found.email = "That address doesn’t look right, and it’s where the report goes.";
     if (!looksLikePhone(id.phone)) found.phone = "We need a number we can actually call.";
     setErrors(found);
     if (Object.keys(found).length) {
@@ -180,7 +180,7 @@ function IdentityForm({ initial, onNext }: { initial: Identity; onNext: (id: Ide
         </span>
       </p>
       <p className="mt-6 border-t border-dark/15 pt-5 text-xs leading-tight text-dark/70">
-        Your report lands in this inbox as a PDF the moment you finish. We’ll call you on this number to walk through it — you don’t book anything. Answer honestly, not optimistically: the score
+        Your report lands in this inbox as a PDF the moment you finish. We’ll call you on this number to walk through it, so you don’t book anything. Answer honestly, not optimistically: the score
         is only as accurate as you are.
       </p>
     </form>
@@ -294,7 +294,7 @@ function QuestionBlock({
     const text = typeof a === "string" ? a : "";
     const len = text.trim().length;
     const counter =
-      len < q.min ? { text: `A little more — tell us what it is, who it’s for, and where you are. (${len}/${q.min})`, tone: "text-dark/60" } : len <= q.sweet ? { text: `Perfect. (${len})`, tone: "text-sky-deep" } : { text: `Keep it tight. (${len}/${q.max})`, tone: "text-dark/60" };
+      len < q.min ? { text: `A little more: tell us what it is, who it’s for, and where you are. (${len}/${q.min})`, tone: "text-dark/60" } : len <= q.sweet ? { text: `Perfect. (${len})`, tone: "text-sky-deep" } : { text: `Keep it tight. (${len}/${q.max})`, tone: "text-dark/60" };
     control = (
       <>
         <textarea aria-labelledby={id} rows={5} maxLength={q.max} placeholder={q.placeholder} className={`${fieldClass} resize-y`} value={text} onChange={(e) => onAnswer(index, e.target.value)} />
@@ -615,21 +615,21 @@ function Report({ result, identity, answers, delivery }: { result: Result; ident
         <p className="mono-text mt-4 font-mono text-dark/60">{whatsNext.fine}</p>
         <p className="mt-2 text-xs leading-tight text-dark/70">{whatsNext.note(result.route)}</p>
         <p className="mt-3 text-xs leading-tight text-dark/70" aria-live="polite">
-          {delivery === "sending" && "Sending your full report to " + identity.email + " — it comes from hello@knnekt.studio…"}
+          {delivery === "sending" && "Sending your full report to " + identity.email + ", it comes from hello@knnekt.studio…"}
           {delivery === "sent" &&
             "Your full report is on its way to " +
               identity.email +
-              " — it comes from hello@knnekt.studio, so check your spam folder if it isn’t in your inbox in a few minutes. We’ll call " +
+              ", it comes from hello@knnekt.studio, so check your spam folder if it isn’t in your inbox in a few minutes. We’ll call " +
               identity.phone +
               "."}
           {delivery === "failed" &&
-            "We couldn’t email your report just now — we still have your details, and we’ll send it from hello@knnekt.studio and call " + identity.phone + " shortly."}
+            "We couldn’t email your report just now, but we still have your details, and we’ll send it from hello@knnekt.studio and call " + identity.phone + " shortly."}
         </p>
       </div>
 
       <details className="mt-8 group">
         <summary className="mono-text cursor-pointer list-none font-mono text-dark/70 transition-colors hover:text-dark">
-          <span className="inline-block transition-transform group-open:rotate-90">›</span> Your answers — exactly what you told us
+          <span className="inline-block transition-transform group-open:rotate-90">›</span> Your answers: exactly what you told us
         </summary>
         <ul className="mt-4 space-y-3 border-t border-dark/15 pt-4">
           {responses(answers, result.catOther, identity).map((r, i) => (

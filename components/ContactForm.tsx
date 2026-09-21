@@ -10,7 +10,7 @@ const interests = [
   "The 90-Day Cohort",
   "The Founder’s Roadmap",
   "Build & Scale",
-  "Not sure yet — tell me what I need",
+  "Not sure yet, tell me what I need",
 ];
 
 type Fields = { name: string; email: string; startup: string; stage: string; interest: string; message: string };
@@ -26,7 +26,7 @@ function validate(f: Fields): Errors {
   if (!f.name.trim()) e.name = "Tell us who you are.";
   if (!f.email.trim()) e.email = "We need somewhere to reply.";
   else if (!looksLikeEmail(f.email)) e.email = "That address doesn’t look right.";
-  if (f.message.trim().length < 10) e.message = "A sentence or two is plenty — but we need one.";
+  if (f.message.trim().length < 10) e.message = "A sentence or two is plenty, but we need one.";
   return e;
 }
 
@@ -48,11 +48,11 @@ export default function ContactForm() {
   const [sent, setSent] = useState(false);
 
   const mailto = useMemo(() => {
-    const subject = `New enquiry — ${fields.name.trim() || "Founder"}${fields.startup.trim() ? ` · ${fields.startup.trim()}` : ""}`;
+    const subject = `New enquiry: ${fields.name.trim() || "Founder"}${fields.startup.trim() ? ` · ${fields.startup.trim()}` : ""}`;
     const body = [
       `Name: ${fields.name.trim()}`,
       `Email: ${fields.email.trim()}`,
-      `Startup: ${fields.startup.trim() || "—"}`,
+      `Startup: ${fields.startup.trim() || "not given"}`,
       `Stage: ${fields.stage}`,
       `Looking for: ${fields.interest}`,
       "",

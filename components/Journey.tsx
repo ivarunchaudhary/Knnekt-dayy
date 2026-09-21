@@ -153,7 +153,7 @@ export default function Journey() {
     <section id="journey" className="py-12 md:py-28">
       <Container>
         <SectionHeading lead="Day 1 to pitch day.">
-          Ten live classes to plan the quarter with you, then eighty days where the studio builds and launches it. Scroll it through—the spine counts the days, the pillars come online, and the customers start landing.
+          Ten live classes to plan the quarter with you, then eighty days where the studio builds and launches it. Scroll it through: the spine counts the days, the pillars come online, and the customers start landing.
         </SectionHeading>
 
         <div className="mt-10 grid grid-cols-[6rem_1fr] gap-x-2.5 md:grid-cols-[11rem_1fr] md:gap-x-4 lg:mt-16 lg:grid-cols-[12rem_1fr] lg:gap-x-6">
