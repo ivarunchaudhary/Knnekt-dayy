@@ -2,13 +2,17 @@
 
 import { useEffect, useRef, useState } from "react";
 import { services } from "@/lib/data";
-import Vimeo from "./Vimeo";
+import { cn } from "@/lib/utils";
+import ServiceAnimation from "./ServiceAnimation";
 
 const panelClass =
   "mx-auto grid w-full max-w-418 origin-top items-center px-4 py-15 sm:px-16 md:px-9 lg:min-h-screen lg:grid-cols-2 lg:px-0 lg:py-20 lg:[@media(max-height:910px)]:py-10 lg:sticky lg:top-0";
 
 const capabilityClass =
-  "before:bg-dark relative items-baseline gap-2 rounded-lg bg-gray-200 px-2.5 pt-1.5 pb-2 lg:flex lg:pt-2.5 lg:pb-3 lg:before:size-2 lg:before:shrink-0 lg:before:-translate-y-[20%] lg:before:rounded-full";
+  "before:bg-dark relative items-baseline gap-2 rounded-lg bg-gray-200 px-2.5 pt-1.5 pb-2 transition-colors duration-500 before:transition-colors before:duration-500 lg:flex lg:pt-2.5 lg:pb-3 lg:before:size-2 lg:before:shrink-0 lg:before:-translate-y-[20%] lg:before:rounded-full";
+
+/** The chip for whichever capability the drawing above is acting out right now. */
+const activeCapabilityClass = "bg-sky-soft before:bg-brand";
 
 /**
  * Four full-height panels stack on top of each other while scrolling (sticky cards).
@@ -69,27 +73,7 @@ export default function Services() {
               }}
               style={{ transformOrigin: "top center", willChange: "transform, opacity" }}
             >
-              <div className="overflow-hidden rounded-lg bg-white px-4 pt-5 lg:max-w-170 lg:rounded-xl lg:pt-8">
-                <div className={s.mediaClass}>
-                  <Vimeo id={s.vimeo} aspect={s.vimeoAspect} title={`Service Animation ${i + 1}`} />
-                </div>
-                <div className="p-5 pt-7 lg:px-14 lg:py-12 lg:[@media(max-height:910px)]:py-8">
-                  <p className="text-md leading-tight lg:max-w-145">{s.text}</p>
-                  <p id={`service-list-title-${s.id}`} className="mono-text text-dark/80 mt-11 font-mono leading-tight lg:[@media(max-height:910px)]:mt-8">
-                    What that covers
-                  </p>
-                  <ul
-                    className="mt-3.5 grid grid-cols-2 gap-1.5 text-xs leading-tight lg:gap-2 lg:[@media(max-height:910px)]:mt-2"
-                    aria-labelledby={`service-list-title-${s.id}`}
-                  >
-                    {s.capabilities.map((c) => (
-                      <li key={c} className={capabilityClass}>
-                        {c}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
+              <ServiceCard service={s} />
             </div>
           </div>
         );
@@ -129,5 +113,32 @@ export default function Services() {
         </div>
       </div>
     </section>
+  );
+}
+
+function ServiceCard({ service: s }: { service: (typeof services)[number] }) {
+  const [step, setStep] = useState<string>();
+  return (
+    <div className="overflow-hidden rounded-lg bg-white px-4 pt-5 lg:max-w-170 lg:rounded-xl lg:pt-8">
+      <div className="px-2 lg:px-10">
+        <ServiceAnimation id={s.id} title={`${s.title}: ${s.capabilities.join(", ")}`} onStep={setStep} />
+      </div>
+      <div className="p-5 pt-7 lg:px-14 lg:py-12 lg:[@media(max-height:910px)]:py-8">
+        <p className="text-md leading-tight lg:max-w-145">{s.text}</p>
+        <p id={`service-list-title-${s.id}`} className="mono-text text-dark/80 mt-11 font-mono leading-tight lg:[@media(max-height:910px)]:mt-8">
+          What that covers
+        </p>
+        <ul
+          className="mt-3.5 grid grid-cols-2 gap-1.5 text-xs leading-tight lg:gap-2 lg:[@media(max-height:910px)]:mt-2"
+          aria-labelledby={`service-list-title-${s.id}`}
+        >
+          {s.capabilities.map((c) => (
+            <li key={c} className={cn(capabilityClass, c === step && activeCapabilityClass)}>
+              {c}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
   );
 }

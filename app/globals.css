@@ -227,17 +227,6 @@ body {
   from { transform: translate3d(0, 0, 0); }
   to { transform: translate3d(-33.3333%, 0, 0); }
 }
-/* Testimonial ticker: a second row travelling the other way, half the speed */
-.marquee-reverse {
-  animation-name: marquee-reverse;
-}
-.marquee-slow {
-  animation-duration: 70s;
-}
-@keyframes marquee-reverse {
-  from { transform: translate3d(-33.3333%, 0, 0); }
-  to { transform: translate3d(0, 0, 0); }
-}
 /* Last, so the shorthand reset wins over every modifier above */
 @media (prefers-reduced-motion: reduce) {
   .marquee { animation: none; }

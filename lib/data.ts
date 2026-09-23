@@ -173,9 +173,6 @@ export const services = [
     title: "Growth & Marketing",
     text: "How you’re found, understood and remembered, turning attention into customers who come back and bring others. Positioning first, then demand: we don’t spend to grow before the story is proven.",
     capabilities: ["Positioning", "Branding", "Marketing", "Content creation", "Demand generation", "Retention"],
-    vimeo: "1184110361",
-    vimeoAspect: 1280 / 536,
-    mediaClass: "-mb-3 px-5 lg:px-14",
     bg: `${cdn}/7fa74a1ccdcb8015276c6112898c48b4bdcb3da7-1920x1112.webp`,
   },
   {
@@ -183,9 +180,6 @@ export const services = [
     title: "Technology",
     text: "The product and the systems behind it, built properly so they hold weight as you grow, without a rebuild later. Website and MVP inside the quarter, with the ops stack that keeps them running.",
     capabilities: ["Website development", "App development", "Ops stack", "Integrations", "Analytics setup", "Automation"],
-    vimeo: "1184110358",
-    vimeoAspect: 1280 / 536,
-    mediaClass: "mt-1 px-7 lg:mt-2 lg:px-16",
     bg: `${cdn}/5972f7b6bc093c048edc54c40149f78a8af834ae-1920x1112.webp`,
   },
   {
@@ -193,9 +187,6 @@ export const services = [
     title: "AI Enablement",
     text: "AI put to work across the business, so the repeatable runs itself and your team spends its time on the rare. Inside the product where it earns its place, and behind it where it saves you hires.",
     capabilities: ["Workflow automation", "Sales & support AI", "Custom AI tools", "Data setup", "Prompt systems", "Agentic workflows"],
-    vimeo: "1184110386",
-    vimeoAspect: 1280 / 536,
-    mediaClass: "my-1 px-7 lg:my-2 lg:px-16",
     bg: `${cdn}/5c0766161f4835c1f8d9489e22128bfc71aad1ff-1920x1112.webp`,
   },
   {
@@ -203,9 +194,6 @@ export const services = [
     title: "Legal & Compliance",
     text: "The paperwork that decides whether a raise goes smoothly, handled early, before it gets expensive to fix. Incorporation, cap table and contracts done once, properly, and a data room that holds up.",
     capabilities: ["Incorporation", "Cap table", "Contracts", "IP assignment", "Compliance", "Data room"],
-    vimeo: "1184110390",
-    vimeoAspect: 1280 / 536,
-    mediaClass: "mt-2 px-10 lg:mt-3 lg:px-20",
     bg: `${cdn}/84a716626708bc871945e911c39039eb81ec16c1-1920x1112.webp`,
   },
 ];
@@ -504,69 +492,87 @@ export type Testimonial = {
   attribution: string;
   /** The one figure that backs the quote up. */
   result: string;
+  /**
+   * The card in the photo stack. The four case-study quotes carry their own
+   * case frame; the rest carry a studio photo, never a face that would read as
+   * the founder's own.
+   */
+  image: { src: string; alt: string };
 };
 
-/** Two rows of these scroll past each other, opposite directions. */
+/** One at a time, on a stack of photos that shuffles forward with each quote. */
 export const testimonials: Testimonial[] = [
   {
     quote: "Knnekt gave me a clear vision to launch. Within two months I shipped my product and gained the traction that helped me understand my customers.",
     attribution: "Founder · Athleisure · In market",
     result: "45 → 71 score",
+    image: { src: `${cdn}/630edbc02eae351ece1f45cce3e1ede17718cca4-1200x1249.webp`, alt: "Coach reviewing data on a laptop while athletes train on an indoor track" },
   },
   {
     quote: "The platform was never the question. Knnekt made us answer who it’s really for.",
     attribution: "Founder · Equity-firm SaaS · In market",
     result: "2 pilots live",
+    image: { src: `${cdn}/39491c8a82d60f80a16f404d543c829d3123d7d7-1200x1249.webp`, alt: "Person holding a tablet displaying an AI assistant interface" },
   },
   {
     quote: "They cut half my roadmap and I launched twice as fast. The no’s were the value.",
     attribution: "Founder · Luxury commerce · Launched",
     result: "52 → 79 score",
+    image: { src: `${own}/qolorr-mobile.webp`, alt: "The Qolorr wordmark, white on black" },
   },
   {
     quote: "They talked me out of spending ₹50k I didn’t need to. I ran the roadmap myself and it worked.",
     attribution: "Founder · D2C beverage · Roadmap",
     result: "38 → 55 score",
+    image: { src: `${own}/khoj-mobile.webp`, alt: "A woman in Punjabi jewellery drinking from a brass glass, in front of a shelf of spice jars" },
   },
   {
     quote: "I’d been quoted four vendors and three months just to get to a kickoff. Here it was one plan and one invoice.",
     attribution: "Founder · Logistics SaaS · Building",
     result: "One fixed price",
+    image: { src: `${cdn}/485eab86632782a606942f1209ba6c34d2668eda-1200x1601.webp`, alt: "A long, bright open-plan office with people working at shared desks" },
   },
   {
     quote: "The score was brutal and it was the most useful hour of my year. I knew exactly what was broken before I spent a rupee.",
     attribution: "Founder · Healthtech · Pre-launch",
     result: "Free report, kept",
+    image: { src: `${cdn}/131a923cb1ee419e62639e344a4d1a0ce6913048-1200x1601.webp`, alt: "Person with a hand to their face, reading something on a desktop computer" },
   },
   {
     quote: "The weekly 1:1 is the part I’d pay for on its own. Someone senior, every week, who’d actually read my numbers.",
     attribution: "Founder · Fintech · Building",
     result: "12 weekly 1:1s",
+    image: { src: `${cdn}/25d452de1b87378bd8baa6e3860b17d5b656edaf-1200x1560.webp`, alt: "Person in a grey sweater reading a message on their phone" },
   },
   {
     quote: "Pitch day put me in front of people I’d been cold-emailing for a year. Two of those conversations are still going.",
     attribution: "Founder · Marketplace · Raising",
     result: "Warm intros, day 90",
+    image: { src: `${cdn}/747377142fa2afc1e416f378ebd1d672a90a184d-1200x1601.webp`, alt: "Four people talking on a bench outside an office building" },
   },
   {
     quote: "We shipped the MVP in week seven and had paying users in week nine. Nothing about that was normal for us.",
     attribution: "Founder · Vertical SaaS · In market",
     result: "MVP by week 7",
+    image: { src: `${cdn}/4ba968d2595fbd0923b413c381b2d5b7577d3215-1200x1599.webp`, alt: "Person at a workbench with a 3D printer and tools on a pegboard wall" },
   },
   {
     quote: "Legal was the thing I kept putting off. It got handled in the first month, before it got expensive.",
     attribution: "Founder · Consumer app · In market",
     result: "Clean data room",
+    image: { src: `${cdn}/a7836cfbeb7410fcc0226cd2f630461ff0199920-1200x1601.webp`, alt: "Person working at a counter beside a large plant, in a sunlit room" },
   },
   {
     quote: "Fifteen founders in the same room, all one quarter deep. I stopped feeling like the only one having that week.",
     attribution: "Founder · Edtech · Building",
     result: "Cohort of 15",
+    image: { src: `${cdn}/6d4203a26a935285c7869dcc83ff68ed568778c1-1200x1249.webp`, alt: "A group gathered around a table with laptops, mid-discussion" },
   },
   {
     quote: "I came in wanting a rebrand. I left with positioning, a product and customers. The rebrand never mattered.",
     attribution: "Founder · B2B services · In market",
     result: "100 customers",
+    image: { src: `${cdn}/2e36adf958deec74eccfb3384d2da6277f206d96-1200x1601.webp`, alt: "Person assembling something at a wooden workbench in a studio" },
   },
 ];
 
