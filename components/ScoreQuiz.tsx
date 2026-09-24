@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { scorePillars } from "@/lib/data";
 import {
   CONFIG,
@@ -20,6 +21,7 @@ import {
   type Identity,
   type Result,
 } from "@/lib/score";
+import { LADDER, PATHS, plan as planFor, planCopy, type Month, type PathKey, type Plan } from "@/lib/scorePlan";
 import GradientBackground from "./GradientBackground";
 
 /** The founder community invite. An env var can point a preview at another
@@ -72,32 +74,6 @@ const check = (
     <path d="M3 8.5l3.2 3.2L13 5" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
-
-/** The six pillars as bars. `weak` marks the ones the constraints come from. */
-function Pillars({ values, weak = [] }: { values: number[]; weak?: number[] }) {
-  return (
-    <>
-      <div aria-hidden="true" className="grid h-40 grid-cols-6 items-end gap-2.5">
-        {values.map((h, i) => (
-          <span key={i} className="flex h-full items-end">
-            <span
-              className={`block w-full rounded-t-md transition-[height] duration-700 ease-out-expo ${weak.includes(i) ? "bg-gray-100 ring-[1.5px] ring-inset ring-sky-deep" : "bg-sky-deep"}`}
-              style={{ height: `${Math.max(h, 2)}%` }}
-            />
-          </span>
-        ))}
-      </div>
-      <ul className="mt-2.5 grid grid-cols-6 gap-2.5">
-        {scorePillars.map((p, i) => (
-          <li key={p} className={`mono-text text-center font-mono text-[0.5625rem] ${weak.includes(i) ? "text-sky-deep" : "text-dark/60"}`}>
-            <span className="block font-sans text-sm font-medium normal-case tracking-normal text-dark tabular-nums">{values[i]}</span>
-            {p}
-          </li>
-        ))}
-      </ul>
-    </>
-  );
-}
 
 type Errors = Partial<Record<"name" | "email" | "phone", string>>;
 const looksLikeEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim());
@@ -460,60 +436,454 @@ function WhatsAppBar({ url }: { url: string }) {
 }
 
 type Delivery = "sending" | "sent" | "failed";
+/** The emailed PDF, handed back by the API so the founder can save it here too. */
+type ReportFile = { filename: string; base64: string };
 
-function Report({ result, identity, answers, delivery }: { result: Result; identity: Identity; answers: Answers; delivery: Delivery }) {
+function download(file: ReportFile) {
+  const bytes = Uint8Array.from(atob(file.base64), (c) => c.charCodeAt(0));
+  const url = URL.createObjectURL(new Blob([bytes], { type: "application/pdf" }));
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = file.filename;
+  a.click();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+/** A page break in the report: the eyebrow with a hairline running off it. */
+function PageEye({ children, first = false }: { children: React.ReactNode; first?: boolean }) {
+  return (
+    <p className={`mono-text flex items-center gap-3 font-mono text-dark/60 ${first ? "mt-6" : "mt-14"}`}>
+      <span className="shrink-0">{children}</span>
+      <span aria-hidden="true" className="h-px flex-1 bg-dark/15" />
+    </p>
+  );
+}
+
+/** A report section: a heading, the line under it that says how to read it, and the thing itself. */
+function Sec({ h, d, children }: { h: string; d?: string; children: React.ReactNode }) {
+  return (
+    <section className="mt-10">
+      <h3 className="text-base leading-tight font-medium lg:text-lg">{h}</h3>
+      {d && <p className="mt-1.5 max-w-[52ch] text-sm leading-tight text-dark/70">{d}</p>}
+      <div className="mt-5">{children}</div>
+    </section>
+  );
+}
+
+const cross = (
+  <span aria-hidden="true" className="w-3 shrink-0 text-dark/50">
+    ×
+  </span>
+);
+const tick = (
+  <span aria-hidden="true" className="w-3 shrink-0 font-mono text-sky-deep">
+    ✓
+  </span>
+);
+
+/** The founder's answers, slid in from the side so the report never has to carry them. */
+function AnswersDrawer({ open, onClose, rows }: { open: boolean; onClose: () => void; rows: ReturnType<typeof responses> }) {
+  const anchor = useRef<HTMLSpanElement>(null);
+  const close = useRef<HTMLButtonElement>(null);
+  const [host, setHost] = useState<Element | null>(null);
+  // Inside the score dialog, the drawer has to live in the dialog too: the
+  // dialog sits in the top layer, and anything portalled to <body> would open
+  // underneath its backdrop.
+  useEffect(() => setHost(anchor.current?.closest("dialog") ?? document.body), []);
+  useEffect(() => {
+    if (!open) return;
+    close.current?.focus();
+    // Capture Escape before the dialog sees it, so it shuts the drawer, not the score.
+    const key = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      e.preventDefault();
+      e.stopPropagation();
+      onClose();
+    };
+    window.addEventListener("keydown", key, true);
+    return () => window.removeEventListener("keydown", key, true);
+  }, [open, onClose]);
+
+  const drawer = (
+    <>
+      <div aria-hidden="true" onClick={onClose} className={`fixed inset-0 z-50 bg-dark/40 transition-opacity duration-300 ${open ? "opacity-100" : "pointer-events-none opacity-0"}`} />
+      <aside
+        aria-label="Your answers"
+        inert={!open}
+        className={`fixed inset-y-0 right-0 z-50 flex w-[min(28rem,100vw)] flex-col bg-white shadow-[-30px_0_60px_-30px_rgba(22,37,63,0.45)] transition-transform duration-500 ease-out-expo ${open ? "translate-x-0" : "translate-x-full"}`}
+      >
+        <div className="flex items-center justify-between gap-4 border-b border-dark/10 px-6 py-4">
+          <p className="mono-text font-mono text-dark">Your answers</p>
+          <button
+            ref={close}
+            type="button"
+            onClick={onClose}
+            className="mono-text flex size-9 items-center justify-center rounded-full bg-gray-200 font-mono text-base text-dark/70 transition-colors hover:text-dark"
+          >
+            <span aria-hidden="true">✕</span>
+            <span className="sr-only">Close</span>
+          </button>
+        </div>
+        <p className="px-6 pt-4 text-sm leading-tight text-dark/70">Exactly what you told us. If anything looks off, we’ll fix it on the call.</p>
+        <ul className="flex-1 space-y-4 overflow-y-auto overscroll-contain px-6 pt-4 pb-10">
+          {rows.map((r, i) => {
+            const head = i === 0 || r.section !== rows[i - 1].section;
+            return (
+              <li key={i} className="text-sm leading-tight">
+                {head && <p className="mono-text mt-4 mb-3 border-t border-dark/10 pt-4 font-mono text-sky-deep first:mt-0">{r.section}</p>}
+                <p className="text-dark/70">{r.question}</p>
+                <p className="mt-1 font-medium text-dark">{r.answer}</p>
+              </li>
+            );
+          })}
+        </ul>
+      </aside>
+    </>
+  );
+  return (
+    <>
+      <span ref={anchor} hidden />
+      {host && createPortal(drawer, host)}
+    </>
+  );
+}
+
+const consTone = ["border-dark", "border-sky-deep", "border-sky"];
+const consText = ["text-dark", "text-sky-deep", "text-sky"];
+
+function Constraints({ items }: { items: Result["constraints"] }) {
+  return (
+    <ul className="grid gap-3 @lg:grid-cols-2 @2xl:grid-cols-3">
+      {items.map((c, i) => (
+        <li key={c.name} className={`rounded-r-lg border-l-2 bg-gray-100 px-5 py-4 ${consTone[i]}`}>
+          <p className={`mono-text font-mono ${consText[i]}`}>{c.label} constraint</p>
+          <p className="mt-2 font-medium">{c.name}</p>
+          <p className="mt-1.5 text-sm leading-tight text-dark/75">{c.why}</p>
+          <p className="mono-text mt-4 border-t border-dark/10 pt-4 font-mono text-dark/60">What it’s costing you</p>
+          <ul className="mt-2.5 space-y-1.5">
+            {c.cost.map((x) => (
+              <li key={x} className="flex items-start gap-2 text-sm leading-tight">
+                {cross}
+                {x}
+              </li>
+            ))}
+          </ul>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** The six pillars as bars, figure on top. Hollow bars are the constraints. */
+function PillarChart({ values, weak, on }: { values: number[]; weak: number[]; on: boolean }) {
+  return (
+    <div role="img" aria-label={pillars.map((p, i) => `${p.name} ${values[i]}`).join(", ")}>
+      <div aria-hidden="true" className="grid h-48 grid-cols-6 items-end gap-1.5 border-b border-dark/20 @md:gap-2.5">
+        {values.map((v, i) => {
+          const w = weak.includes(i);
+          return (
+            <div key={i} className="flex h-full flex-col justify-end">
+              <span className={`mb-1.5 text-center text-sm font-medium tabular-nums ${w ? "text-dark" : "text-sky-deep"}`}>{v}</span>
+              <span
+                className={`block w-full rounded-t-md transition-[height] duration-700 ease-out-expo ${w ? "bg-gray-100 ring-[1.5px] ring-sky-deep ring-inset" : "bg-sky-deep"}`}
+                style={{ height: on ? `${Math.max(v, 3) * 0.8}%` : "0%" }}
+              />
+            </div>
+          );
+        })}
+      </div>
+      <ul aria-hidden="true" className="mt-2.5 grid grid-cols-6 gap-1.5 @md:gap-2.5">
+        {pillars.map((p, i) => (
+          <li key={p.key} className={`mono-text text-center font-mono text-[0.5rem] leading-snug tracking-normal @md:text-[0.5625rem] @md:tracking-[0.055rem] ${weak.includes(i) ? "text-dark" : "text-dark/60"}`}>
+            <span className="@xl:hidden">{scorePillars[i]}</span>
+            <span className="hidden @xl:inline">{p.name}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/** The benchmark: a track to 100 with the model's three marks on it, and the founder. */
+function Stand({ you, bench, on }: { you: number; bench: Result["bench"]; on: boolean }) {
+  const marks: [number, string][] = [
+    [bench[0], "Median"],
+    [bench[1], "Top third"],
+    [bench[2], "Scale-ready"],
+  ];
+  return (
+    <div>
+      <div className="relative mx-1 mt-10 h-2 rounded-full bg-gray-100">
+        <span className="absolute inset-y-0 left-0 rounded-full bg-sky-deep transition-[width] duration-[1150ms] ease-out-expo" style={{ width: on ? `${you}%` : 0 }} />
+        {marks.map(([at, label]) => (
+          <span key={label} aria-hidden="true" className="absolute top-1/2 -translate-x-1/2" style={{ left: `${at}%` }}>
+            <span className="block h-4 w-px -translate-y-1/2 bg-dark/40" />
+            <span className="mono-text absolute -top-8 left-1/2 -translate-x-1/2 font-mono text-dark/60">{at}</span>
+          </span>
+        ))}
+        <span
+          className="absolute top-1/2 z-10 size-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-sky-deep shadow-[0_0_0_1.5px_var(--color-sky-deep)] transition-[left] duration-[1150ms] ease-out-expo"
+          style={{ left: `${on ? you : 0}%` }}
+        >
+          <span className="absolute top-4 left-1/2 -translate-x-1/2 text-sm font-medium whitespace-nowrap text-sky-deep">You {you}</span>
+        </span>
+      </div>
+      <p className="mono-text mt-12 flex flex-wrap gap-x-4 gap-y-1.5 font-mono text-dark/60">
+        <span className="flex items-center gap-1.5">
+          <i aria-hidden="true" className="size-2 rounded-full bg-sky-deep" />
+          You {you}
+        </span>
+        {marks.map(([at, label]) => (
+          <span key={label} className="flex items-center gap-1.5">
+            <i aria-hidden="true" className="h-2.5 w-px bg-dark/40" />
+            {label} {at}
+          </span>
+        ))}
+      </p>
+    </div>
+  );
+}
+
+/** What launch-ready means for this model, ticked where it's done. */
+function LaunchReady({ check: c, on }: { check: Plan["check"]; on: boolean }) {
+  return (
+    <div className="rounded-lg border border-dark/15 p-5 @md:p-6">
+      <p className="flex items-baseline gap-1.5">
+        <span className="text-4xl leading-none font-medium tabular-nums">{c.done}</span>
+        <span className="text-lg text-dark/40 tabular-nums">/{c.total}</span>
+        <span className="ml-2 text-sm font-medium text-dark/70">launch-ready</span>
+      </p>
+      <div aria-hidden="true" className="mt-4 h-2 overflow-hidden rounded-full bg-gray-100">
+        <span className="block h-full rounded-full bg-sky-deep transition-[width] duration-1000 ease-out-expo" style={{ width: on ? `${Math.round((c.done / c.total) * 100)}%` : 0 }} />
+      </div>
+      <p className="mt-4 text-sm leading-tight text-sky-deep">{planCopy.lrDone(c.done)}</p>
+      <ul className="mt-3 grid gap-x-6 @lg:grid-cols-2">
+        {c.items.map((it) => (
+          <li key={it.label} className={`flex items-start gap-2.5 border-b border-dark/10 py-2.5 text-sm leading-tight ${it.done ? "text-dark/60" : "text-dark"}`}>
+            {it.done ? tick : <span aria-hidden="true" className="w-3 shrink-0 text-dark">→</span>}
+            <span className="sr-only">{it.done ? "Done:" : "Still to do:"}</span>
+            {it.label}
+          </li>
+        ))}
+      </ul>
+      <p className="mt-4 text-xs leading-tight text-dark/70">{c.footer}</p>
+    </div>
+  );
+}
+
+/** Launch to investor-ready, with the rung the work starts on and where the founder has built to. */
+function Ladder({ start, built }: Plan["ladder"]) {
+  const pos = built > start ? (start + built) / 2 : start;
+  return (
+    <div>
+      <ol className="grid grid-cols-4 rounded-lg border border-dark/15">
+        {LADDER.map((s, i) => {
+          const st = i < start ? "past" : i === start ? "now" : built > start && i <= built ? "built" : "fut";
+          const tag = i === start ? "Start here" : i === built && built > start ? "Built to here" : "";
+          const tone = { now: "bg-sky-deep text-white", built: "bg-gray-100", past: "bg-gray-100 text-dark/60", fut: "text-dark/40" }[st];
+          return (
+            <li key={s.name} aria-current={i === start ? "step" : undefined} className={`relative min-w-0 px-2 pt-6 pb-3.5 first:rounded-l-lg last:rounded-r-lg @md:px-4 ${i ? "border-l border-dark/15" : ""} ${tone}`}>
+              {tag && <span className="mono-text absolute -top-2.5 left-2 rounded-full border border-sky-deep bg-white px-2 py-0.5 font-mono text-[0.5625rem] whitespace-nowrap text-sky-deep">{tag}</span>}
+              <span className="block text-[0.6875rem] leading-tight font-medium @md:text-sm">{s.name}</span>
+              <span className="mono-text mt-1 block font-mono text-[0.5625rem] opacity-80">{s.sub}</span>
+            </li>
+          );
+        })}
+      </ol>
+      <div aria-hidden="true" className="relative h-12">
+        <span className="absolute top-2.5 flex -translate-x-1/2 flex-col items-center gap-1.5" style={{ left: `${((pos + 0.5) / 4) * 100}%` }}>
+          <span className="size-2.5 rounded-full border-2 border-white bg-sky-deep shadow-[0_0_0_1.5px_var(--color-sky-deep)]" />
+          <span className="mono-text font-mono whitespace-nowrap text-dark">You’re here</span>
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function Months({ months }: { months: Month[] }) {
+  return (
+    <>
+      <ol className="space-y-3">
+        {months.map((m) => (
+          <li key={m.m} className="rounded-lg border border-dark/15 px-5 py-4">
+            <p className="flex flex-wrap items-baseline justify-between gap-2 border-b border-dark/10 pb-3">
+              <span className="font-medium">{m.m}</span>
+              <span className="mono-text font-mono text-dark/60">
+                {m.from} → <b className="font-medium text-sky-deep">~{m.to}</b> score
+              </span>
+            </p>
+            <div className="mt-3.5 grid gap-5 @lg:grid-cols-2">
+              <div>
+                <p className="mono-text font-mono text-dark/60">What gets done</p>
+                <ul className="mt-2.5 space-y-1.5">
+                  {m.topics.map((t) => (
+                    <li key={t} className="flex items-start gap-2 text-sm leading-tight">
+                      <span aria-hidden="true" className="w-3 shrink-0 text-dark/50">
+                        →
+                      </span>
+                      {t}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <p className="mono-text font-mono text-sky-deep">What Knnekt does alongside</p>
+                <ul className="mt-2.5 space-y-1.5">
+                  {m.kn.map((t) => (
+                    <li key={t} className="flex items-start gap-2 text-sm leading-tight">
+                      <span aria-hidden="true" className="mt-[0.45em] mr-1 size-1.5 shrink-0 rounded-full bg-sky-deep" />
+                      {t}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ol>
+      <p className="mt-3 text-xs leading-tight text-dark/60 italic">{planCopy.months.note}</p>
+    </>
+  );
+}
+
+const PATH_ORDER: PathKey[] = ["roadmap", "cohort"];
+
+/** Roadmap only, or the cohort. The cohort starts picked; either card or pill switches it. */
+function Paths() {
+  const [pick, setPick] = useState<PathKey>("cohort");
+  return (
+    <>
+      <div role="radiogroup" aria-label="Choose how to get there" className="inline-flex rounded-full border border-dark/10 bg-gray-100 p-1">
+        {PATH_ORDER.map((k) => (
+          <button
+            key={k}
+            type="button"
+            role="radio"
+            aria-checked={pick === k}
+            onClick={() => setPick(k)}
+            className={`rounded-full px-4 py-2 text-sm font-medium transition-colors outline-dark ${pick === k ? "bg-sky-deep text-white" : "text-dark/70 hover:text-dark"}`}
+          >
+            {k === "roadmap" ? "Roadmap only" : "Join the cohort"}
+          </button>
+        ))}
+      </div>
+      <div className="mt-6 grid gap-4 @xl:grid-cols-2">
+        {PATH_ORDER.map((k) => {
+          const p = PATHS[k];
+          const sel = pick === k;
+          return (
+            <div
+              key={k}
+              onClick={() => setPick(k)}
+              className={`relative cursor-pointer rounded-lg border px-5 pt-6 pb-5 transition-[border-color,background-color,box-shadow] duration-300 ${sel ? "border-sky-deep bg-gray-100 shadow-[0_24px_50px_-34px_rgba(22,37,63,0.5)]" : "border-dark/15 bg-white hover:border-sky-deep"}`}
+            >
+              {sel && <span className="mono-text absolute -top-3 left-4 rounded-full bg-sky-deep px-2.5 py-1 font-mono text-white">Your pick</span>}
+              <p className={`mono-text font-mono ${sel ? "text-sky-deep" : "text-dark/60"}`}>{p.tag}</p>
+              <p className="mt-2 text-lg leading-tight font-medium">{p.name}</p>
+              <p className="mono-text mt-1.5 font-mono text-dark/70">{p.price}</p>
+              <p className="mt-2 text-sm leading-tight text-dark/75">{p.one}</p>
+              <p className="mono-text mt-4 border-t border-dark/10 pt-4 font-mono text-dark/60">What’s included</p>
+              <ul className="mt-1">
+                {p.inc.map((x) => (
+                  <li key={x} className="flex items-start gap-2 border-b border-dark/10 py-2 text-sm leading-tight last:border-0">
+                    {tick}
+                    {x}
+                  </li>
+                ))}
+              </ul>
+              <p className="mono-text mt-3 font-mono text-dark/60">What’s not included</p>
+              <ul className="mt-1">
+                {p.exc.map((x) => (
+                  <li key={x} className="flex items-start gap-2 border-b border-dark/10 py-2 text-sm leading-tight text-dark/75 last:border-0">
+                    {cross}
+                    {x}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          );
+        })}
+      </div>
+    </>
+  );
+}
+
+function Report({ result, identity, answers, delivery, file }: { result: Result; identity: Identity; answers: Answers; delivery: Delivery; file: ReportFile | null }) {
   const n = useCountUp(result.overall, 1000);
   const v = verdicts[result.route];
   const arch = archetypes[result.arch];
+  const [plan] = useState(() => planFor(result));
   const [on, setOn] = useState(false);
+  const [drawer, setDrawer] = useState(false);
   useEffect(() => {
     const t = setTimeout(() => setOn(true), reduceMotion() ? 0 : 60);
     return () => clearTimeout(t);
   }, []);
   const weak = result.constraints.map((c) => pillars.findIndex((p) => p.name === c.name));
-  const marks: [number, string][] = [
-    [result.bench[0], "Median"],
-    [result.bench[1], "Top third"],
-    [result.bench[2], "Scale-ready"],
-  ];
   const founderLabel = result.founders === null ? null : ["Solo founder", "2 founders", "3+ founders"][result.founders];
+  const tone = result.confidence.tone;
 
   return (
-    <div className="motion-safe:animate-[score-in_0.5s_var(--ease-out-expo)_both]">
-      {identity.optin && WHATSAPP_URL && <WhatsAppBar url={WHATSAPP_URL} />}
-      <Eyebrow left="Your report" right={result.venName} />
-      <div className="mt-5 flex flex-wrap items-baseline gap-x-2.5 gap-y-2">
-        <span className="text-4xl leading-[0.9] font-medium tabular-nums md:text-[4.75rem]">{n}</span>
-        <span className="mono-text font-mono text-dark/60">/100</span>
-        <span className="mono-text ml-auto text-right font-mono text-dark/60">
-          Archetype
-          <span className="mt-1 block font-sans text-sm font-medium normal-case tracking-normal text-dark">{arch.name}</span>
-        </span>
+    <div className="@container motion-safe:animate-[score-in_0.5s_var(--ease-out-expo)_both]">
+      <div className="-mx-1 px-1 pt-1">
+        {identity.optin && WHATSAPP_URL && <WhatsAppBar url={WHATSAPP_URL} />}
+        <div className="flex items-center justify-between gap-3 border-b border-dark/15 pb-3">
+          <span className="mono-text font-mono whitespace-nowrap text-dark/60">Your report</span>
+          <span className="flex items-center gap-2">
+            {file && (
+              <button type="button" onClick={() => download(file)} className={`${ghostBtn} whitespace-nowrap`}>
+                PDF ↓
+              </button>
+            )}
+            <button
+              type="button"
+              aria-expanded={drawer}
+              onClick={() => setDrawer(true)}
+              className="mono-text rounded-lg border border-dark px-3.5 py-2 font-mono whitespace-nowrap text-dark transition-colors outline-offset-2 outline-dark hover:bg-dark hover:text-white"
+            >
+              Your answers
+            </button>
+          </span>
+        </div>
       </div>
-      <p className="mt-4 text-sm leading-tight text-dark/80">{arch.sub}</p>
+      <AnswersDrawer open={drawer} onClose={() => setDrawer(false)} rows={responses(answers, result.catOther, identity)} />
 
-      <dl className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
+      <PageEye first>Page 01 — Diagnosis · a 60-second read</PageEye>
+      <p className="mono-text mt-6 font-mono break-all text-sky-deep">{result.venName}</p>
+      <div className="mt-4 grid items-end gap-x-8 gap-y-4 @lg:grid-cols-[auto_1fr]">
+        <p className="flex items-baseline gap-2">
+          <span className="text-[5rem] leading-[0.85] font-medium tracking-tight tabular-nums @lg:text-[6.5rem]">{n}</span>
+          <span className="mono-text font-mono text-dark/50">/ 100</span>
+        </p>
+        <div className="pb-1">
+          <p className="mono-text font-mono text-dark/60">{plan.stage}</p>
+          <p className="mt-1.5 text-2xl leading-tight font-medium">{arch.name}</p>
+          <p className="mt-2 text-sm leading-tight text-dark/75">{arch.sub}</p>
+        </div>
+      </div>
+
+      <dl className="mt-8 grid overflow-hidden rounded-lg border border-dark/15 @md:grid-cols-[1.4fr_1fr_1fr]">
         {[
           ["Venture", result.venName],
           ["Team", founderLabel],
-          ["Benchmark", result.benchName],
+          ["Stage", plan.stage],
         ]
           .filter((f): f is [string, string] => !!f[1])
-          .map(([k, val]) => (
-            <div key={k} className="rounded-lg bg-gray-100 px-4 py-3">
+          .map(([k, val], i) => (
+            <div key={k} className={`px-4 py-3.5 ${i ? "border-t border-dark/15 @md:border-t-0 @md:border-l" : ""}`}>
               <dt className="mono-text font-mono text-dark/60">{k}</dt>
-              <dd className="mt-1 text-sm font-medium">{val}</dd>
+              <dd className="mt-1.5 text-sm font-medium break-words">{val}</dd>
             </div>
           ))}
       </dl>
 
-      <div className="mt-5 flex items-start gap-3 rounded-lg border border-dark/10 px-4 py-3">
-        <span aria-hidden="true" className={`mt-1.5 size-2 shrink-0 rounded-full ${result.confidence.tone === "high" ? "bg-sky-deep" : result.confidence.tone === "med" ? "bg-sky" : "bg-dark/40"}`} />
-        <p className="text-sm leading-tight">
+      <div className="mt-4 flex items-start gap-3 rounded-lg bg-gray-100 px-4 py-4 @md:px-5">
+        <span aria-hidden="true" className={`mt-1.5 size-2 shrink-0 rounded-full ${tone === "high" ? "bg-sky-deep" : tone === "med" ? "bg-sky" : "bg-dark/40"}`} />
+        <p className="flex-1 text-sm leading-tight">
           <span className="font-medium">{result.confidence.label}</span>
-          <span className="mono-text ml-2 font-mono text-dark/60">{result.confidence.pct}%</span>
           <span className="mt-1 block text-dark/80">{result.confidence.body}</span>
         </p>
+        <span className="text-xl font-medium text-sky-deep tabular-nums">{result.confidence.pct}%</span>
       </div>
 
       {result.gates
@@ -525,7 +895,7 @@ function Report({ result, identity, answers, delivery }: { result: Result; ident
           </div>
         ))}
 
-      <div className="mt-8 rounded-lg bg-panel px-5 py-4">
+      <div className="mt-3 rounded-lg bg-panel px-5 py-4">
         <p className="mono-text font-mono text-sky-deep">
           {v.band} · {v.bandSub}
         </p>
@@ -533,69 +903,34 @@ function Report({ result, identity, answers, delivery }: { result: Result; ident
         <p className="mt-2 text-sm leading-tight text-dark/80">{v.body}</p>
       </div>
 
-      <div className="mt-8">
-        <Eyebrow left="Your top constraints" right="What each costs you" />
-        <ul className="mt-4 space-y-2.5">
-          {result.constraints.map((c) => (
-            <li key={c.name} className="rounded-r-lg border-l-2 border-sky-deep bg-gray-100 px-4 py-3">
-              <p className="mono-text font-mono text-dark/60">{c.label}</p>
-              <p className="mt-1 text-sm font-medium">{c.name}</p>
-              <p className="text-dark-subtle mt-0.5 text-xs leading-tight">{c.why}</p>
-              <ul className="mt-2 space-y-1">
-                {c.cost.map((x) => (
-                  <li key={x} className="flex items-center gap-2.5 text-xs leading-tight">
-                    <span aria-hidden="true" className="flex size-[0.9375rem] shrink-0 items-center justify-center rounded-[4px] bg-sky-deep text-white">
-                      {check}
-                    </span>
-                    {x}
-                  </li>
-                ))}
-              </ul>
-            </li>
-          ))}
-        </ul>
-      </div>
+      <Sec h={planCopy.constraints.h} d={planCopy.constraints.d}>
+        <Constraints items={result.constraints} />
+      </Sec>
+      <Sec h={planCopy.pillars.h} d={planCopy.pillars.d}>
+        <PillarChart values={result.pct} weak={weak} on={on} />
+      </Sec>
+      <Sec h={planCopy.stand.h} d={planCopy.stand.d(result.benchName)}>
+        <Stand you={result.overall} bench={result.bench} on={on} />
+      </Sec>
+      <Sec h={planCopy.left.h} d={planCopy.left.d}>
+        <LaunchReady check={plan.check} on={on} />
+      </Sec>
 
-      <div className="mt-8">
-        <Eyebrow left="Your six pillars" right="0–100" />
-        <div className="mt-4">
-          <Pillars values={result.pct} weak={weak} />
-        </div>
-      </div>
+      <PageEye>Page 02 — Your path forward</PageEye>
+      <Sec h={planCopy.ladder.h} d={planCopy.ladder.d}>
+        <Ladder {...plan.ladder} />
+      </Sec>
+      <Sec h={planCopy.months.h} d={planCopy.months.d}>
+        <Months months={plan.months} />
+      </Sec>
+      <Sec h={planCopy.paths.h} d={planCopy.paths.d}>
+        <Paths />
+      </Sec>
 
-      <div className="mt-8">
-        <Eyebrow left="Where you stand" right={`${result.benchName} founders`} />
-        <p className="mono-text mt-8 flex justify-between font-mono text-dark/60">
-          <span>0</span>
-          <span>100</span>
-        </p>
-        <div className="relative mt-9 mb-14 h-3 rounded-full border border-dark/15 bg-gray-100">
-          <span
-            aria-hidden="true"
-            className="absolute inset-y-0 left-0 rounded-full bg-[linear-gradient(90deg,var(--color-sky-deep),var(--color-sky))] transition-[width] duration-[1150ms] ease-out-expo"
-            style={{ width: on ? `${result.overall}%` : 0 }}
-          />
-          {marks.map(([at, label], i) => (
-            <span key={label} className="absolute top-1/2 -translate-x-1/2" style={{ left: `${at}%` }}>
-              <span aria-hidden="true" className="block h-5 w-0.5 -translate-y-1/2 bg-dark/15" />
-              <span className={`mono-text absolute left-1/2 -translate-x-1/2 font-mono text-[0.5625rem] whitespace-nowrap text-dark/60 ${i === 1 && at - marks[0][0] < 12 ? "-top-9" : "top-3.5"}`}>
-                {label} {at}
-              </span>
-            </span>
-          ))}
-          <span
-            className="absolute top-1/2 z-10 size-[1.125rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-sky-deep shadow-[0_0_0_5px_var(--color-gray-100)] transition-[left] duration-[1150ms] ease-out-expo"
-            style={{ left: `${on ? result.overall : 0}%` }}
-          >
-            <span className="absolute bottom-6 left-1/2 -translate-x-1/2 rounded-full border border-sky-deep bg-white px-2.5 py-1 text-xs font-medium whitespace-nowrap text-sky-deep">You · {result.overall}</span>
-          </span>
-        </div>
-      </div>
-
-      <div className="mt-8 rounded-lg border border-dark/10 bg-gray-100 px-5 py-5">
-        <p className="font-medium">{whatsNext.h}</p>
-        <p className="mt-1.5 text-sm leading-tight text-dark/80">{whatsNext.intro}</p>
-        <ul className="mt-3 space-y-1.5">
+      <div className="mt-12 rounded-lg bg-panel px-5 py-6 @md:px-7 @md:py-7">
+        <p className="text-xl leading-tight font-medium">{whatsNext.h}</p>
+        <p className="mt-2 text-sm leading-tight text-dark/80">{whatsNext.intro}</p>
+        <ul className="mt-4 space-y-2">
           {whatsNext.bullets.map((b) => (
             <li key={b} className="flex items-start gap-2.5 text-sm leading-tight">
               <span aria-hidden="true" className="mt-0.5 flex size-[0.9375rem] shrink-0 items-center justify-center rounded-[4px] bg-sky-deep text-white">
@@ -605,16 +940,23 @@ function Report({ result, identity, answers, delivery }: { result: Result; ident
             </li>
           ))}
         </ul>
-        {identity.optin && WHATSAPP_URL && (
-          <p className="mt-5">
-            <a href={WHATSAPP_URL} target="_blank" rel="noopener" className={primaryBtn}>
-              Join the WhatsApp community →
-            </a>
+        {(file || (identity.optin && WHATSAPP_URL)) && (
+          <p className="mt-6 flex flex-wrap gap-3">
+            {file && (
+              <button type="button" onClick={() => download(file)} className={primaryBtn}>
+                Download my report →
+              </button>
+            )}
+            {identity.optin && WHATSAPP_URL && (
+              <a href={WHATSAPP_URL} target="_blank" rel="noopener" className="mono-text rounded-full bg-white px-7 py-3 font-mono text-dark transition-colors hover:bg-gray-100">
+                Join the WhatsApp community →
+              </a>
+            )}
           </p>
         )}
-        <p className="mono-text mt-4 font-mono text-dark/60">{whatsNext.fine}</p>
-        <p className="mt-2 text-xs leading-tight text-dark/70">{whatsNext.note(result.route)}</p>
-        <p className="mt-3 text-xs leading-tight text-dark/70" aria-live="polite">
+        <p className="mono-text mt-5 border-t border-dark/15 pt-4 font-mono text-dark/70">{whatsNext.fine}</p>
+        <p className="mt-2 text-xs leading-tight text-dark/75">{whatsNext.note(result.route)}</p>
+        <p className="mt-3 text-xs leading-tight text-dark/75" aria-live="polite">
           {delivery === "sending" && "Sending your full report to " + identity.email + ", it comes from hello@knnekt.studio…"}
           {delivery === "sent" &&
             "Your full report is on its way to " +
@@ -626,22 +968,6 @@ function Report({ result, identity, answers, delivery }: { result: Result; ident
             "We couldn’t email your report just now, but we still have your details, and we’ll send it from hello@knnekt.studio and call " + identity.phone + " shortly."}
         </p>
       </div>
-
-      <details className="mt-8 group">
-        <summary className="mono-text cursor-pointer list-none font-mono text-dark/70 transition-colors hover:text-dark">
-          <span className="inline-block transition-transform group-open:rotate-90">›</span> Your answers: exactly what you told us
-        </summary>
-        <ul className="mt-4 space-y-3 border-t border-dark/15 pt-4">
-          {responses(answers, result.catOther, identity).map((r, i) => (
-            <li key={i} className="text-xs leading-tight">
-              <p className="mono-text font-mono text-dark/50">{r.section}</p>
-              <p className="mt-0.5 text-dark/80">{r.question}</p>
-              <p className="mt-0.5 font-medium text-dark">{r.answer}</p>
-            </li>
-          ))}
-        </ul>
-        <p className="mt-4 text-xs leading-tight text-dark/70">If anything looks off, we’ll fix it on the call.</p>
-      </details>
     </div>
   );
 }
@@ -662,6 +988,7 @@ export default function ScoreQuiz({ bare = false }: { bare?: boolean }) {
   const [catOther, setCatOther] = useState("");
   const [stage, setStage] = useState<Stage>({ at: "identity" });
   const [delivery, setDelivery] = useState<Delivery>("sending");
+  const [file, setFile] = useState<ReportFile | null>(null);
   const top = useRef<HTMLDivElement>(null);
 
   const scrollTop = () => top.current?.scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "start" });
@@ -674,6 +1001,7 @@ export default function ScoreQuiz({ bare = false }: { bare?: boolean }) {
     go({ at: "scoring" });
     const result = grade(answers, catOther);
     setDelivery("sending");
+    setFile(null);
     const pause = new Promise((r) => setTimeout(r, reduceMotion() ? 300 : 2000));
     const send = fetch("/api/score", {
       method: "POST",
@@ -681,8 +1009,9 @@ export default function ScoreQuiz({ bare = false }: { bare?: boolean }) {
       body: JSON.stringify({ identity, answers, catOther }),
     })
       .then(async (res) => {
-        const body = (await res.json().catch(() => null)) as { emailed?: boolean } | null;
+        const body = (await res.json().catch(() => null)) as { emailed?: boolean; pdf?: ReportFile } | null;
         setDelivery(res.ok && body?.emailed ? "sent" : "failed");
+        if (res.ok && body?.pdf) setFile(body.pdf);
       })
       .catch(() => setDelivery("failed"));
     pause.then(() => go({ at: "report", result }));
@@ -718,7 +1047,7 @@ export default function ScoreQuiz({ bare = false }: { bare?: boolean }) {
     ) : stage.at === "scoring" ? (
       <Scoring />
     ) : (
-      <Report result={stage.result} identity={identity} answers={answers} delivery={delivery} />
+      <Report result={stage.result} identity={identity} answers={answers} delivery={delivery} file={file} />
     );
 
   const inner = <div className="flex min-h-[30rem] flex-col">{card}</div>;
@@ -732,10 +1061,10 @@ export default function ScoreQuiz({ bare = false }: { bare?: boolean }) {
   }
 
   return (
-    <div ref={top} className="bg-panel relative isolate scroll-mt-8 overflow-hidden rounded-xl">
+    <div ref={top} className="bg-panel relative isolate scroll-mt-8 overflow-clip rounded-xl">
       <GradientBackground />
       <div className="relative z-10 px-4 py-8 sm:p-8 lg:p-12">
-        <div className="mx-auto w-full max-w-[40rem] rounded-xl bg-white p-6 shadow-[0_40px_90px_-50px_rgba(22,37,63,0.45)] md:p-9">{inner}</div>
+        <div className={`mx-auto w-full rounded-xl ${stage.at === "report" ? "max-w-[52rem]" : "max-w-[40rem]"} bg-white p-6 shadow-[0_40px_90px_-50px_rgba(22,37,63,0.45)] md:p-9`}>{inner}</div>
       </div>
     </div>
   );
