@@ -23,7 +23,8 @@ export async function sendMail(mail: Mail): Promise<MailResult> {
   const key = process.env.RESEND_API_KEY;
   if (!key) return { sent: false, reason: "unconfigured" };
 
-  const bcc = (process.env.SCORE_BCC || "")
+  // The studio's copy of every report. Without SCORE_BCC it goes to the reply-to inbox.
+  const bcc = (process.env.SCORE_BCC || REPLY_TO)
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean);
