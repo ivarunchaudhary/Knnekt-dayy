@@ -1,8 +1,8 @@
 /**
  * The founder's report as an email: the short version of what the result page
  * shows — score, archetype, verdict, the six pillars and the constraints.
- * Every answer stays in the attached PDF, so the email stays readable on a
- * phone. Tables and inline styles throughout: this has to survive Gmail.
+ * The full report, with the path forward, is the attached PDF, so the email
+ * stays readable on a phone. Tables and inline styles throughout: this has to survive Gmail.
  *
  * The palette is the site's, from `app/globals.css` — one hue, the studio blue
  * #3B81E3, taken down to the near-black navy the figures in the hero wear. The
@@ -190,7 +190,7 @@ export function reportEmailHtml(r: Result, id: Identity, pdfName: string): strin
         </td>
         <td valign="middle" style="padding:16px;">
           <p style="margin:0;font:600 13px/1.35 ${FONT};color:${INK};">${esc(pdfName)}</p>
-          <p style="margin:4px 0 0;font:400 12px/1.5 ${FONT};color:${MUTED};">Attached to this email &mdash; the full report, every question, exactly as you answered it.</p>
+          <p style="margin:4px 0 0;font:400 12px/1.5 ${FONT};color:${MUTED};">Attached to this email &mdash; your full report: the diagnosis, what&rsquo;s left before launch, and your next three months.</p>
         </td>
       </tr>
     </table>
@@ -259,7 +259,7 @@ export function reportEmailText(r: Result, id: Identity, pdfName: string): strin
     next.fine,
     next.note(r.route),
     "",
-    `The full report - every question, exactly as you answered it - is attached as ${pdfName}.`,
+    `Your full report - the diagnosis, what's left before launch, and your next three months - is attached as ${pdfName}.`,
     "",
     `Sent to ${id.email} because you completed the Startup Operating Score.`,
     "Questions, or something looks off? Just reply - it reaches us at hello@knnekt.studio.",
