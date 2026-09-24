@@ -374,8 +374,8 @@ export const gateCopy: Record<Exclude<Gate, "RESOURCING">, [string, string]> = {
 
 /** What happens after the last answer. The founder does nothing; we call. */
 export const next = {
-  h: "What happens next",
-  intro: "Your report is on its way to your inbox: the full breakdown, every answer, attached as a PDF. In the meantime, we’ll:",
+  h: "Ready to move?",
+  intro: "This report is on its way to your inbox as a PDF: the diagnosis and your path forward. Then we’ll:",
   bullets: [
     "Call you on the number you gave us to walk through your score and where it comes from",
     "Pressure-test your venture, your stage and your next moves",
