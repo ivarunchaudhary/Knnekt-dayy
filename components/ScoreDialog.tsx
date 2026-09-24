@@ -44,7 +44,7 @@ export default function ScoreDialog({ onClose }: { onClose: () => void }) {
       onClick={(e) => {
         if (e.target === ref.current) dismiss();
       }}
-      className={`ease-in-out-quart m-auto w-[min(46rem,calc(100vw-1.5rem))] max-w-none rounded-xl bg-white p-0 text-inherit backdrop:bg-dark/60 backdrop:backdrop-blur-[2px] motion-safe:transition motion-safe:duration-200 ${
+      className={`ease-in-out-quart m-auto w-[min(60rem,calc(100vw-1.5rem))] max-w-none rounded-xl bg-white p-0 text-inherit backdrop:bg-dark/60 backdrop:backdrop-blur-[2px] motion-safe:transition motion-safe:duration-200 ${
         shown ? "opacity-100" : "scale-[0.98] opacity-0"
       }`}
     >

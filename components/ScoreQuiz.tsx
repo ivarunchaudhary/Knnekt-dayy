@@ -36,6 +36,7 @@ const fieldClass =
 const labelClass = "mono-text text-dark/80 block font-mono";
 const errorClass = "mono-text mt-2 block font-mono text-[#b3261e]";
 const primaryBtn = "mono-text rounded-full bg-sky-deep px-7 py-3 font-mono text-white transition-colors outline-offset-2 outline-dark hover:bg-dark disabled:pointer-events-none disabled:opacity-40";
+const outlineBtn = "mono-text rounded-lg border border-dark px-3.5 py-2 font-mono whitespace-nowrap text-dark transition-colors outline-offset-2 outline-dark hover:bg-dark hover:text-white";
 const ghostBtn = "mono-text rounded-full px-3 py-2 font-mono text-dark/70 transition-colors outline-dark hover:text-dark";
 
 /** Counts up from zero to `to` over `ms`, easing out, and settles on the exact figure. */
@@ -831,7 +832,7 @@ function Report({ result, identity, answers, delivery, file }: { result: Result;
           <span className="mono-text font-mono whitespace-nowrap text-dark/60">Your report</span>
           <span className="flex items-center gap-2">
             {file && (
-              <button type="button" onClick={() => download(file)} className={`${ghostBtn} whitespace-nowrap`}>
+              <button type="button" onClick={() => download(file)} className={outlineBtn}>
                 PDF ↓
               </button>
             )}
@@ -839,7 +840,7 @@ function Report({ result, identity, answers, delivery, file }: { result: Result;
               type="button"
               aria-expanded={drawer}
               onClick={() => setDrawer(true)}
-              className="mono-text rounded-lg border border-dark px-3.5 py-2 font-mono whitespace-nowrap text-dark transition-colors outline-offset-2 outline-dark hover:bg-dark hover:text-white"
+              className={outlineBtn}
             >
               Your answers
             </button>
@@ -1064,7 +1065,7 @@ export default function ScoreQuiz({ bare = false }: { bare?: boolean }) {
     <div ref={top} className="bg-panel relative isolate scroll-mt-8 overflow-clip rounded-xl">
       <GradientBackground />
       <div className="relative z-10 px-4 py-8 sm:p-8 lg:p-12">
-        <div className={`mx-auto w-full rounded-xl ${stage.at === "report" ? "max-w-[52rem]" : "max-w-[40rem]"} bg-white p-6 shadow-[0_40px_90px_-50px_rgba(22,37,63,0.45)] md:p-9`}>{inner}</div>
+        <div className="mx-auto w-full max-w-[60rem] rounded-xl bg-white p-6 shadow-[0_40px_90px_-50px_rgba(22,37,63,0.45)] md:p-9">{inner}</div>
       </div>
     </div>
   );

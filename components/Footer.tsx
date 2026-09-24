@@ -59,9 +59,11 @@ export default function Footer() {
           safe at every width. From md up the picture is pulled up 14% of the
           width, which would otherwise bring its top-left foliage in behind the
           line; the 15% foot cancels that pull and leaves the line a whole
-          percent of clear white to sit on. */}
+          percent of clear white to sit on. The line is then nudged down 8cqi
+          (a width fraction, so it tracks the picture) to sit where the white
+          starts fading into the sky. */}
       <div className={`${containerClass} @container relative z-10 pb-10 md:pb-[15%]`}>
-        <p className="text-dark font-sans text-[min(4.6cqi,4rem)] leading-none font-medium tracking-tight whitespace-nowrap normal-case">
+        <p className="text-dark text-center translate-y-[8cqi] font-sans text-[min(4.6cqi,4rem)] leading-none font-medium tracking-tight whitespace-nowrap normal-case">
           Every Startup Needs One Friend
         </p>
       </div>
