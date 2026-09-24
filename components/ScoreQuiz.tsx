@@ -2,14 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { scorePillars } from "@/lib/data";
+import { feeIncludes, ledgerIn, paymentSteps, pricing, pricingFacts, scorePillars } from "@/lib/data";
 import {
   CONFIG,
   answered,
   archetypes,
   gateCopy,
   grade,
-  next as whatsNext,
   pageMeta,
   pages,
   pillars,
@@ -21,7 +20,7 @@ import {
   type Identity,
   type Result,
 } from "@/lib/score";
-import { LADDER, PATHS, plan as planFor, planCopy, type Month, type PathKey, type Plan } from "@/lib/scorePlan";
+import { LADDER, plan as planFor, planCopy, type Month, type Plan } from "@/lib/scorePlan";
 import GradientBackground from "./GradientBackground";
 
 /** The founder community invite. An env var can point a preview at another
@@ -404,28 +403,46 @@ function Scoring() {
   );
 }
 
-/** The countdown to the WhatsApp community, for founders who ticked the box. */
+/** The countdown to the WhatsApp community, for founders who ticked the box.
+ *  WhatsApp opens in a new tab so the report stays open behind it. */
 function WhatsAppBar({ url }: { url: string }) {
   const [n, setN] = useState(CONFIG.WA_REDIRECT_SECS);
   const [stay, setStay] = useState(false);
+  /** The browser refused the timed pop-up, so it waits for a tap on Join now. */
+  const [blocked, setBlocked] = useState(false);
   useEffect(() => {
-    if (stay) return;
-    if (n <= 0) {
-      window.location.href = url;
-      return;
-    }
-    const t = setTimeout(() => setN(n - 1), 1000);
+    if (stay || blocked) return;
+    const t = setTimeout(() => {
+      if (n > 1) return setN(n - 1);
+      const w = window.open(url, "_blank");
+      if (w) {
+        w.opener = null;
+        setStay(true);
+      } else setBlocked(true);
+    }, 1000);
     return () => clearTimeout(t);
-  }, [n, stay, url]);
+  }, [n, stay, blocked, url]);
   if (stay) return null;
   return (
     <div role="status" className="sticky top-0 z-20 -mx-1 mb-6 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-dark px-4 py-3 text-white shadow-[0_20px_40px_-24px_rgba(22,37,63,0.6)]">
       <p className="text-sm leading-tight">
-        You’re in. Taking you to the founder WhatsApp community in <b className="tabular-nums">{n}</b>s…
+        {blocked ? (
+          "You’re in. Tap Join now to open the founder WhatsApp community."
+        ) : (
+          <>
+            You’re in. Taking you to the founder WhatsApp community in <b className="tabular-nums">{n}</b>s…
+          </>
+        )}
         <span className="block text-xs text-white/70">Your report is in your inbox and you can come back to this page any time.</span>
       </p>
       <span className="flex items-center gap-3">
-        <a href={url} className="mono-text rounded-full bg-white px-4 py-2 font-mono text-dark transition-colors hover:bg-sky-soft">
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener"
+          onClick={() => setStay(true)}
+          className="mono-text rounded-full bg-white px-4 py-2 font-mono text-dark transition-colors hover:bg-sky-soft"
+        >
           Join now →
         </a>
         <button type="button" onClick={() => setStay(true)} className="mono-text font-mono text-white/80 transition-colors hover:text-white">
@@ -747,65 +764,109 @@ function Months({ months }: { months: Month[] }) {
   );
 }
 
-const PATH_ORDER: PathKey[] = ["roadmap", "cohort"];
-
-/** Roadmap only, or the cohort. The cohort starts picked; either card or pill switches it. */
-function Paths() {
-  const [pick, setPick] = useState<PathKey>("cohort");
+/** The fee, as the pricing section on the site states it: the promises, the schedule, and what it covers. */
+function Fee() {
+  const taken = pricing.seats - pricing.seatsLeft;
   return (
-    <>
-      <div role="radiogroup" aria-label="Choose how to get there" className="inline-flex rounded-full border border-dark/10 bg-gray-100 p-1">
-        {PATH_ORDER.map((k) => (
-          <button
-            key={k}
-            type="button"
-            role="radio"
-            aria-checked={pick === k}
-            onClick={() => setPick(k)}
-            className={`rounded-full px-4 py-2 text-sm font-medium transition-colors outline-dark ${pick === k ? "bg-sky-deep text-white" : "text-dark/70 hover:text-dark"}`}
-          >
-            {k === "roadmap" ? "Roadmap only" : "Join the cohort"}
-          </button>
+    <div className="grid items-start gap-6 @3xl:grid-cols-[1.06fr_0.94fr]">
+      <div>
+        <ul className="flex flex-wrap gap-1.5">
+          {["Application-only", `${pricing.seats} seats per cohort`].map((chip) => (
+            <li key={chip} className="mono-text rounded-full bg-gray-200 px-3.5 py-2 font-mono text-dark/70">
+              {chip}
+            </li>
+          ))}
+        </ul>
+        <ul className="mt-6 grid border-t border-dark/10 @xl:grid-cols-2">
+          {pricingFacts.map(([title, body], i) => (
+            <li key={title} className={`border-b border-dark/10 py-5 ${i % 2 === 0 ? "@xl:border-r @xl:pr-5" : "@xl:pl-5"}`}>
+              <p className="font-medium">{title}</p>
+              <p className="mt-1.5 text-xs leading-tight text-dark/70">{body}</p>
+            </li>
+          ))}
+        </ul>
+        <p id="score-pay-schedule" className="mono-text mt-8 font-mono text-dark/80">
+          How you pay it
+        </p>
+        <ol aria-labelledby="score-pay-schedule" className="mt-4 border-t border-dark">
+          {paymentSteps.map((step, i) => (
+            <li key={step.title} className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-4 gap-y-2 border-b border-dark/10 py-5 @xl:grid-cols-[auto_minmax(0,1fr)_auto]">
+              <span className="mono-text mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full border border-dark font-mono tabular-nums">{i + 1}</span>
+              <div>
+                <p className="font-medium">{step.title}</p>
+                <p className="mt-1.5 text-xs leading-tight text-dark/70">{step.body}</p>
+              </div>
+              <p className="col-start-2 @xl:col-start-3 @xl:text-right">
+                <span className="block text-lg leading-none font-medium">{step.amount}</span>
+                <span className="mono-text mt-1.5 block font-mono text-dark/50">{step.when}</span>
+              </p>
+            </li>
+          ))}
+        </ol>
+        <p className="mt-4 text-xs leading-tight text-dark/70">
+          Total <span className="font-medium text-dark">{pricing.total}</span>. Every rupee is scheduled before you start: no milestone invoices, no change
+          orders, no surprise line at day 70.
+        </p>
+      </div>
+
+      <div className="rounded-lg bg-panel p-5 @md:p-7">
+        <p className="text-xl leading-tight font-medium">What the fee covers</p>
+        <p className="mono-text mt-2 font-mono text-dark/70">{pricing.cohort}</p>
+        <ul className="mt-6 space-y-3 text-sm leading-tight">
+          {feeIncludes.map(([thing, note]) => (
+            <li key={thing} className="flex gap-3">
+              <span aria-hidden="true" className="mt-0.5 flex size-[0.9375rem] shrink-0 items-center justify-center rounded-[4px] bg-sky-deep text-white">
+                {check}
+              </span>
+              <span className="text-dark/80">
+                <span className="font-medium text-dark">{thing}</span>, {note}
+              </span>
+            </li>
+          ))}
+        </ul>
+        <div className="mt-7 border-t border-dark/15 pt-5">
+          <p className="mono-text font-mono text-dark/70">Program fee</p>
+          <p className="mt-2 flex flex-wrap items-baseline gap-3">
+            <span className="text-3xl leading-none font-medium">{pricing.fee}</span>
+            <span className="mono-text font-mono text-dark/70">{pricing.gst}</span>
+          </p>
+        </div>
+        <div className="mt-6 border-t border-dark/15 pt-5">
+          <div aria-hidden="true" className="grid grid-cols-15 gap-1">
+            {Array.from({ length: pricing.seats }, (_, i) => (
+              <span key={i} className={`h-5 rounded-sm ${i < taken ? "bg-dark" : "bg-dark/15"}`} />
+            ))}
+          </div>
+          <p className="mt-3 flex flex-wrap items-baseline gap-2">
+            <span className="text-xl leading-none font-medium tabular-nums">{pricing.seatsLeft}</span>
+            <span className="mono-text font-mono text-dark/70">
+              of {pricing.seats} seats left · {pricing.cohort}
+            </span>
+          </p>
+        </div>
+        <p className="mt-6 text-xs leading-tight text-dark/70">{pricing.fine}</p>
+      </div>
+    </div>
+  );
+}
+
+/** Everything the fee buys, from the ledger on the pricing section. */
+function Included() {
+  return (
+    <div className="rounded-lg border border-dark/20 bg-gray-100 p-5 @md:p-7">
+      <p className="flex flex-wrap items-baseline gap-3 text-xl font-medium">
+        Included <span className="mono-text font-mono text-dark/50">in the 90</span>
+      </p>
+      <p className="mt-2 text-xs leading-tight text-dark/70">Everything the roadmap needs to hit the goal.</p>
+      <ul className="mt-5 @xl:columns-2 @xl:gap-x-7">
+        {ledgerIn.map((item) => (
+          <li key={item} className="flex break-inside-avoid gap-2.5 border-t border-dark/10 py-3 text-sm leading-tight">
+            <span aria-hidden="true" className="mt-[0.4rem] size-1.5 shrink-0 rounded-full bg-dark" />
+            {item}
+          </li>
         ))}
-      </div>
-      <div className="mt-6 grid gap-4 @xl:grid-cols-2">
-        {PATH_ORDER.map((k) => {
-          const p = PATHS[k];
-          const sel = pick === k;
-          return (
-            <div
-              key={k}
-              onClick={() => setPick(k)}
-              className={`relative cursor-pointer rounded-lg border px-5 pt-6 pb-5 transition-[border-color,background-color,box-shadow] duration-300 ${sel ? "border-sky-deep bg-gray-100 shadow-[0_24px_50px_-34px_rgba(22,37,63,0.5)]" : "border-dark/15 bg-white hover:border-sky-deep"}`}
-            >
-              {sel && <span className="mono-text absolute -top-3 left-4 rounded-full bg-sky-deep px-2.5 py-1 font-mono text-white">Your pick</span>}
-              <p className={`mono-text font-mono ${sel ? "text-sky-deep" : "text-dark/60"}`}>{p.tag}</p>
-              <p className="mt-2 text-lg leading-tight font-medium">{p.name}</p>
-              <p className="mono-text mt-1.5 font-mono text-dark/70">{p.price}</p>
-              <p className="mt-2 text-sm leading-tight text-dark/75">{p.one}</p>
-              <p className="mono-text mt-4 border-t border-dark/10 pt-4 font-mono text-dark/60">What’s included</p>
-              <ul className="mt-1">
-                {p.inc.map((x) => (
-                  <li key={x} className="flex items-start gap-2 border-b border-dark/10 py-2 text-sm leading-tight last:border-0">
-                    {tick}
-                    {x}
-                  </li>
-                ))}
-              </ul>
-              <p className="mono-text mt-3 font-mono text-dark/60">What’s not included</p>
-              <ul className="mt-1">
-                {p.exc.map((x) => (
-                  <li key={x} className="flex items-start gap-2 border-b border-dark/10 py-2 text-sm leading-tight text-dark/75 last:border-0">
-                    {cross}
-                    {x}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          );
-        })}
-      </div>
-    </>
+      </ul>
+    </div>
   );
 }
 
@@ -830,21 +891,14 @@ function Report({ result, identity, answers, delivery, file }: { result: Result;
         {identity.optin && WHATSAPP_URL && <WhatsAppBar url={WHATSAPP_URL} />}
         <div className="flex items-center justify-between gap-3 border-b border-dark/15 pb-3">
           <span className="mono-text font-mono whitespace-nowrap text-dark/60">Your report</span>
-          <span className="flex items-center gap-2">
-            {file && (
-              <button type="button" onClick={() => download(file)} className={outlineBtn}>
-                PDF ↓
-              </button>
-            )}
-            <button
-              type="button"
-              aria-expanded={drawer}
-              onClick={() => setDrawer(true)}
-              className={outlineBtn}
-            >
-              Your answers
-            </button>
-          </span>
+          <button
+            type="button"
+            aria-expanded={drawer}
+            onClick={() => setDrawer(true)}
+            className={outlineBtn}
+          >
+            Your answers
+          </button>
         </div>
       </div>
       <AnswersDrawer open={drawer} onClose={() => setDrawer(false)} rows={responses(answers, result.catOther, identity)} />
@@ -924,40 +978,29 @@ function Report({ result, identity, answers, delivery, file }: { result: Result;
       <Sec h={planCopy.months.h} d={planCopy.months.d}>
         <Months months={plan.months} />
       </Sec>
-      <Sec h={planCopy.paths.h} d={planCopy.paths.d}>
-        <Paths />
+      <Sec h={planCopy.fee.h} d={planCopy.fee.d}>
+        <Fee />
       </Sec>
+      <div className="mt-4">
+        <Included />
+      </div>
 
-      <div className="mt-12 rounded-lg bg-panel px-5 py-6 @md:px-7 @md:py-7">
-        <p className="text-xl leading-tight font-medium">{whatsNext.h}</p>
-        <p className="mt-2 text-sm leading-tight text-dark/80">{whatsNext.intro}</p>
-        <ul className="mt-4 space-y-2">
-          {whatsNext.bullets.map((b) => (
-            <li key={b} className="flex items-start gap-2.5 text-sm leading-tight">
-              <span aria-hidden="true" className="mt-0.5 flex size-[0.9375rem] shrink-0 items-center justify-center rounded-[4px] bg-sky-deep text-white">
-                {check}
-              </span>
-              {b}
-            </li>
-          ))}
-        </ul>
+      <div className="mt-10 border-t border-dark/15 pt-6">
         {(file || (identity.optin && WHATSAPP_URL)) && (
-          <p className="mt-6 flex flex-wrap gap-3">
+          <p className="flex flex-wrap gap-3">
             {file && (
               <button type="button" onClick={() => download(file)} className={primaryBtn}>
                 Download my report →
               </button>
             )}
             {identity.optin && WHATSAPP_URL && (
-              <a href={WHATSAPP_URL} target="_blank" rel="noopener" className="mono-text rounded-full bg-white px-7 py-3 font-mono text-dark transition-colors hover:bg-gray-100">
+              <a href={WHATSAPP_URL} target="_blank" rel="noopener" className="mono-text rounded-full border border-dark/15 bg-white px-7 py-3 font-mono text-dark transition-colors hover:bg-gray-100">
                 Join the WhatsApp community →
               </a>
             )}
           </p>
         )}
-        <p className="mono-text mt-5 border-t border-dark/15 pt-4 font-mono text-dark/70">{whatsNext.fine}</p>
-        <p className="mt-2 text-xs leading-tight text-dark/75">{whatsNext.note(result.route)}</p>
-        <p className="mt-3 text-xs leading-tight text-dark/75" aria-live="polite">
+        <p className="mt-4 text-xs leading-tight text-dark/75 first:mt-0" aria-live="polite">
           {delivery === "sending" && "Sending your full report to " + identity.email + ", it comes from hello@knnekt.studio…"}
           {delivery === "sent" &&
             "Your full report is on its way to " +
@@ -992,11 +1035,21 @@ export default function ScoreQuiz({ bare = false }: { bare?: boolean }) {
   const [file, setFile] = useState<ReportFile | null>(null);
   const top = useRef<HTMLDivElement>(null);
 
-  const scrollTop = () => top.current?.scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "start" });
-  const go = (s: Stage) => {
-    setStage(s);
-    scrollTop();
-  };
+  const go = (s: Stage) => setStage(s);
+
+  /** Back to the top of the card each time the stage changes. It runs after the
+   *  new page has rendered: scrolling from the click handler started while the
+   *  old page was still in the DOM, and swapping it out could cut the scroll
+   *  short, leaving the founder at the bottom of the next section. */
+  const stageKey = stage.at === "page" ? `page-${stage.page}` : stage.at;
+  const mounted = useRef(false);
+  useEffect(() => {
+    if (!mounted.current) {
+      mounted.current = true;
+      return;
+    }
+    top.current?.scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "start" });
+  }, [stageKey]);
 
   const finish = () => {
     go({ at: "scoring" });
@@ -1055,14 +1108,14 @@ export default function ScoreQuiz({ bare = false }: { bare?: boolean }) {
 
   if (bare) {
     return (
-      <div ref={top} className="scroll-mt-8 rounded-xl border border-dark/10 bg-white p-5 md:p-7">
+      <div ref={top} className="scroll-mt-8 [overflow-anchor:none] rounded-xl border border-dark/10 bg-white p-5 md:p-7">
         {inner}
       </div>
     );
   }
 
   return (
-    <div ref={top} className="bg-panel relative isolate scroll-mt-8 overflow-clip rounded-xl">
+    <div ref={top} className="bg-panel relative isolate scroll-mt-8 [overflow-anchor:none] overflow-clip rounded-xl">
       <GradientBackground />
       <div className="relative z-10 px-4 py-8 sm:p-8 lg:p-12">
         <div className="mx-auto w-full max-w-[60rem] rounded-xl bg-white p-6 shadow-[0_40px_90px_-50px_rgba(22,37,63,0.45)] md:p-9">{inner}</div>

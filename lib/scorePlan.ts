@@ -226,27 +226,6 @@ export const LADDER = [
   { name: "Investor-ready", sub: "the goal" },
 ] as const;
 
-/** The two ways to work through the plan. The cohort is the default pick. */
-export const PATHS = {
-  roadmap: {
-    tag: "Roadmap only · solo",
-    name: "The Founder’s Roadmap",
-    price: "₹10k · one-time",
-    one: "Run the full launch → investor-ready path yourself, at your own pace.",
-    inc: ["Your roadmap, launch → investor-ready", "Manuals + our playbook", "6 founder calls along the way", "Yours to keep, forever"],
-    exc: ["You build it — we don’t execute", "No done-for-you growth / tech / AI / legal", "No team working beside you"],
-  },
-  cohort: {
-    tag: "The cohort · done with you",
-    name: "Build90",
-    price: "₹60k–1L · / month",
-    one: "We work with you and execute alongside you — the fastest path to investor-ready.",
-    inc: ["We build it with you", "Growth, tech, AI & legal — done", "Weekly 1:1s + a live dashboard", "Real traction, not just a plan"],
-    exc: ["Not self-paced", "Not a template pack", "Monthly, while we work together"],
-  },
-} as const;
-export type PathKey = keyof typeof PATHS;
-
 export type Month = { m: string; from: number; to: number; topics: string[]; kn: string[] };
 
 export type Plan = {
@@ -367,6 +346,9 @@ export const planCopy = {
     d: "What gets done each month, what we do alongside you, and where your score should land.",
     note: "One path, launch → investor-ready. Checkpoints are estimates from founders on a similar path — yours moves with the work you put in.",
   },
-  paths: { h: "Two ways to get there", d: "Join the cohort and we build it with you — or take the roadmap and run it yourself. Same destination, your call." },
+  fee: {
+    h: "One price, published.",
+    d: "One fee for the whole studio, growth, tech, AI and legal, for one quarter. The scope moves when your business needs it to. The number doesn’t.",
+  },
   lrDone: (n: number) => (n ? `You’ve already got ${n} of these sorted. Ticked means done. The arrows are what’s still left before you can launch.` : "Nothing locked in yet. Each arrow below is a step towards being ready to launch."),
 };
