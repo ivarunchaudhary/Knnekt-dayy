@@ -14,9 +14,10 @@ type Reply = { ok?: boolean; message?: string } | null;
 /**
  * A finished score. Re-graded here from the raw answers so the number the
  * founder saw and the number we send can't drift apart, then emailed to them
- * from hello@knnekt.studio — the short readout in the body, every answer in the
- * attached PDF — and forwarded to the webhook that files the lead. The studio
- * calls from there; nothing is booked.
+ * from hello@knnekt.studio — the short readout in the body, the full report as
+ * the attached PDF, with the studio copied — and forwarded to the webhook that
+ * files the lead. The PDF comes back in the response too, so the result screen
+ * can offer it for download. The studio calls from there; nothing is booked.
  */
 export async function POST(request: Request) {
   let body: Body;
@@ -52,7 +53,13 @@ export async function POST(request: Request) {
 
   const result = grade(clean, catOther);
   const filename = reportFilename(result);
-  const pdf = reportPdfBase64(result, id, clean);
+  let pdf = "";
+  try {
+    pdf = await reportPdfBase64(result, id);
+  } catch (err) {
+    // The report is the promise, but a rendering failure must not cost us the lead.
+    console.error("[score] report PDF failed", err);
+  }
 
   // The founder's copy. Everything else here is bookkeeping; this is the promise.
   const mail = await sendMail({
@@ -60,7 +67,7 @@ export async function POST(request: Request) {
     subject: reportSubject(result),
     html: reportEmailHtml(result, id, filename),
     text: reportEmailText(result, id, filename),
-    attachment: { filename, base64: pdf },
+    ...(pdf ? { attachment: { filename, base64: pdf } } : {}),
   });
   if (!mail.sent) {
     const how = mail.reason === "unconfigured" ? "RESEND_API_KEY not set" : mail.error;
@@ -97,5 +104,5 @@ export async function POST(request: Request) {
     console.log("[score] SCORE_WEBHOOK_URL not set; submission not forwarded", { email: id.email, overall: result.overall, route: result.route });
   }
 
-  return NextResponse.json({ ok: true, emailed: mail.sent, forwarded });
+  return NextResponse.json({ ok: true, emailed: mail.sent, forwarded, pdf: pdf ? { filename, base64: pdf } : null });
 }
