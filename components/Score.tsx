@@ -346,25 +346,27 @@ export default function Score() {
             </p>
 
             {/*
-              The one thing this section is asking for, so the pill is sized like it:
-              the label steps up from the 11px `mono-text` the rest of the page runs on
-              to 14px on a phone and 17px from `sm`, with the padding opened to match.
-              A 32-character label will not hold one line inside 311px, so on a phone
-              the pill goes full width and centres over two lines rather than sitting
-              in a lopsided lozenge; from `sm` there is room and it goes inline again.
+              The one thing this section is asking for, so it has to read as a button at
+              a glance: a single pill on one line (from `sm`), a soft drop shadow so it
+              sits above the panel, and an arrow in a white disc that nudges right on
+              hover. It lifts a pixel on hover and presses back down on tap. "Free · 5
+              min" lives in the line underneath, so it no longer rides beside the pill.
             */}
             <p className="mt-8">
               <button
                 type="button"
                 onClick={() => setOpen(true)}
-                className={`mono-text group flex w-full flex-col items-stretch gap-3 rounded-full text-center font-mono outline-offset-2 outline-dark sm:inline-flex sm:w-auto sm:flex-row sm:items-center sm:gap-5 sm:text-left ${
+                className={`mono-text group inline-flex w-full items-center justify-center gap-3 rounded-full bg-sky-deep py-2 pr-2 pl-6 text-xs text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.18),0_8px_20px_-8px_rgb(22_37_63/0.55)] outline-offset-2 outline-dark transition-[background-color,transform,box-shadow] duration-200 hover:-translate-y-px hover:bg-dark hover:shadow-[inset_0_1px_0_rgb(255_255_255/0.12),0_12px_24px_-10px_rgb(22_37_63/0.6)] focus-visible:bg-dark active:translate-y-0 active:scale-[0.98] sm:w-auto sm:pl-7 sm:text-sm sm:whitespace-nowrap ${
                   pulse ? "motion-safe:animate-[score-pulse_1.6s_ease-in-out_infinite]" : ""
                 }`}
               >
-                <span className="rounded-full bg-sky-deep px-6 py-4 text-xs text-white transition-colors group-hover:bg-dark group-focus-visible:bg-dark sm:px-9 sm:py-5 sm:text-sm">
-                  Take the Startup Operating Score
+                Take the Startup Operating Score
+                <span
+                  aria-hidden="true"
+                  className="grid size-9 shrink-0 place-items-center rounded-full bg-white text-sm text-sky-deep transition-[color,transform] duration-200 group-hover:translate-x-0.5 group-hover:text-dark sm:size-10"
+                >
+                  →
                 </span>
-                <span className="text-dark/60 transition-colors group-hover:text-dark group-focus-visible:text-dark">Free · 5 min →</span>
               </button>
             </p>
             <p className="mt-4 text-sm text-dark/70 italic">The gap you can’t see is the one that ends you.</p>

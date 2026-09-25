@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { IconBrandWhatsapp } from "@tabler/icons-react";
 import { createPortal } from "react-dom";
 import { feeIncludes, ledgerIn, paymentSteps, pricing, pricingFacts, scorePillars } from "@/lib/data";
 import {
@@ -986,18 +987,11 @@ function Report({ result, identity, answers, delivery, file }: { result: Result;
       </div>
 
       <div className="mt-10 border-t border-dark/15 pt-6">
-        {(file || (identity.optin && WHATSAPP_URL)) && (
-          <p className="flex flex-wrap gap-3">
-            {file && (
-              <button type="button" onClick={() => download(file)} className={primaryBtn}>
-                Download my report →
-              </button>
-            )}
-            {identity.optin && WHATSAPP_URL && (
-              <a href={WHATSAPP_URL} target="_blank" rel="noopener" className="mono-text rounded-full border border-dark/15 bg-white px-7 py-3 font-mono text-dark transition-colors hover:bg-gray-100">
-                Join the WhatsApp community →
-              </a>
-            )}
+        {file && (
+          <p>
+            <button type="button" onClick={() => download(file)} className={primaryBtn}>
+              Download my report →
+            </button>
           </p>
         )}
         <p className="mt-4 text-xs leading-tight text-dark/75 first:mt-0" aria-live="polite">
@@ -1012,6 +1006,27 @@ function Report({ result, identity, answers, delivery, file }: { result: Result;
             "We couldn’t email your report just now, but we still have your details, and we’ll send it from hello@knnekt.studio and call " + identity.phone + " shortly."}
         </p>
       </div>
+
+      {/* The report's last word, for every founder, not only those who ticked the box. */}
+      {WHATSAPP_URL && (
+        <div className="mt-8 flex flex-col gap-4 rounded-lg border border-dark/15 bg-white px-5 py-5 @md:flex-row @md:items-center @md:justify-between">
+          <div className="flex items-start gap-3">
+            <IconBrandWhatsapp aria-hidden="true" className="mt-0.5 size-6 shrink-0 text-[#1fa855]" stroke={1.75} />
+            <p className="text-sm leading-tight">
+              <span className="font-medium">Join the Knnekt founder community</span>
+              <span className="mt-1 block text-dark/70">Insights, what other founders are working through, and what’s changing in the market. Nothing to buy.</span>
+            </p>
+          </div>
+          <a
+            href={WHATSAPP_URL}
+            target="_blank"
+            rel="noopener"
+            className="mono-text shrink-0 rounded-full bg-[#1fa855] px-6 py-3 text-center font-mono whitespace-nowrap text-white transition-colors outline-offset-2 outline-dark hover:bg-[#178a45]"
+          >
+            Join on WhatsApp →
+          </a>
+        </div>
+      )}
     </div>
   );
 }

@@ -26,8 +26,8 @@ export default function Hero() {
         className="pointer-events-none absolute inset-x-0 top-0 z-10 h-3/5 bg-[linear-gradient(to_bottom,color-mix(in_srgb,var(--color-dark)_55%,transparent)_0%,transparent_100%)]"
       />
       <div className={`${containerClass} relative z-20 flex h-full flex-col items-center pt-[19vh] text-center text-white`}>
-        <Wordmark className="text-4xl text-sky-soft sm:text-6xl" />
-        <p className="mt-3 text-sm sm:text-xl">India&apos;s first Startup Execution Studio</p>
+        <Wordmark className="text-[clamp(2.25rem,13vw,7.5rem)] leading-none text-sky-soft" />
+        <p className="mt-5 text-[1.75rem] leading-tight sm:text-[2.5rem]">India&apos;s first Startup Execution Studio</p>
       </div>
       <HeroBackground />
       <HeroFog />
