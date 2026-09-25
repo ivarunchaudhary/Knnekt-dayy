@@ -502,12 +502,12 @@ export function grade(answers: Answers, catOther = ""): Result {
     body: CONF_COPY[tone],
   } as const;
 
-  // Constraints: primary, then secondary if it's really weak, then the weakest of the rest.
+  // Constraints: primary, then secondary if it's really weak, then the weakest of the rest — always three.
   const byWeak = NECK_ORDER.slice().sort((a, b) => pct[a] - pct[b]);
   const consIdx = [primary];
   if (secondary !== null && secondary !== primary && pct[secondary] < 60) consIdx.push(secondary);
   byWeak.forEach((i) => {
-    if (consIdx.length < 3 && !consIdx.includes(i) && pct[i] < 52) consIdx.push(i);
+    if (consIdx.length < 3 && !consIdx.includes(i)) consIdx.push(i);
   });
   const labels = ["Primary", "Secondary", "Tertiary"];
   const constraints = consIdx.slice(0, 3).map((i, n) => ({ label: labels[n], name: pillars[i].name, why: NECK[pillars[i].key], cost: COST[pillars[i].key] }));

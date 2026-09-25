@@ -1,6 +1,6 @@
 /**
  * The founder's report as an email: the short version of what the result page
- * shows — score, archetype, verdict, the six pillars and the constraints.
+ * shows — score, archetype, verdict and the six pillars.
  * The full report, with the path forward, is the attached PDF, so the email
  * stays readable on a phone. Tables and inline styles throughout: this has to survive Gmail.
  *
@@ -40,12 +40,15 @@ function track(pct: number, fill: string, bg: string, h = 8): string {
   </tr></table>`;
 }
 
-/** A pillar row: name, bar, number. Constraints carry the ink, not the blue. */
+/** Text drawn as its own shadow: a blur Gmail keeps, since it strips `filter`. */
+const blurred = (color: string) => `color:transparent;text-shadow:0 0 7px ${color};`;
+
+/** A pillar row: name, bar, number. Constraints carry the ink, not the blue. Blurred — the figures are in the PDF. */
 function pillarRow(name: string, pct: number): string {
   const weak = pct < 42;
   return `<tr>
-    <td style="padding:9px 0 3px;font:500 13px/1.3 ${FONT};color:${INK};">${esc(name)}${weak ? `<span style="display:inline-block;margin-left:8px;padding:2px 6px;border-radius:4px;background:${HORIZON};font:700 9px/1.4 ${FONT};letter-spacing:.1em;text-transform:uppercase;color:${DEEP};">constraint</span>` : ""}</td>
-    <td width="40" align="right" style="padding:9px 0 3px;font:700 14px/1.3 ${FONT};color:${weak ? INK : BRAND};">${pct}</td>
+    <td style="padding:9px 0 3px;font:500 13px/1.3 ${FONT};${blurred(INK)}">${esc(name)}${weak ? `<span style="display:inline-block;margin-left:8px;padding:2px 6px;border-radius:4px;background:${HORIZON};font:700 9px/1.4 ${FONT};letter-spacing:.1em;text-transform:uppercase;${blurred(DEEP)}">constraint</span>` : ""}</td>
+    <td width="40" align="right" style="padding:9px 0 3px;font:700 14px/1.3 ${FONT};${blurred(weak ? INK : BRAND)}">${pct}</td>
   </tr>
   <tr><td colspan="2" style="padding:0 0 5px;">${track(pct, weak ? INK : BRAND, LINE, 8)}</td></tr>`;
 }
@@ -76,23 +79,6 @@ export function reportEmailHtml(r: Result, id: Identity, pdfName: string): strin
         </tr>
       </table>`;
     })
-    .join("");
-
-  const constraints = r.constraints
-    .map(
-      (c, i) => `<tr>
-        <td width="30" valign="top" style="padding:14px 0 0;">
-          <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;"><tr>
-            <td width="22" height="22" align="center" valign="middle" style="width:22px;height:22px;background:${BRAND};border-radius:11px;font:700 11px/22px ${FONT};color:#ffffff;">${i + 1}</td>
-          </tr></table>
-        </td>
-        <td valign="top" style="padding:12px 0 14px;${i ? `border-top:1px solid ${LINE};` : ""}">
-          <p style="margin:0;font:700 9px/1.2 ${FONT};letter-spacing:.12em;text-transform:uppercase;color:${MUTED};">${esc(c.label)}</p>
-          <p style="margin:5px 0 0;font:600 15px/1.3 ${FONT};color:${INK};">${esc(c.name)}</p>
-          <p style="margin:5px 0 0;font:400 13px/1.5 ${FONT};color:${MUTED};">${esc(c.why)}</p>
-        </td>
-      </tr>`,
-    )
     .join("");
 
   const bullets = next.bullets
@@ -148,35 +134,21 @@ export function reportEmailHtml(r: Result, id: Identity, pdfName: string): strin
 
   ${gateCards ? `<tr><td style="padding:14px 30px 0;">${gateCards}</td></tr>` : ""}
 
-  <!-- archetype + confidence -->
+  <!-- archetype -->
   <tr><td style="padding:30px 30px 0;">
     ${label("Your archetype")}
     <p style="margin:0;font:600 17px/1.3 ${FONT};color:${INK};">${esc(a.name)}</p>
     <p style="margin:7px 0 0;font:400 13px/1.55 ${FONT};color:${MUTED};">${esc(a.sub)}</p>
-    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse;margin:18px 0 0;background:#ffffff;border:1px solid ${LINE};border-radius:10px;">
-      <tr><td style="padding:14px 16px;">
-        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse;"><tr>
-          <td style="font:600 13px/1.3 ${FONT};color:${INK};">${esc(r.confidence.label)}</td>
-          <td align="right" style="font:700 13px/1.3 ${FONT};color:${BRAND};">${r.confidence.pct}%</td>
-        </tr></table>
-        <div style="margin:9px 0 0;">${track(r.confidence.pct, BRAND, LINE, 6)}</div>
-        <p style="margin:10px 0 0;font:400 12px/1.5 ${FONT};color:${MUTED};">${esc(r.confidence.body)}</p>
-      </td></tr>
-    </table>
   </td></tr>
 
   <!-- pillars -->
   <tr><td style="padding:30px 30px 0;">
     ${label("Your six pillars · 0–100")}
+    <div aria-hidden="true" style="filter:blur(4px);-webkit-filter:blur(4px);">
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse;">
       ${pillars.map((p, i) => pillarRow(p.name, r.pct[i])).join("")}
     </table>
-  </td></tr>
-
-  <!-- constraints -->
-  <tr><td style="padding:30px 30px 0;">
-    ${label("Your top constraints")}
-    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse;">${constraints}</table>
+    </div>
   </td></tr>
 
   <!-- the attachment -->
@@ -235,9 +207,6 @@ export function reportEmailText(r: Result, id: Identity, pdfName: string): strin
     `Archetype: ${a.name}`,
     a.sub,
     "",
-    `${r.confidence.label} (${r.confidence.pct}%)`,
-    r.confidence.body,
-    "",
   ];
   for (const g of r.gates) {
     if (g === "RESOURCING") continue;
@@ -246,8 +215,6 @@ export function reportEmailText(r: Result, id: Identity, pdfName: string): strin
   }
   lines.push(`Verdict: ${v.band} - ${v.bandSub}`, v.title, v.body, "", "YOUR SIX PILLARS (0-100)");
   pillars.forEach((p, i) => lines.push(`- ${p.name}: ${r.pct[i]}${r.pct[i] < 42 ? " (constraint)" : ""}`));
-  lines.push("", "YOUR TOP CONSTRAINTS");
-  for (const c of r.constraints) lines.push(`- ${c.label} - ${c.name}. ${c.why}`);
   lines.push(
     "",
     `Against ${r.benchName} founders: you ${r.overall}, median ${r.bench[0]}, top third ${r.bench[1]}, scale-ready ${r.bench[2]}.`,

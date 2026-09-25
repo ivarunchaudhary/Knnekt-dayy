@@ -464,14 +464,10 @@ function ReportDoc({ r, id }: { r: Result; id: Identity }) {
                   <Text style={[s.mono, { color: INK_70 }]}>{pricing.gst}</Text>
                 </Text>
               </View>
-              <View style={{ flexDirection: "row", gap: 2, marginTop: 10 }}>
-                {Array.from({ length: pricing.seats }, (_, i) => (
-                  <View key={i} style={{ flex: 1, height: 10, borderRadius: 2, backgroundColor: i < pricing.seats - pricing.seatsLeft ? INK : "#ffffff" }} />
-                ))}
+              {/* No italic cut ships with the face, so the slant is a skew on the regular. */}
+              <View style={{ marginTop: 10, transform: "skewX(-10deg)" }}>
+                <Text style={s.small}>Only few seats left.</Text>
               </View>
-              <Mono color={INK_70} style={{ marginTop: 4 }}>
-                {pricing.seatsLeft} of {pricing.seats} seats left · {pricing.cohort}
-              </Mono>
               <Text style={[s.small, { color: INK_80, marginTop: 7 }]}>{pricing.fine}</Text>
             </View>
           </View>
