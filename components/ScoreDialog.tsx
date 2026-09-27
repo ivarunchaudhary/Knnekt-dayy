@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { SCORE_URL } from "@/lib/site";
 import ScoreQuiz from "./ScoreQuiz";
 
 /**
@@ -70,15 +70,17 @@ export default function ScoreDialog({ onClose }: { onClose: () => void }) {
           <ScoreQuiz bare />
         </div>
 
-        <Link
-          href="/en/score"
+        <a
+          href={SCORE_URL}
+          target="_blank"
+          rel="noopener"
           className="mono-text text-dark-subtle hover:text-dark group mt-8 inline-flex items-center gap-2 font-mono transition-colors"
         >
           Open on its own page
           <span aria-hidden="true" className="ease-in-out-quart inline-block transition-transform duration-300 group-hover:translate-x-1">
             →
           </span>
-        </Link>
+        </a>
       </div>
     </dialog>
   );
