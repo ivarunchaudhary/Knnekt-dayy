@@ -4,7 +4,7 @@ import { containerClass } from "@/components/Container";
 import Footer from "@/components/Footer";
 import Nav from "@/components/Nav";
 import ScoreQuiz from "@/components/ScoreQuiz";
-import { SCORE_URL } from "@/lib/site";
+import { SCORE_URL, SITE_URL } from "@/lib/site";
 
 const title = "Startup Operating Score · Knnekt Studios";
 const description =
@@ -29,7 +29,7 @@ export default function ScorePage() {
     <div className="bg-white">
       <Nav />
       <main className={`${containerClass} pt-16 pb-24`}>
-        <Link href="/en" className="mono-text text-dark-subtle hover:text-dark font-mono">
+        <Link href={`${SITE_URL}/en`} className="mono-text text-dark-subtle hover:text-dark font-mono">
           ← Back
         </Link>
         <p className="mono-text mt-16 font-mono text-dark/75">Every startup has a number. We built the one that decides who we build with.</p>
