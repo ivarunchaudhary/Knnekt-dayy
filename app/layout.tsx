@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 const ftSystemBlank = localFont({
@@ -23,6 +24,8 @@ const description =
   "India's first Startup Execution Studio. It starts with your Startup Operating Score. Then fifteen founders per cohort go all-in for one 90-day build, and come out with real customers and a company ready to raise.";
 
 export const metadata: Metadata = {
+  // Share images resolve against the apex, whichever host (www, score) served the page.
+  ...(SITE_URL && { metadataBase: new URL(SITE_URL) }),
   title,
   description,
   robots: { index: true, follow: true },
