@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   // The report PDF is laid out by react-pdf (yoga + fontkit), which has to run
   // from node_modules rather than be bundled, in the site's own TTF cuts.
   serverExternalPackages: ["@react-pdf/renderer"],
-  outputFileTracingIncludes: { "/api/score": ["./assets/*.ttf"] },
+  outputFileTracingIncludes: { "/api/score": ["./assets/*.ttf", "./assets/knnekt-mark.png"] },
   async headers() {
     return [
       {
