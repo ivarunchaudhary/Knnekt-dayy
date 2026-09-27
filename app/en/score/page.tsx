@@ -4,7 +4,7 @@ import { containerClass } from "@/components/Container";
 import Footer from "@/components/Footer";
 import Nav from "@/components/Nav";
 import ScoreQuiz from "@/components/ScoreQuiz";
-import { SCORE_URL, SITE_URL } from "@/lib/site";
+import { SCORE_URL, SHARE_IMAGE, SITE_URL } from "@/lib/site";
 
 const title = "Startup Operating Score · Knnekt Studios";
 const description =
@@ -15,8 +15,8 @@ export const metadata: Metadata = {
   description,
   // Served at the root of the score subdomain in production; the canonical says so.
   ...(SCORE_URL.startsWith("http") && { alternates: { canonical: SCORE_URL } }),
-  openGraph: { title, description, type: "website" },
-  twitter: { card: "summary_large_image", title, description },
+  openGraph: { title, description, type: "website", images: [SHARE_IMAGE] },
+  twitter: { card: "summary_large_image", title, description, images: [SHARE_IMAGE] },
 };
 
 /**

@@ -5,6 +5,7 @@ import { containerClass } from "@/components/Container";
 import Footer from "@/components/Footer";
 import Nav from "@/components/Nav";
 import PostCard from "@/components/PostCard";
+import { SHARE_IMAGE } from "@/lib/site";
 
 const title = "Insights · Knnekt Studios";
 const description =
@@ -13,8 +14,8 @@ const description =
 export const metadata: Metadata = {
   title,
   description,
-  openGraph: { title, description, type: "website" },
-  twitter: { card: "summary_large_image", title, description },
+  openGraph: { title, description, type: "website", images: [SHARE_IMAGE] },
+  twitter: { card: "summary_large_image", title, description, images: [SHARE_IMAGE] },
 };
 
 export default function InsightsIndex() {
