@@ -6,6 +6,7 @@ import { containerClass } from "@/components/Container";
 import Footer from "@/components/Footer";
 import Nav from "@/components/Nav";
 import Parallax from "@/components/Parallax";
+import ScoreButton from "@/components/ScoreButton";
 
 export function generateStaticParams() {
   return insights.map((p) => ({ slug: p.slug }));
@@ -150,13 +151,10 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
         </Link>
 
         <p className="mt-16 md:mt-24">
-          <Link
-            href="/en/score"
-            className="mono-text group inline-flex items-center gap-2.5 font-mono outline-offset-2 outline-dark"
-          >
+          <ScoreButton className="mono-text group inline-flex items-center gap-2.5 text-left font-mono outline-offset-2 outline-dark">
             <span className="bg-sky-deep group-hover:bg-dark rounded-full px-7 py-3 text-white transition-colors">Take the score</span>
             <span className="text-dark/50 group-hover:text-dark transition-colors">Free, five minutes, no card</span>
-          </Link>
+          </ScoreButton>
         </p>
       </main>
       <Footer />
