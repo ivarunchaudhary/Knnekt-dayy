@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
+import { LOCKUP_PATH, LOCKUP_RATIO, LOCKUP_VIEWBOX } from "@/lib/brand";
 
 /**
  * The link preview card — what a shared URL unfurls to in iMessage, Slack, X,
@@ -27,10 +28,11 @@ export const contentType = "image/png";
 
 const asset = (name: string) => readFile(join(process.cwd(), "assets", name));
 
-const [semibold, regular, hero] = await Promise.all([
+const [semibold, regular, hero, mark] = await Promise.all([
   asset("ft-system-blank-semibold.ttf"),
   asset("ft-system-blank-regular.ttf"),
   asset("og-hero.jpg"),
+  asset("knnekt-mark.png"),
 ]);
 
 const dark = "#16253f";
@@ -56,7 +58,13 @@ export default function OpengraphImage() {
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-            <span style={{ fontSize: 40, fontWeight: 600, letterSpacing: "-0.03em" }}>Knnekt Studios</span>
+            {/* The mark is the k, so the logotype after it starts at "nnekt". */}
+            <div style={{ display: "flex", alignItems: "flex-end", gap: 4 }}>
+              <img src={`data:image/png;base64,${mark.toString("base64")}`} alt="" width={40 * (854 / 1026)} height={40} />
+              <svg viewBox={LOCKUP_VIEWBOX} width={40 * LOCKUP_RATIO} height={40}>
+                <path d={LOCKUP_PATH} fill={dark} />
+              </svg>
+            </div>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", fontSize: 21, lineHeight: 1.3 }}>
               <span>India’s first Startup Execution Studio</span>
             </div>
