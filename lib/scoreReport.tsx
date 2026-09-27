@@ -7,7 +7,8 @@
  * every copy is the same document.
  */
 import { join } from "node:path";
-import { Document, Font, Page, StyleSheet, Text, View, renderToBuffer, type Styles } from "@react-pdf/renderer";
+import { Document, Font, Image, Page, Path, StyleSheet, Svg, Text, View, renderToBuffer, type Styles } from "@react-pdf/renderer";
+import { LOCKUP_PATH, LOCKUP_RATIO, LOCKUP_VIEWBOX } from "./brand";
 import { feeIncludes, ledgerIn, paymentSteps, pricing, pricingFacts } from "./data";
 import { archetypes, gateCopy, pillars, verdicts, type Identity, type Result } from "./score";
 import { LADDER, plan as planFor, planCopy } from "./scorePlan";
@@ -54,7 +55,7 @@ const BLUE_BG = "#f1f7fe";
 const s = StyleSheet.create({
   page: { fontFamily: "Blank", fontSize: 9, color: INK, paddingTop: 62, paddingBottom: 48, paddingHorizontal: 44, lineHeight: 1.3 },
   head: { position: "absolute", top: 26, left: 44, right: 44, flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingBottom: 9, borderBottomWidth: 0.75, borderBottomColor: RULE },
-  brand: { fontSize: 11, fontWeight: 600 },
+  brand: { flexDirection: "row", alignItems: "flex-end", gap: 1.2 },
   foot: { position: "absolute", top: 808, left: 44, right: 44, flexDirection: "row", justifyContent: "space-between" },
   mono: { fontFamily: "Mono", fontSize: 6.5, letterSpacing: 0.8, textTransform: "uppercase", color: INK_60 },
   bar: { position: "absolute", top: 0, left: 0, right: 0, height: 4, backgroundColor: DEEP },
@@ -140,9 +141,14 @@ function ReportDoc({ r, id }: { r: Result; id: Identity }) {
       <Page size="A4" style={s.page}>
         <View style={s.bar} fixed />
         <View style={s.head} fixed>
-          <Text style={s.brand}>
-            KNNEKT <Text style={{ fontWeight: 400, color: INK_60 }}>Studios</Text>
-          </Text>
+          <View style={s.brand}>
+            {/* The mark is the k, so the logotype after it starts at "nnekt". react-pdf's Image takes no alt. */}
+            {/* eslint-disable-next-line jsx-a11y/alt-text */}
+            <Image src={asset("knnekt-mark.png")} style={{ height: 12, width: 12 * (854 / 1026) }} />
+            <Svg viewBox={LOCKUP_VIEWBOX} style={{ height: 12, width: 12 * LOCKUP_RATIO }}>
+              <Path d={LOCKUP_PATH} fill={INK} />
+            </Svg>
+          </View>
           <Mono>Startup Operating Score™</Mono>
         </View>
         <View style={s.foot} fixed>
