@@ -11,7 +11,7 @@ export default function Footer() {
       <div className={`${containerClass} relative z-10 flex flex-col justify-between gap-x-20 gap-y-10 pt-16 pb-14 md:pb-12`}>
         <div className="grid gap-x-1.5 gap-y-10 md:grid-cols-4">
           <div>
-            <Wordmark className="text-dark text-lg" />
+            <Wordmark mark className="text-dark text-[2rem]" />
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:block md:space-y-6">
             <address className="not-italic">
