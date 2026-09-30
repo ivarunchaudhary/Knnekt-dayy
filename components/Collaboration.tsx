@@ -4,7 +4,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { FreeMode, Mousewheel } from "swiper/modules";
 import { principles } from "@/lib/data";
 import Container, { SectionHeading } from "./Container";
-import Parallax from "./Parallax";
+import PrincipleAnimation from "./PrincipleAnimation";
 
 /**
  * Six cards, each holding an agency habit against what we do instead. They sit a
@@ -34,14 +34,10 @@ export default function Collaboration() {
                 type="button"
                 className="group flex aspect-[1/1.1] w-full cursor-[inherit] flex-col overflow-hidden rounded-lg border border-dark/5 bg-gray-100 text-left outline-offset-2 outline-dark transition-all duration-300 hover:rounded-2xl"
               >
-                <span className="block w-full overflow-hidden">
-                  <Parallax
-                    className="ease-in-out-quart transition-transform duration-300 motion-safe:group-hover:scale-102 motion-safe:group-focus-visible:scale-102"
-                    style={{ aspectRatio: "2000/1414" }}
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img alt={p.alt} loading="lazy" decoding="async" width={2000} height={1414} className="size-full object-cover" sizes="23.25rem" src={p.src} />
-                  </Parallax>
+                <span className="block w-full overflow-hidden bg-gray-200/60" style={{ aspectRatio: "600/424" }}>
+                  <span className="ease-in-out-quart block size-full transition-transform duration-300 motion-safe:group-hover:scale-102 motion-safe:group-focus-visible:scale-102">
+                    <PrincipleAnimation index={i} />
+                  </span>
                 </span>
                 <span className="flex w-full grow flex-col justify-between px-5 py-5">
                   <span className="font-medium [@media(min-width:1440px)]:text-lg">

@@ -13,30 +13,30 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
  * before it starts again. The clock only runs while the card is on screen.
  */
 
-type Pt = [number, number];
+export type Pt = [number, number];
 type Step = [from: number, to: number, capability: string];
 type Scene = { loop: number; still: number; steps: Step[]; Draw: (props: { t: number }) => React.ReactNode };
 
 const W = 1280;
 const H = 536;
-const INK = "#16253f";
-const ACCENT = "#3b81e3";
+export const INK = "#16253f";
+export const ACCENT = "#3b81e3";
 const TAU = Math.PI * 2;
 
-const clamp = (v: number) => Math.min(1, Math.max(0, v));
-const prog = (t: number, a: number, b: number) => clamp((t - a) / (b - a));
-const inOut = (p: number) => (p < 0.5 ? 4 * p * p * p : 1 - (-2 * p + 2) ** 3 / 2);
-const out = (p: number) => 1 - (1 - p) ** 3;
-const back = (p: number) => 1 + 2.70158 * (p - 1) ** 3 + 1.70158 * (p - 1) ** 2;
-const lerp = (a: number, b: number, p: number) => a + (b - a) * p;
-const mix = (a: Pt, b: Pt, p: number): Pt => [lerp(a[0], b[0], p), lerp(a[1], b[1], p)];
-const quad = (a: Pt, c: Pt, b: Pt, p: number): Pt => mix(mix(a, c, p), mix(c, b, p), p);
-const cubic = (a: Pt, c1: Pt, c2: Pt, b: Pt, p: number): Pt => quad(mix(a, c1, p), mix(c1, c2, p), mix(c2, b, p), p);
-const pt = (p: Pt) => `${p[0].toFixed(1)} ${p[1].toFixed(1)}`;
-const fade = (t: number, loop: number) => prog(t, 0, 0.25) * (1 - prog(t, loop - 0.7, loop));
+export const clamp = (v: number) => Math.min(1, Math.max(0, v));
+export const prog = (t: number, a: number, b: number) => clamp((t - a) / (b - a));
+export const inOut = (p: number) => (p < 0.5 ? 4 * p * p * p : 1 - (-2 * p + 2) ** 3 / 2);
+export const out = (p: number) => 1 - (1 - p) ** 3;
+export const back = (p: number) => 1 + 2.70158 * (p - 1) ** 3 + 1.70158 * (p - 1) ** 2;
+export const lerp = (a: number, b: number, p: number) => a + (b - a) * p;
+export const mix = (a: Pt, b: Pt, p: number): Pt => [lerp(a[0], b[0], p), lerp(a[1], b[1], p)];
+export const quad = (a: Pt, c: Pt, b: Pt, p: number): Pt => mix(mix(a, c, p), mix(c, b, p), p);
+export const cubic = (a: Pt, c1: Pt, c2: Pt, b: Pt, p: number): Pt => quad(mix(a, c1, p), mix(c1, c2, p), mix(c2, b, p), p);
+export const pt = (p: Pt) => `${p[0].toFixed(1)} ${p[1].toFixed(1)}`;
+export const fade = (t: number, loop: number) => prog(t, 0, 0.25) * (1 - prog(t, loop - 0.7, loop));
 
 /** Stroke-draw a shape from 0 (nothing) to 1 (whole outline). */
-const draw = (p: number) =>
+export const draw = (p: number) =>
   ({ pathLength: 1, strokeDasharray: "1 1", strokeDashoffset: 1 - p, visibility: p > 0 ? "visible" : "hidden" }) as const;
 
 const line = { fill: "none", stroke: INK, strokeWidth: 2.5, strokeLinecap: "round", strokeLinejoin: "round" } as const;
@@ -87,7 +87,7 @@ const G_LEADS = Array.from({ length: 12 }, (_, i) => ({
 }));
 const G_REFERRERS = [1, 2, 3];
 
-function Person({ at, color = INK, s = 1, opacity = 1 }: { at: Pt; color?: string; s?: number; opacity?: number }) {
+export function Person({ at, color = INK, s = 1, opacity = 1 }: { at: Pt; color?: string; s?: number; opacity?: number }) {
   return (
     <g transform={`translate(${pt(at)}) scale(${s})`} opacity={opacity}>
       <circle cy={-12} r={8} fill={color} />
@@ -596,23 +596,17 @@ const subscribeReduced = (cb: () => void) => {
   return () => m.removeEventListener("change", cb);
 };
 
-type Props = {
-  id: string;
-  title: string;
-  /** Called with the capability currently being acted out. */
-  onStep?: (capability: string | undefined) => void;
-};
-
-export default function ServiceAnimation({ id, title, onStep }: Props) {
-  const scene = scenes[id];
-  const svg = useRef<SVGSVGElement>(null);
+/**
+ * Seconds into a `loop`-second cycle, advancing only while `el` is on screen.
+ * Under reduced motion it holds at `still`, a frame chosen to read on its own.
+ */
+export function useLoopClock(el: React.RefObject<Element | null>, loop: number, still: number) {
   const [clock, setClock] = useState(0);
   const reduced = useSyncExternalStore(subscribeReduced, () => window.matchMedia(REDUCED).matches, () => false);
-  const loop = scene?.loop ?? 1;
 
   useEffect(() => {
-    const el = svg.current;
-    if (!el || reduced) return;
+    const node = el.current;
+    if (!node || reduced) return;
     let raf = 0;
     let last = 0;
     let elapsed = 0;
@@ -627,14 +621,27 @@ export default function ServiceAnimation({ id, title, onStep }: Props) {
       last = 0;
       if (entry.isIntersecting) raf = requestAnimationFrame(tick);
     });
-    io.observe(el);
+    io.observe(node);
     return () => {
       io.disconnect();
       cancelAnimationFrame(raf);
     };
-  }, [reduced, loop]);
+  }, [el, reduced, loop]);
 
-  const t = reduced ? (scene?.still ?? 0) : clock;
+  return reduced ? still : clock;
+}
+
+type Props = {
+  id: string;
+  title: string;
+  /** Called with the capability currently being acted out. */
+  onStep?: (capability: string | undefined) => void;
+};
+
+export default function ServiceAnimation({ id, title, onStep }: Props) {
+  const scene = scenes[id];
+  const svg = useRef<SVGSVGElement>(null);
+  const t = useLoopClock(svg, scene?.loop ?? 1, scene?.still ?? 0);
   const step = scene?.steps.find(([a, b]) => t >= a && t < b)?.[2];
 
   useEffect(() => {

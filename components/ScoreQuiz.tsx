@@ -999,9 +999,9 @@ function Report({ result, identity, answers, delivery, file }: { result: Result;
           {delivery === "sent" &&
             "Your full report is on its way to " +
               identity.email +
-              ", it comes from hello@knnekt.studio, so check your spam folder if it isn’t in your inbox in a few minutes. We’ll call " +
+              ", it comes from hello@knnekt.studio, so check your spam folder if it isn’t in your inbox in a few minutes. We’ll get on a call with you on " +
               identity.phone +
-              "."}
+              " soon, within 24 hours."}
           {delivery === "failed" &&
             "We couldn’t email your report just now, but we still have your details, and we’ll send it from hello@knnekt.studio and call " + identity.phone + " shortly."}
         </p>
