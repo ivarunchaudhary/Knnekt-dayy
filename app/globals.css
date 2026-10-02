@@ -170,12 +170,6 @@
     0%, 100% { transform: none; }
     50% { transform: translateY(-2px); }
   }
-  /* Journey founder: a quick blink every few seconds, so the face reads as alive. */
-  @keyframes journey-blink {
-    0%, 92%, 100% { transform: scaleY(1); }
-    95% { transform: scaleY(0.1); }
-  }
-
   @keyframes score-pip {
     0% { box-shadow: 0 0 0 0 rgba(45, 111, 174, 0.5); }
     70% { box-shadow: 0 0 0 7px rgba(45, 111, 174, 0); }
@@ -315,4 +309,104 @@ body {
     radial-gradient(84% 54% at 46% 100%, rgba(238, 244, 252, 0.92) 0%, rgba(238, 244, 252, 0.5) 46%, rgba(238, 244, 252, 0) 80%),
     radial-gradient(40% 42% at 52% 60%, rgba(223, 233, 248, 0.5) 0%, rgba(223, 233, 248, 0) 76%);
   filter: blur(56px);
+}
+
+/* Journey founder: the avatar riding the spine. A progress ring round a sky disc, the
+   founder cut out of it so the head breaks the top edge, and one small overlay per
+   stage. Scoped under .founder-ava, since its parts share names with page classes. */
+.founder-ava {
+  --fa-accent: #3b81e3;
+  --fa-deep: #2461c2;
+  --fa-light: #6fa8f2;
+  --fa-ink: #16213d;
+  --fa-soft: #6b7385;
+  --fa-rule: #dce2ec;
+  --fa-paper: #fff;
+  --fa-pin: #e5484d;
+  position: relative;
+  width: var(--fa-size);
+  height: var(--fa-size);
+  color: var(--fa-ink);
+}
+.founder-ava svg.orbit,
+.founder-ava svg.fx { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.founder-ava .orbit { z-index: 1; }
+.founder-ava .trk { fill: none; stroke: var(--fa-rule); stroke-width: 2; }
+.founder-ava .prg { fill: none; stroke: var(--fa-accent); stroke-width: 2.6; stroke-linecap: round; stroke-dasharray: 1000; stroke-dashoffset: 1000; transition: stroke-dashoffset 0.2s linear; }
+.founder-ava .tick { fill: var(--fa-paper); stroke: var(--fa-rule); stroke-width: 1.4; transition: fill 0.3s, stroke 0.3s; }
+.founder-ava .tick.on { fill: var(--fa-accent); stroke: var(--fa-accent); }
+
+.founder-ava .disc {
+  position: absolute; inset: 7%; border-radius: 50%; z-index: 2;
+  background: radial-gradient(115% 95% at 50% 16%, var(--fa-light) 0%, var(--fa-accent) 52%, var(--fa-deep) 100%);
+  box-shadow: 0 22px 38px -18px rgba(22, 33, 61, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: box-shadow 0.6s ease;
+}
+.founder-ava.sc6 .disc {
+  box-shadow: 0 0 0 7px rgba(59, 129, 227, 0.14), 0 0 56px 4px rgba(59, 129, 227, 0.32), 0 22px 38px -18px rgba(22, 33, 61, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+.founder-ava.bump .disc { animation: founder-bump 0.55s cubic-bezier(0.2, 1.4, 0.4, 1); }
+@keyframes founder-bump { 0% { transform: scale(1); } 38% { transform: scale(1.035); } 100% { transform: scale(1); } }
+
+.founder-ava .cut {
+  position: absolute; left: 7%; right: 7%; top: -16%; bottom: 7%; z-index: 3;
+  -webkit-mask: radial-gradient(circle closest-side at 50% 60.55%, #000 99.3%, transparent 100%) no-repeat, linear-gradient(#000, #000) top / 100% 60.55% no-repeat;
+  mask: radial-gradient(circle closest-side at 50% 60.55%, #000 99.3%, transparent 100%) no-repeat, linear-gradient(#000, #000) top / 100% 60.55% no-repeat;
+}
+.founder-ava .stage { position: absolute; inset: 0; animation: founder-breath 3.8s ease-in-out infinite alternate; }
+@keyframes founder-breath { from { transform: translateY(0); } to { transform: translateY(-1.1%); } }
+.founder-ava .pose {
+  position: absolute; aspect-ratio: 1; height: auto; width: 125%; left: -12.5%; bottom: -6.2%; max-width: none;
+  opacity: 0; transform: translateY(5%) scale(0.955); transform-origin: 50% 90%;
+  transition: opacity 0.26s ease, transform 0.5s cubic-bezier(0.2, 0.9, 0.25, 1); user-select: none; -webkit-user-drag: none;
+}
+.founder-ava .pose.on { opacity: 1; transform: none; transition: opacity 0.42s ease 0.06s, transform 0.62s cubic-bezier(0.2, 0.9, 0.25, 1); }
+.founder-ava .lip { position: absolute; inset: 7%; border-radius: 50%; z-index: 3; pointer-events: none; box-shadow: inset 0 -16px 18px -12px rgba(16, 40, 90, 0.45); }
+
+.founder-ava .fx { z-index: 4; filter: drop-shadow(0 5px 9px rgba(22, 33, 61, 0.14)); }
+.founder-ava .s { opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s linear 0.3s; }
+.founder-ava.sc0 .s0, .founder-ava.sc1 .s1, .founder-ava.sc2 .s2, .founder-ava.sc3 .s3,
+.founder-ava.sc4 .s4, .founder-ava.sc5 .s5, .founder-ava.sc6 .s6 { opacity: 1; visibility: visible; transition: opacity 0.4s ease 0.1s; }
+.founder-ava .pop { transform-box: fill-box; transform-origin: center; transform: scale(0.55); opacity: 0; transition: transform 0.55s cubic-bezier(0.2, 1.3, 0.35, 1), opacity 0.28s ease; }
+.founder-ava.sc0 .s0 .pop, .founder-ava.sc1 .s1 .pop, .founder-ava.sc2 .s2 .pop, .founder-ava.sc3 .s3 .pop,
+.founder-ava.sc4 .s4 .pop, .founder-ava.sc5 .s5 .pop, .founder-ava.sc6 .s6 .pop { transform: none; opacity: 1; }
+.founder-ava .d2 { transition-delay: 0.09s; }
+.founder-ava .d3 { transition-delay: 0.18s; }
+.founder-ava .d4 { transition-delay: 0.27s; }
+.founder-ava .chip { fill: var(--fa-paper); stroke: var(--fa-rule); stroke-width: 1.3; }
+.founder-ava .card { fill: var(--fa-paper); stroke: var(--fa-ink); stroke-width: 1.2; }
+.founder-ava text { font-family: inherit; font-weight: 600; text-anchor: middle; }
+.founder-ava .ct { font-size: 12px; fill: var(--fa-ink); }
+.founder-ava .bub circle { fill: var(--fa-paper); stroke: var(--fa-rule); stroke-width: 1.3; }
+.founder-ava .bub text { font-size: 17px; font-weight: 700; fill: var(--fa-accent); }
+.founder-ava .bub.sm text { font-size: 12px; fill: var(--fa-soft); }
+.founder-ava .fl { animation: founder-float 2.6s ease-in-out infinite alternate; }
+.founder-ava .fl.b { animation-duration: 3.1s; animation-delay: -1.2s; }
+@keyframes founder-float { from { transform: translateY(0); } to { transform: translateY(-5px); } }
+.founder-ava .studio { fill: var(--fa-accent); }
+.founder-ava .route, .founder-ava .trend { fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 0.9s cubic-bezier(0.4, 0, 0.2, 1) 0.25s; }
+.founder-ava .route { stroke: var(--fa-accent); stroke-width: 2.4; }
+.founder-ava .trend { stroke: var(--fa-ink); stroke-width: 2; }
+.founder-ava.sc2 .route, .founder-ava.sc5 .trend { stroke-dashoffset: 0; }
+.founder-ava .pin { fill: var(--fa-pin); }
+.founder-ava .pil rect { fill: var(--fa-paper); stroke: var(--fa-rule); stroke-width: 1.3; transition: fill 0.35s, stroke 0.35s; }
+.founder-ava .pil text { font-size: 11px; fill: var(--fa-soft); transition: fill 0.35s; }
+.founder-ava .pil.lit rect { fill: var(--fa-accent); stroke: var(--fa-accent); }
+.founder-ava .pil.lit text { fill: #fff; }
+.founder-ava .cnt { fill: var(--fa-ink); }
+.founder-ava .cntt { font-size: 13px; font-weight: 700; fill: #fff; }
+.founder-ava .cntt .of { font-weight: 500; fill: rgba(255, 255, 255, 0.7); }
+.founder-ava .cd { fill: var(--fa-paper); stroke: var(--fa-rule); stroke-width: 1; transition: fill 0.25s, stroke 0.25s; }
+.founder-ava .cd.on { fill: var(--fa-accent); stroke: var(--fa-accent); }
+.founder-ava .bar { fill: var(--fa-accent); transform-box: fill-box; transform-origin: bottom; transform: scaleY(0); transition: transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1); }
+.founder-ava .bar.lo { fill: var(--fa-deep); }
+.founder-ava.sc5 .bar { transform: none; }
+.founder-ava .bar:nth-of-type(2) { transition-delay: 0.08s; }
+.founder-ava .bar:nth-of-type(3) { transition-delay: 0.16s; }
+.founder-ava .bar:nth-of-type(4) { transition-delay: 0.24s; }
+.founder-ava .badge { fill: var(--fa-accent); }
+.founder-ava .chk { fill: none; stroke: #fff; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.founder-ava .aud { fill: var(--fa-ink); }
+@media (prefers-reduced-motion: reduce) {
+  .founder-ava *, .founder-ava *::before, .founder-ava *::after { animation: none !important; transition: none !important; }
 }

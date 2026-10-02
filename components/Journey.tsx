@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { journeyPhases } from "@/lib/data";
 import Container, { SectionHeading } from "./Container";
 
@@ -13,200 +13,222 @@ const customersFor = (day: number) => Math.max(0, Math.min(100, Math.round(((day
 /** Decade marks on the spine, so the eye has something to measure the travel against. */
 const decades = [10, 20, 30, 40, 50, 60, 70, 80];
 
-/* The avatar sits on the page's own ramp: the sky behind the founder, the ink for
-   the one badge beside them. The founder alone keeps natural colour. */
-const INK = "#16253f";
-const SKY = "#3b81e3";
-const SKY_LIGHT = "#6caef5";
-const SHIRT = "#f4f7fb";
-const FACE_INK = "#2a2420";
-const LIP = "#9c4e2e";
+/** One pose per status, drawn as the founder lives the quarter. */
+const poses = ["01-start", "02-classes", "03-roadmap", "04-building", "05-customers", "06-traction", "07-pitch"].map(
+  (name) => `/founder/knnekt-founder-${name}.webp`,
+);
 
-/*
- * The face carries the story, one expression per status:
- *   Start      worried   — brows knit up, a wobbly mouth
- *   Classes    curious   — brows up, a small "o"
- *   Roadmap    thinking  — one brow up, eyes off to the side
- *   Building   focused   — brows down, a set smile
- *   Customers  happy     — eyes closed into arcs, a wide smile
- *   Traction   thrilled  — brows high, an open grin
- *   Pitch      confident — level brows, a half smile, and the suit on
- * Each scene picks a brow and a mouth from the sets below by index, so two
- * scenes can share a feature without drawing it twice.
- */
-const brows = [
-  ["M50.5 40 L57 37.6", "M69.5 40 L63 37.6"],
-  ["M50 38.2 Q53.5 35 57 37.6", "M63 37.6 Q66.5 35 70 38.2"],
-  ["M50.5 38.8 L57 38.8", "M63 37.6 Q66.5 35 70 37.4"],
-  ["M50.5 37.2 L57 39.2", "M69.5 37.2 L63 39.2"],
-  ["M50 38.4 Q53.5 36 57 38", "M63 38 Q66.5 36 70 38.4"],
-  ["M50.5 38.6 L57 38.4", "M63 38.4 L69.5 38.6"],
+/* The ring round the disc fills over the 90 days; a tick lights as each milestone passes. */
+const ringTicks = [4, 11, 17, 46, 83, 90].map((d) => {
+  const a = ((-90 + ((d - 1) / 89) * 360) * Math.PI) / 180;
+  return { d, cx: (100 + 96 * Math.cos(a)).toFixed(2), cy: (100 + 96 * Math.sin(a)).toFixed(2) };
+});
+
+/* Twenty seats on an arc under the founder, filling in as the customers land. */
+const seats = Array.from({ length: 20 }, (_, k) => {
+  const a = ((38 + k * (104 / 19)) * Math.PI) / 180;
+  return { cx: (100 + 106 * Math.cos(a)).toFixed(2), cy: (100 + 106 * Math.sin(a)).toFixed(2) };
+}).reverse();
+
+/* The four disciplines light up one by one through the build. */
+const pills = [
+  { label: "AI", day: 22, x: 6, y: -2, w: 34, delay: "" },
+  { label: "Tech", day: 29, x: 158, y: -4, w: 44, delay: "d2" },
+  { label: "Legal", day: 36, x: -6, y: 180, w: 48, delay: "d3" },
+  { label: "Growth", day: 43, x: 156, y: 180, w: 56, delay: "d4" },
 ];
-const browFor = [0, 1, 2, 3, 4, 1, 5];
-
-const mouths = [
-  <path key="wobble" d="M55 55.4 q1.25 -1.4 2.5 0 t2.5 0 t2.5 0 t2.5 0" fill="none" stroke={LIP} strokeWidth="1.8" strokeLinecap="round" />,
-  <ellipse key="o" cx="60" cy="55.2" rx="1.9" ry="2.3" fill={LIP} />,
-  <path key="hmm" d="M57 55.2 L63.6 54.2" fill="none" stroke={LIP} strokeWidth="1.9" strokeLinecap="round" />,
-  <path key="set" d="M55.5 54 Q60 57.4 64.5 54" fill="none" stroke={LIP} strokeWidth="2" strokeLinecap="round" />,
-  <path key="smile" d="M54 53.2 Q60 59.6 66 53.2" fill="none" stroke={LIP} strokeWidth="2.2" strokeLinecap="round" />,
-  <g key="grin">
-    <path d="M54.5 53 Q60 62 65.5 53 Q60 55.4 54.5 53 Z" fill={LIP} />
-    <path d="M56 53.9 Q60 55.4 64 53.9" fill="none" stroke="#fff" strokeWidth="1.1" opacity=".7" />
-  </g>,
-  <path key="smirk" d="M55.5 54.6 Q60.5 57.6 65 52.8" fill="none" stroke={LIP} strokeWidth="2.1" strokeLinecap="round" />,
-];
-const mouthFor = [0, 1, 2, 3, 4, 5, 6];
-
-/** Where the eyes look in each scene — up in worry, off to the side while thinking. */
-const lookFor: [number, number][] = [
-  [0, -0.9],
-  [0, -0.4],
-  [1.3, -0.7],
-  [0, 0.5],
-  [0, 0],
-  [0, 0],
-  [0, 0],
-];
-
-const fade = "transition-opacity duration-500 ease-in-out-quart";
-const shown = (on: boolean) => `${fade} ${on ? "opacity-100" : "opacity-0"}`;
-
-/** The badge beside the founder — one small hint per scene, in the same spot every time. */
-function Badge({ scene, customers }: { scene: number; customers: number }) {
-  const stroke = { fill: "none", stroke: INK, strokeWidth: 1.8, strokeLinecap: "round", strokeLinejoin: "round" } as const;
-  return (
-    <g>
-      <circle cx="98" cy="22" r="12" fill="#fff" stroke="#16253f26" />
-      <text x="98" y="27" fontSize="14" fontWeight="500" fill={INK} textAnchor="middle" className={`${shown(scene === 0)} font-sans`}>
-        ?
-      </text>
-      <path d="M91.5 17.5 v9 q3.25 -1.6 6.5 0 q3.25 -1.6 6.5 0 v-9 q-3.25 -1.6 -6.5 0 q-3.25 -1.6 -6.5 0 Z M98 17.5 v9" {...stroke} className={shown(scene === 1)} />
-      <g className={shown(scene === 2)}>
-        <path d="M98 15.5 c3.3 0 5.4 2.4 5.4 5.4 c0 3.5 -5.4 7.6 -5.4 7.6 c0 0 -5.4 -4.1 -5.4 -7.6 c0 -3 2.1 -5.4 5.4 -5.4 Z" fill={INK} />
-        <circle cx="98" cy="20.9" r="1.8" fill="#fff" />
-      </g>
-      <g className={shown(scene === 3)}>
-        <circle cx="98" cy="22" r="5.2" fill="none" stroke={INK} strokeWidth="2.6" strokeDasharray="2.2 1.9" />
-        <circle cx="98" cy="22" r="3.3" fill={INK} />
-        <circle cx="98" cy="22" r="1.4" fill="#fff" />
-      </g>
-      <text x="98" y="25.2" fontSize="8.5" fontWeight="500" fill={INK} textAnchor="middle" className={`${shown(scene === 4)} font-sans tabular-nums`}>
-        {customers}
-      </text>
-      <g className={shown(scene === 5)}>
-        <path d="M91.5 27 L96 22 L99.5 24.8 L104.5 18" {...stroke} stroke={SKY} strokeWidth={2} />
-        <path d="M100.5 18 L104.5 18 L104.5 22" {...stroke} stroke={SKY} strokeWidth={2} />
-      </g>
-      <g className={shown(scene === 6)}>
-        <rect x="95.4" y="14.5" width="5.2" height="9" rx="2.6" fill={INK} />
-        <path d="M92.8 21 a5.2 5.2 0 0 0 10.4 0 M98 26.2 v2.6" {...stroke} />
-      </g>
-    </g>
-  );
-}
 
 /**
- * The founder who rides the spine. Deliberately plain: a face on the sky, and one
- * small badge beside it. The expression does the storytelling — worried on day one,
- * focused while the studio builds, beaming once the customers land, composed on
- * pitch day — and the eyes blink every few seconds so the founder reads as alive
- * even while the page is still.
+ * The founder who rides the spine: a sky disc inside a progress ring, with the founder
+ * cut out of it so the head breaks the top edge. Each status swaps the pose and pops one
+ * small overlay beside the disc — the question marks of day one, the class count, the
+ * roadmap, the disciplines, the customer seats, the chart and, on pitch day, the room.
  */
 function FounderAvatar({ day }: { day: number }) {
-  const uid = useId().replace(/[^a-zA-Z0-9_-]/g, "");
-  const disc = `journey-disc-${uid}`;
-  const glow = `journey-glow-${uid}`;
   const scene = statusFor(day);
-  const [lookX, lookY] = lookFor[scene];
-  const happyEyes = scene === 4;
+  const customers = customersFor(day);
+  const lit = Math.round((customers / 100) * seats.length);
+  const ava = useRef<HTMLDivElement>(null);
+  const studio = useRef<SVGGElement>(null);
+  const shownScene = useRef(scene);
+
+  // A small bump of the disc each time the founder moves on to a new status.
+  useEffect(() => {
+    const el = ava.current;
+    if (!el || shownScene.current === scene) return;
+    shownScene.current = scene;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    el.classList.remove("bump");
+    void el.offsetWidth;
+    el.classList.add("bump");
+    const t = setTimeout(() => el.classList.remove("bump"), 600);
+    return () => clearTimeout(t);
+  }, [scene]);
+
+  // The "In studio" chip is sized to its label once the page font is in.
+  useEffect(() => {
+    const fit = () => {
+      const g = studio.current;
+      const text = g?.querySelector("text");
+      const rect = g?.querySelector("rect");
+      if (!text || !rect) return;
+      const w = text.getBBox().width;
+      if (w) rect.setAttribute("width", (w + 33).toFixed(1));
+    };
+    fit();
+    document.fonts?.ready.then(fit);
+  }, []);
 
   return (
-    <svg viewBox="0 0 120 120" aria-hidden="true" className="block aspect-square w-full overflow-visible drop-shadow-[0_12px_20px_rgb(22_37_63/0.18)]">
-      <defs>
-        <clipPath id={disc}>
-          <circle cx="60" cy="52" r="34" />
-        </clipPath>
-        <radialGradient id={glow} cx="50%" cy="38%" r="72%">
-          <stop offset="0" stopColor={SKY_LIGHT} />
-          <stop offset="1" stopColor={SKY} />
-        </radialGradient>
-      </defs>
-
-      {/* A ring of white round the disc, so the spine breaks cleanly around the founder. */}
-      <circle cx="60" cy="60" r="54" fill="#fff" />
-
-      {/* The face is drawn at 34 units and scaled up to fill the disc. */}
-      <g transform="translate(60 60) scale(1.47) translate(-60 -52)">
-        <g clipPath={`url(#${disc})`}>
-          <circle cx="60" cy="52" r="34" fill={`url(#${glow})`} />
-
-          {/* Casual all quarter; the suit goes on for pitch day. */}
-          <g className={shown(scene !== 6)}>
-            <path d="M32 90 C32 74 44 68 60 68 C76 68 88 74 88 90 Z" fill={SHIRT} />
-            <path d="M56 68 L60 75 L64 68" fill="none" stroke="#c9d6e6" strokeWidth="1.5" />
-          </g>
-          <g className={shown(scene === 6)}>
-            <path d="M32 90 C32 74 44 68 60 68 C76 68 88 74 88 90 Z" fill={SHIRT} />
-            <path d="M60 68 L51 90 L44 90 L48 72 Z" fill={INK} />
-            <path d="M60 68 L69 90 L76 90 L72 72 Z" fill={INK} />
-            <path d="M56 69 L60 74 L64 69 Z" fill={SKY} />
-            <path d="M58 74 L60 87 L62 74 Z" fill={SKY} />
-          </g>
-
-          <path d="M54 60 h12 v6 c0 3 -12 3 -12 0 Z" fill="#e0a579" />
-          <circle cx="45.6" cy="47" r="3.2" fill="#efc09a" />
-          <circle cx="74.4" cy="47" r="3.2" fill="#efc09a" />
-          <ellipse cx="60" cy="45" rx="13" ry="15" fill="#efc09a" />
-          {/* Cheeks warm up once things start going right. */}
-          <g fill="#eba07a" className="transition-opacity duration-500" style={{ opacity: scene >= 4 ? 0.75 : 0.35 }}>
-            <circle cx="51.6" cy="50" r="2.5" />
-            <circle cx="68.4" cy="50" r="2.5" />
-          </g>
-          <path d="M60 46 q-1.3 3.4 0 4" fill="none" stroke="#e0a579" strokeWidth="1.5" strokeLinecap="round" />
-
-          {/* Hair goes down before the features, so a raised brow still reads over the fringe. */}
-          <g fill="#3a2a22">
-            <path d="M43 46 C42 27 78 27 77 46 L77 72 C74 72 71.5 68 71.5 64 L71.5 46 C71.5 35 66 30 60 30 C54 30 48.5 35 48.5 46 L48.5 64 C48.5 68 46 72 43 72 Z" />
-            <path d="M46 44 C46 28 74 28 74 44 C73 34 68 29.5 60 29.5 C52 29.5 47 34 46 44 Z" />
-          </g>
-
-          {/* Eyes: open (and blinking) in every scene but the happy one, where they close into arcs. */}
-          <g className={shown(!happyEyes)}>
-            <g className="ease-in-out-quart transition-transform duration-500" style={{ transform: `translate(${lookX}px, ${lookY}px)` }}>
-              <g className="origin-center [transform-box:fill-box] motion-safe:animate-[journey-blink_4.8s_ease-in-out_infinite]">
-                <ellipse cx="54.4" cy="44.6" rx="1.9" ry="2.5" fill={FACE_INK} />
-                <ellipse cx="65.6" cy="44.6" rx="1.9" ry="2.5" fill={FACE_INK} />
-                <circle cx="55" cy="43.9" r=".65" fill="#fff" />
-                <circle cx="66.2" cy="43.9" r=".65" fill="#fff" />
+    <div ref={ava} className={`founder-ava sc${scene}`} aria-hidden="true">
+      <svg className="orbit" viewBox="0 0 200 200">
+        <circle className="trk" cx="100" cy="100" r="96" />
+        <circle
+          className="prg"
+          cx="100"
+          cy="100"
+          r="96"
+          pathLength={1000}
+          transform="rotate(-90 100 100)"
+          style={{ strokeDashoffset: (1000 * (1 - (day - 1) / 89)).toFixed(1) }}
+        />
+        <g>
+          {ringTicks.map((t) => (
+            <circle key={t.d} className={`tick ${day >= t.d ? "on" : ""}`} r="3" cx={t.cx} cy={t.cy} />
+          ))}
+        </g>
+      </svg>
+      <div className="disc" />
+      <div className="cut">
+        <div className="stage">
+          {poses.map((src, i) => (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img key={src} src={src} alt="" width={640} height={640} decoding="async" draggable={false} className={`pose ${i === scene ? "on" : ""}`} />
+          ))}
+        </div>
+      </div>
+      <div className="lip" />
+      <svg className="fx" viewBox="0 0 200 200">
+        <g className="s s0">
+          <g transform="translate(174 36)">
+            <g className="pop">
+              <g className="fl">
+                <g className="bub">
+                  <circle r="14" />
+                  <text y="6">?</text>
+                </g>
               </g>
             </g>
           </g>
-          <g className={shown(happyEyes)} fill="none" stroke={FACE_INK} strokeWidth="1.8" strokeLinecap="round">
-            <path d="M52.2 45.4 Q54.4 42.4 56.6 45.4" />
-            <path d="M63.4 45.4 Q65.6 42.4 67.8 45.4" />
-          </g>
-
-          <g fill="none" stroke={FACE_INK} strokeWidth="1.7" strokeLinecap="round">
-            {brows.map(([left, right], i) => (
-              <g key={i} className={shown(browFor[scene] === i)}>
-                <path d={left} />
-                <path d={right} />
+          <g transform="translate(20 74)">
+            <g className="pop d2">
+              <g className="fl b">
+                <g className="bub sm">
+                  <circle r="10" />
+                  <text y="4.3">?</text>
+                </g>
               </g>
-            ))}
+            </g>
           </g>
-
-          {mouths.map((mouth, i) => (
-            <g key={i} className={shown(mouthFor[scene] === i)}>
-              {mouth}
+        </g>
+        <g className="s s1">
+          <g transform="translate(-14 176)">
+            <g ref={studio} className="pop">
+              <rect className="chip" width="78" height="22" rx="11" />
+              <circle className="studio" cx="12" cy="11" r="3" />
+              <text className="ct" x="21" y="15" style={{ textAnchor: "start" }}>
+                In studio
+              </text>
+            </g>
+          </g>
+          <g transform="translate(116 176)">
+            <g className="pop d2">
+              <rect className="chip" width="92" height="22" rx="11" />
+              <text className="ct" x="46" y="15">
+                Class {Math.min(10, Math.max(1, day))} of 10
+              </text>
+            </g>
+          </g>
+        </g>
+        <g className="s s2">
+          <g transform="translate(142 -2)">
+            <g className="pop">
+              <rect className="card" width="58" height="44" rx="6" />
+              <circle cx="11" cy="12" r="3.2" className="studio" />
+              <path className="route" pathLength={1} d="M11 12 C28 14 14 24 31 27 C41 29 38 36 47 33" />
+              <path className="pin" d="M47 20.5c3.9 0 6.3 2.9 6.3 6.2c0 4.1-6.3 9.2-6.3 9.2s-6.3-5.1-6.3-9.2c0-3.3 2.4-6.2 6.3-6.2Z" />
+              <circle cx="47" cy="26.8" r="2.1" fill="#fff" />
+            </g>
+          </g>
+          <g transform="translate(112 176)">
+            <g className="pop d2">
+              <rect className="chip" width="88" height="22" rx="11" />
+              <text className="ct" x="44" y="15">
+                90-day plan
+              </text>
+            </g>
+          </g>
+        </g>
+        <g className="s s3">
+          {pills.map((p) => (
+            <g key={p.label} transform={`translate(${p.x} ${p.y})`}>
+              <g className={`pop pil ${p.delay} ${day >= p.day ? "lit" : ""}`}>
+                <rect width={p.w} height="22" rx="11" />
+                <text x={p.w / 2} y="15">
+                  {p.label}
+                </text>
+              </g>
             </g>
           ))}
-
         </g>
-      </g>
-
-      <Badge scene={scene} customers={customersFor(day)} />
-    </svg>
+        <g className="s s4">
+          <g transform="translate(126 -4)">
+            <g className="pop">
+              <rect className="cnt" width="76" height="26" rx="13" />
+              <text className="cntt" x="38" y="17.6">
+                <tspan>{customers}</tspan>
+                <tspan className="of"> / 100</tspan>
+              </text>
+            </g>
+          </g>
+          <g>
+            {seats.map((c, i) => (
+              <circle key={i} className={`cd ${i < lit ? "on" : ""}`} r="2.7" cx={c.cx} cy={c.cy} />
+            ))}
+          </g>
+        </g>
+        <g className="s s5">
+          <g transform="translate(138 -4)">
+            <g className="pop">
+              <rect className="card" width="62" height="46" rx="6" />
+              <rect className="bar lo" x="9" y="28" width="8" height="10" rx="1.5" />
+              <rect className="bar" x="21" y="23" width="8" height="15" rx="1.5" />
+              <rect className="bar" x="33" y="17" width="8" height="21" rx="1.5" />
+              <rect className="bar" x="45" y="9" width="8" height="29" rx="1.5" />
+              <path className="trend" pathLength={1} d="M9 23 L25 17 L37 11 L53 4" />
+            </g>
+          </g>
+        </g>
+        <g className="s s6">
+          <g transform="translate(176 154)">
+            <g className="pop">
+              <circle className="badge" r="18" />
+              <path className="chk" d="M-7.5 0.5 l4.8 4.8 l9.4 -10" />
+            </g>
+          </g>
+          <g transform="translate(-6 168)">
+            <g className="pop d2 aud">
+              <circle cx="6" cy="6" r="5" />
+              <path d="M-1.5 21a7.5 7.5 0 0 1 15 0Z" />
+              <circle cx="24" cy="4" r="5" />
+              <path d="M16.5 19a7.5 7.5 0 0 1 15 0Z" />
+              <circle cx="42" cy="8" r="5" />
+              <path d="M34.5 23a7.5 7.5 0 0 1 15 0Z" />
+            </g>
+          </g>
+        </g>
+      </svg>
+    </div>
   );
 }
 
@@ -382,13 +404,13 @@ export default function Journey() {
 
             <div
               ref={marker}
-              className="absolute top-0 left-1/2 z-10 w-full max-w-44 -translate-x-1/2 -translate-y-1/2 transition-[top] duration-100 ease-linear"
+              className="absolute top-0 left-1/2 z-10 -translate-x-1/2 -translate-y-1/2 transition-[top] duration-100 ease-linear [--fa-size:118px] md:[--fa-size:clamp(118px,13vw,190px)]"
             >
               <p className="sr-only">
                 Day {day} of 90: {status}. {customers} customers.
               </p>
               <FounderAvatar day={day} />
-              <div ref={caption} aria-hidden="true" className="absolute top-full left-1/2 mt-3 flex -translate-x-1/2 flex-col items-center gap-1.5">
+              <div ref={caption} aria-hidden="true" className="absolute top-full left-1/2 mt-3.5 flex -translate-x-1/2 flex-col items-center gap-2">
                 <span className="mono-text border-dark/15 text-dark rounded-full border bg-white px-3 py-1.5 whitespace-nowrap tabular-nums">Day {day}</span>
                 <span className="bg-dark mono-text rounded-full px-3 py-1.5 whitespace-nowrap text-white">{status}</span>
               </div>
