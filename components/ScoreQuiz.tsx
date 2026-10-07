@@ -103,7 +103,7 @@ function IdentityForm({ initial, onNext }: { initial: Identity; onNext: (id: Ide
   };
   return (
     <form noValidate onSubmit={submit} className="flex flex-1 flex-col motion-safe:animate-[score-in_0.5s_var(--ease-out-expo)_both]">
-      <Eyebrow left="Before we start" right="1 min" />
+      <Eyebrow left="Before we start" right="5 min" />
       <h2 className="mt-6 text-xl leading-tight font-medium lg:text-2xl">First, who are we scoring?</h2>
       <p className="mt-2 text-sm leading-tight text-dark/70">Your report comes back to this address, and we call you on this number.</p>
       <div className="mt-6 grid gap-5">

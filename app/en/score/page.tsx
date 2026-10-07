@@ -28,18 +28,15 @@ export default function ScorePage() {
   return (
     <div className="bg-white">
       <Nav />
-      <main className={`${containerClass} pt-16 pb-24`}>
+      <main className={`${containerClass} pt-8 pb-24 md:pt-16`}>
         <Link href={`${SITE_URL}/en`} className="mono-text text-dark-subtle hover:text-dark font-mono">
           ← Back
         </Link>
-        <p className="mono-text mt-16 font-mono text-dark/75">Every startup has a number. We built the one that decides who we build with.</p>
-        <h1 className="mt-5 max-w-[16ch] text-3xl font-medium md:text-4xl">See exactly what’s in your way.</h1>
-        <p className="mt-4 max-w-[52ch] text-lg text-dark/80 lg:text-xl">
-          Six pillars, one page each. One honest score, and the verdict we’d give you on the call, before we call.
-        </p>
-        <p className="mono-text mt-4 font-mono text-dark/60">Free · 5 min · no card · your report emailed as a PDF · we call you</p>
+        <h1 className="mt-8 max-w-[16ch] text-3xl font-medium md:mt-16 md:text-4xl">See exactly what’s in your way.</h1>
+        <p className="mt-3 max-w-[48ch] text-lg text-dark/80 lg:text-xl">Six pillars, one honest score. The report lands in your inbox, and we call you to walk through it.</p>
+        <p className="mono-text mt-3 font-mono text-dark/60">Free · 5 min · no card</p>
 
-        <div className="mt-12 md:mt-16">
+        <div className="mt-8 md:mt-12">
           <ScoreQuiz />
         </div>
       </main>
