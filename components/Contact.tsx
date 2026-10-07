@@ -1,5 +1,6 @@
 import Container from "./Container";
-import ContactForm, { CONTACT_EMAIL } from "./ContactForm";
+import { CONTACT_EMAIL } from "@/lib/contact";
+import ContactForm from "./ContactForm";
 import GradientBackground from "./GradientBackground";
 
 const details: [string, string][] = [

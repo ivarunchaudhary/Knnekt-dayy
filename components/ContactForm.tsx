@@ -1,8 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-
-export const CONTACT_EMAIL = "hello@knnekt.studio";
+import { CONTACT_EMAIL } from "@/lib/contact";
 
 const stages = ["Idea, nothing built yet", "Building, pre-launch", "In market, early customers", "Raising, or about to"];
 const interests = [
