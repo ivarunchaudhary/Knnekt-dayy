@@ -6,6 +6,7 @@ import { createPortal } from "react-dom";
 import { feeIncludes, ledgerIn, paymentSteps, pricing, pricingFacts, scorePillars } from "@/lib/data";
 import {
   CONFIG,
+  SECTIONS,
   answered,
   archetypes,
   gateCopy,
@@ -21,6 +22,7 @@ import {
   type Identity,
   type Result,
 } from "@/lib/score";
+import { identify, track, useFormTracking } from "@/lib/pixel";
 import { LADDER, plan as planFor, planCopy, type Month, type Plan } from "@/lib/scorePlan";
 import GradientBackground from "./GradientBackground";
 
@@ -1049,8 +1051,14 @@ export default function ScoreQuiz({ bare = false }: { bare?: boolean }) {
   const [delivery, setDelivery] = useState<Delivery>("sending");
   const [file, setFile] = useState<ReportFile | null>(null);
   const top = useRef<HTMLDivElement>(null);
+  const funnel = useFormTracking("score", top, "Your details");
 
-  const go = (s: Stage) => setStage(s);
+  // Step 1 is the founder's details; each section page after it is one more.
+  const go = (s: Stage) => {
+    setStage(s);
+    if (s.at === "identity") funnel.step(1, "Your details");
+    else if (s.at === "page") funnel.step(s.page + 2, SECTIONS[pages[s.page].sec]);
+  };
 
   /** Back to the top of the card each time the stage changes. It runs after the
    *  new page has rendered: scrolling from the click handler started while the
@@ -1067,6 +1075,8 @@ export default function ScoreQuiz({ bare = false }: { bare?: boolean }) {
   }, [stageKey]);
 
   const finish = () => {
+    funnel.submit();
+    track("Lead", { content_name: "Startup Operating Score" });
     go({ at: "scoring" });
     const result = grade(answers, catOther);
     setDelivery("sending");
@@ -1093,6 +1103,7 @@ export default function ScoreQuiz({ bare = false }: { bare?: boolean }) {
         initial={identity}
         onNext={(id) => {
           setIdentity(id);
+          identify({ email: id.email, phone: id.phone, name: id.name });
           go({ at: "page", page: 0 });
         }}
       />
@@ -1119,7 +1130,12 @@ export default function ScoreQuiz({ bare = false }: { bare?: boolean }) {
       <Report result={stage.result} identity={identity} answers={answers} delivery={delivery} file={file} />
     );
 
-  const inner = <div className="flex min-h-[30rem] flex-col">{card}</div>;
+  // Typing into the details form is the start; nobody reaches a question page without it.
+  const inner = (
+    <div className="flex min-h-[30rem] flex-col" onChange={funnel.start}>
+      {card}
+    </div>
+  );
 
   if (bare) {
     return (

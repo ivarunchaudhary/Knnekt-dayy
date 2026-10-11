@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { CONTACT_EMAIL } from "@/lib/contact";
+import { identify, track, useFormTracking } from "@/lib/pixel";
 
 const stages = ["Idea, nothing built yet", "Building, pre-launch", "In market, early customers", "Raising, or about to"];
 const interests = [
@@ -45,6 +46,8 @@ export default function ContactForm() {
   const [fields, setFields] = useState<Fields>(empty);
   const [errors, setErrors] = useState<Errors>({});
   const [sent, setSent] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
+  const funnel = useFormTracking("contact", formRef, "Contact form");
 
   const mailto = useMemo(() => {
     const subject = `New enquiry: ${fields.name.trim() || "Founder"}${fields.startup.trim() ? ` · ${fields.startup.trim()}` : ""}`;
@@ -61,6 +64,7 @@ export default function ContactForm() {
   }, [fields]);
 
   const set = (key: keyof Fields) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    funnel.start();
     setFields((f) => ({ ...f, [key]: e.target.value }));
     setErrors((prev) => (prev[key] ? { ...prev, [key]: undefined } : prev));
   };
@@ -73,6 +77,9 @@ export default function ContactForm() {
       document.querySelector<HTMLElement>("[aria-invalid='true']")?.focus();
       return;
     }
+    funnel.submit();
+    identify({ email: fields.email.trim().toLowerCase(), name: fields.name.trim() });
+    track("Contact", { content_name: "Contact form", stage: fields.stage, interest: fields.interest });
     window.location.href = mailto;
     setSent(true);
   };
@@ -101,6 +108,7 @@ export default function ContactForm() {
             onClick={() => {
               setFields(empty);
               setSent(false);
+              funnel.reset();
             }}
             className="mono-text bg-sky-deep hover:bg-dark rounded-full px-7 py-3 font-mono text-white outline-offset-2 outline-dark transition-colors"
           >
@@ -112,7 +120,7 @@ export default function ContactForm() {
   }
 
   return (
-    <form noValidate onSubmit={onSubmit} className="text-dark rounded-xl bg-white p-6 md:p-8 lg:p-10">
+    <form ref={formRef} noValidate onSubmit={onSubmit} className="text-dark rounded-xl bg-white p-6 md:p-8 lg:p-10">
       <h3 className="font-medium">Tell us where you are.</h3>
       <p className="text-dark-subtle mt-1 text-sm leading-tight">
         Five fields. We read every one of these ourselves and reply inside two working days.
