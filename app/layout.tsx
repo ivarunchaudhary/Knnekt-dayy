@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
+import MetaPixel from "@/components/MetaPixel";
 import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
@@ -55,6 +56,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://f.vimeocdn.com" />
         <link rel="preconnect" href="https://vod-adaptive-ak.vimeocdn.com" />
         {children}
+        <MetaPixel />
       </body>
     </html>
   );
