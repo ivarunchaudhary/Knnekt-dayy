@@ -902,5 +902,5 @@ export const scoreSample = {
     ["Commercial Traction", "Revenue isn’t repeatable yet."],
   ] as [string, string][],
   /** Where the sample founder sits on the track, in percent, and the marks they climb past. */
-  climb: { you: 34, marks: [[46, "Median"], [68, "Scale-ready"], [87, "Investor-ready"]] as [number, string][] },
+  climb: { you: 34, marks: [[46, "Median"], [68, "Scale-ready"], [90, "Investor-ready"]] as [number, string][] },
 };

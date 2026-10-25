@@ -23,14 +23,15 @@ export default function Contact() {
         <GradientBackground />
         <div className="relative z-10 grid gap-x-1.5 gap-y-12 px-4 py-8 sm:p-8 lg:grid-cols-12 lg:gap-y-0 lg:p-12">
           <div className="flex flex-col justify-between lg:col-span-5 lg:pr-10">
-            <div>
+            {/* Heading, paragraph and button share one width, so the CTA runs the full measure of the copy above it. */}
+            <div className="max-w-[31rem]">
               <h2 className="font-medium text-2xl md:text-3xl">Take the score NOW.</h2>
-              <p className="mt-4 max-w-[30ch] text-lg text-dark/80 lg:text-xl">
+              <p className="mt-4 text-lg text-dark/80 lg:text-xl">
                 We’re taking 15 founders this cohort, in November. Fill in the form, and we’ll call you within 24 hours with your
                 constraints and next moves.
               </p>
               <p className="mt-8">
-                <ScoreButton className="mono-text group inline-flex w-full items-center justify-center gap-3 rounded-full bg-sky-deep py-2 pr-2 pl-6 text-xs text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.18),0_8px_20px_-8px_rgb(22_37_63/0.55)] outline-offset-2 outline-dark transition-[background-color,transform,box-shadow] duration-200 hover:-translate-y-px hover:bg-dark hover:shadow-[inset_0_1px_0_rgb(255_255_255/0.12),0_12px_24px_-10px_rgb(22_37_63/0.6)] focus-visible:bg-dark active:translate-y-0 active:scale-[0.98] sm:w-auto sm:pl-7 sm:text-sm sm:whitespace-nowrap">
+                <ScoreButton className="mono-text group inline-flex w-full min-w-0 items-center justify-between gap-3 rounded-full bg-sky-deep py-2 pr-2 pl-6 text-left text-xs leading-tight text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.18),0_8px_20px_-8px_rgb(22_37_63/0.55)] outline-offset-2 outline-dark transition-[background-color,transform,box-shadow] duration-200 hover:-translate-y-px hover:bg-dark hover:shadow-[inset_0_1px_0_rgb(255_255_255/0.12),0_12px_24px_-10px_rgb(22_37_63/0.6)] focus-visible:bg-dark active:translate-y-0 active:scale-[0.98] sm:pl-7 sm:text-[0.8125rem]">
                   Take the free Startup Operating Score
                   <span
                     aria-hidden="true"

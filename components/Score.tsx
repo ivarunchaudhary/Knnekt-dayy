@@ -172,12 +172,22 @@ function ClimbSlide() {
           className="absolute inset-y-0 left-0 rounded-full bg-[linear-gradient(90deg,var(--color-sky-deep),var(--color-sky))] transition-[width] duration-[1150ms] ease-out-expo"
           style={{ width: on ? `${you}%` : 0 }}
         />
-        {marks.map(([at, label]) => (
-          <span key={label} className="absolute top-1/2 -translate-x-1/2" style={{ left: `${at}%` }}>
-            <span aria-hidden="true" className="block h-5 w-0.5 -translate-y-1/2 bg-dark/15" />
-            <span className="mono-text absolute top-3.5 left-1/2 -translate-x-1/2 font-mono text-[0.5625rem] whitespace-nowrap text-dark/60">{label}</span>
-          </span>
-        ))}
+        {/* The labels are too wide to sit side by side on a phone, so the middle one drops a line and the last hangs off its tick to the left. */}
+        {marks.map(([at, label], i) => {
+          const last = i === marks.length - 1;
+          return (
+            <span key={label} className="absolute top-1/2 -translate-x-1/2" style={{ left: `${at}%` }}>
+              <span aria-hidden="true" className="block h-5 w-0.5 -translate-y-1/2 bg-dark/15" />
+              <span
+                className={`mono-text absolute font-mono text-[0.5625rem] whitespace-nowrap text-dark/60 ${last ? "top-3.5 right-0" : "left-1/2 -translate-x-1/2"} ${
+                  i === 1 ? "top-[1.95rem]" : last ? "" : "top-3.5"
+                }`}
+              >
+                {label}
+              </span>
+            </span>
+          );
+        })}
         <span
           className="absolute top-1/2 z-10 size-[1.125rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-sky-deep shadow-[0_0_0_5px_var(--color-gray-100)]"
           style={{ left: `${you}%` }}
@@ -312,7 +322,7 @@ export default function Score() {
                 type="button"
                 onClick={() => setOpen(true)}
                 data-score-cta=""
-                className={`mono-text group inline-flex w-full items-center justify-center gap-3 rounded-full bg-sky-deep py-2 pr-2 pl-6 text-xs text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.18),0_8px_20px_-8px_rgb(22_37_63/0.55)] outline-offset-2 outline-dark transition-[background-color,transform,box-shadow] duration-200 hover:-translate-y-px hover:bg-dark hover:shadow-[inset_0_1px_0_rgb(255_255_255/0.12),0_12px_24px_-10px_rgb(22_37_63/0.6)] focus-visible:bg-dark active:translate-y-0 active:scale-[0.98] sm:w-auto sm:pl-7 sm:text-sm sm:whitespace-nowrap ${
+                className={`mono-text group inline-flex w-full items-center justify-center gap-3 rounded-full bg-sky-deep py-2 pr-2 pl-6 text-xs text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.18),0_8px_20px_-8px_rgb(22_37_63/0.55)] outline-offset-2 outline-dark transition-[background-color,transform,box-shadow] duration-200 hover:-translate-y-px hover:bg-dark hover:shadow-[inset_0_1px_0_rgb(255_255_255/0.12),0_12px_24px_-10px_rgb(22_37_63/0.6)] focus-visible:bg-dark active:translate-y-0 active:scale-[0.98] text-left sm:w-auto sm:pl-7 sm:text-sm sm:whitespace-nowrap ${
                   pulse ? "motion-safe:animate-[score-pulse_1.6s_ease-in-out_infinite]" : ""
                 }`}
               >
