@@ -21,9 +21,9 @@ const ftSystemMono = localFont({
   src: [{ path: "./fonts/ft-system-mono-medium.woff2", weight: "500", style: "normal" }],
 });
 
-const title = "Knnekt Studios · Launch in 90 days. Get your first 100 customers.";
+const title = "Knnekt Studios · Investors fund proof, not pitches";
 const description =
-  "India's first Startup Execution Studio. It starts with your Startup Operating Score. Then fifteen founders per cohort go all-in for one 90-day build, and come out with real customers and a company ready to raise.";
+  "A startup execution studio in Gurugram. 15 founders a cohort: 10 days to plan, 90 to build, weekly masterclasses with investors, founders and industry experts, and Pitch Day on Day 100. Start with the free Startup Operating Score.";
 
 export const metadata: Metadata = {
   // Share images resolve against the apex, whichever host (www, score) served the page.

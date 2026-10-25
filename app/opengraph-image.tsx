@@ -70,8 +70,8 @@ export default function OpengraphImage() {
             </div>
           </div>
           <div style={{ display: "flex", flexDirection: "column", fontSize: 56, fontWeight: 600, letterSpacing: "-0.03em", lineHeight: 1.12 }}>
-            <span>Your first 100 customers.</span>
-            <span>Fund-ready in 90 days.</span>
+            <span>Investors fund proof, not pitches.</span>
+            <span>Pitch Day on Day 100.</span>
           </div>
         </div>
       </div>
