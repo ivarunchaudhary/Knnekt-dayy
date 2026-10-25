@@ -1,33 +1,23 @@
 import HeroBackground from "./HeroBackground";
 import HeroFog from "./HeroFog";
 import Wordmark from "./Wordmark";
-import { containerClass } from "./Container";
 
 /**
- * The hero is a light frame now, an azure sky over a white set, so the shell
- * behind it is `bg-sky-soft` rather than the old near-black plate: it is what
- * shows for the frame before the photograph decodes, and a dark flash under a
- * light picture is the one thing that reads as a fault.
+ * The hero is the studio film (see <HeroBackground/>), and the film carries the
+ * wordmark and the claim in its own frame, so the type here is for screen
+ * readers and crawlers only. Drawn on screen as well, it would sit on top of its
+ * own twin. For the same reason there is no scrim any more: the film's top band
+ * is already a deep navy under its white type.
  *
- * The claim stays white, because white is what belongs on sky; the wordmark is a
- * step larger and set in `sky-soft` (#B9D8F9), so the name reads as the one
- * coloured thing in the frame while the line under it stays plain white.
- * White on the picture's own top band (#3B81E3) holds only 3.9:1, though, so a
- * navy scrim runs down the top 60% of the frame, `--color-dark` at 55%, closing
- * to nothing, which brings the blend under the claim to about 5:1. It sits under
- * the content and over the picture, and stops well short of the crew, so the
- * lower two-thirds of the photograph are the photograph.
+ * The shell stays `bg-sky-soft` (see `.hero-backdrop`), which is what shows for
+ * the frame before the poster decodes.
  */
 export default function Hero() {
   return (
     <header className="relative h-svh bg-sky-soft">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 z-10 h-3/5 bg-[linear-gradient(to_bottom,color-mix(in_srgb,var(--color-dark)_55%,transparent)_0%,transparent_100%)]"
-      />
-      <div className={`${containerClass} relative z-20 flex h-full flex-col items-center pt-[19vh] text-center text-white`}>
-        <Wordmark className="text-[clamp(2.25rem,13vw,7.5rem)] leading-none text-sky-soft" />
-        <p className="mt-5 text-[1.75rem] leading-tight sm:text-[2.5rem]">Startup execution studio · Gurugram</p>
+      <div className="sr-only">
+        <Wordmark />
+        <p>India&rsquo;s first startup execution studio · Gurugram</p>
       </div>
       <HeroBackground />
       <HeroFog />
