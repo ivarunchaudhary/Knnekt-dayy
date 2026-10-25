@@ -203,7 +203,13 @@ function Report({ onStart }: { onStart: () => void }) {
   const card = useRef<HTMLDivElement>(null);
   const [live, setLive] = useState(false);
   const [slide, setSlide] = useState(0);
-  const [paused, setPaused] = useState(false);
+  // Held while a mouse is over the card or keyboard focus is inside it, and for good once
+  // the visitor starts the quiz. Only a mouse counts as hovering: a tap fires
+  // mouseenter too, and on a phone nothing would ever un-hover it.
+  const [hover, setHover] = useState(false);
+  const [focus, setFocus] = useState(false);
+  const [started, setStarted] = useState(false);
+  const paused = hover || focus || started;
   const [key, setKey] = useState(0);
 
   useEffect(() => {
@@ -234,16 +240,19 @@ function Report({ onStart }: { onStart: () => void }) {
   };
 
   const start = () => {
-    setPaused(true);
+    setStarted(true);
     onStart();
   };
 
   return (
     <div
       ref={card}
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      onFocusCapture={() => setPaused(true)}
+      onPointerEnter={(e) => e.pointerType === "mouse" && setHover(true)}
+      onPointerLeave={(e) => e.pointerType === "mouse" && setHover(false)}
+      onFocusCapture={(e) => e.target.matches(":focus-visible") && setFocus(true)}
+      onBlurCapture={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget)) setFocus(false);
+      }}
       className="flex min-h-[34rem] w-full max-w-[35rem] flex-col rounded-xl bg-white p-6 shadow-[0_40px_90px_-50px_rgba(22,37,63,0.45)] md:p-9"
     >
       <div key={slide} className="flex-1 motion-safe:animate-[score-in_0.5s_var(--ease-out-expo)_both]" aria-live="polite">

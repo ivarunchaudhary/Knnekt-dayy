@@ -220,8 +220,11 @@ body {
   width: max-content;
   animation: marquee 40s linear infinite;
 }
-.marquee:hover {
-  animation-play-state: paused;
+/* Only where hovering is real: a tap counts as hover on touch screens and never lets go. */
+@media (hover: hover) {
+  .marquee:hover {
+    animation-play-state: paused;
+  }
 }
 @keyframes marquee {
   from { transform: translate3d(0, 0, 0); }
