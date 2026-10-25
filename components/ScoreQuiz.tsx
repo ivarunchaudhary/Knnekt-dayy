@@ -22,7 +22,7 @@ import {
   type Identity,
   type Result,
 } from "@/lib/score";
-import { identify, meta, track, useFormTracking } from "@/lib/pixel";
+import { identify, track, useFormTracking } from "@/lib/pixel";
 import { LADDER, plan as planFor, planCopy, type Month, type Plan } from "@/lib/scorePlan";
 import GradientBackground from "./GradientBackground";
 
@@ -1056,7 +1056,6 @@ export default function ScoreQuiz({ bare = false }: { bare?: boolean }) {
   const [file, setFile] = useState<ReportFile | null>(null);
   const top = useRef<HTMLDivElement>(null);
   const funnel = useFormTracking("score", top, "Your details");
-  const led = useRef(false);
 
   // Step 1 is the founder's details; each section page after it is one more.
   const go = (s: Stage) => {
@@ -1081,7 +1080,7 @@ export default function ScoreQuiz({ bare = false }: { bare?: boolean }) {
 
   const finish = () => {
     funnel.submit();
-    meta("SubmitApplication", { content_name: "Startup Operating Score" });
+    track("generate_lead", {}, { event: "Lead", params: { content_name: "Startup Operating Score" } });
     go({ at: "scoring" });
     const result = grade(answers, catOther);
     setDelivery("sending");
@@ -1112,11 +1111,6 @@ export default function ScoreQuiz({ bare = false }: { bare?: boolean }) {
         onNext={(id) => {
           setIdentity(id);
           identify({ email: id.email, phone: id.phone, name: id.name });
-          // Page 1 is in: that's the lead. Counted once, however often they come back to it.
-          if (!led.current) {
-            led.current = true;
-            track("generate_lead", {}, { event: "Lead", params: { content_name: "Startup Operating Score" } });
-          }
           go({ at: "page", page: 0 });
         }}
       />
