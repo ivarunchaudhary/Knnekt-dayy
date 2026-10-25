@@ -36,7 +36,8 @@ export default function ScorePage() {
         <p className="mt-3 max-w-[48ch] text-lg text-dark/80 lg:text-xl">Six pillars, one honest score. The report lands in your inbox, and we call you to walk through it.</p>
         <p className="mono-text mt-3 font-mono text-dark/60">Free · 5 min · no card</p>
 
-        <div className="mt-8 md:mt-12">
+        {/* The score asks for name, email and phone, and its report holds the business: none of it shows in Clarity. */}
+        <div className="mt-8 md:mt-12" data-clarity-mask="true">
           <ScoreQuiz />
         </div>
       </main>

@@ -37,6 +37,8 @@ export default function ScoreDialog({ onClose }: { onClose: () => void }) {
     <dialog
       ref={ref}
       aria-labelledby="score-dialog-title"
+      // The score asks for name, email and phone, and its report holds the business: none of it shows in Clarity.
+      data-clarity-mask="true"
       onCancel={(e) => {
         e.preventDefault();
         dismiss();

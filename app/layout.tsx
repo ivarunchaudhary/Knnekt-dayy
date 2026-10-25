@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
+import Script from "next/script";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import CookieBanner from "@/components/CookieBanner";
 import MetaPixel from "@/components/MetaPixel";
@@ -46,6 +47,7 @@ export const metadata: Metadata = {
 };
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
+const CLARITY_ID = process.env.NEXT_PUBLIC_CLARITY_ID;
 
 export const viewport: Viewport = {
   themeColor: "#3b81e3",
@@ -58,7 +60,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`relative scroll-smooth ${ftSystemBlank.variable} ${ftSystemMono.variable}`}>
       <head>
         {/* Consent defaults, before any tag: see lib/consent.ts. */}
-        <script dangerouslySetInnerHTML={{ __html: consentBootstrap() }} />
+        <script dangerouslySetInnerHTML={{ __html: consentBootstrap(CLARITY_ID) }} />
       </head>
       <body className="text-dark font-sans text-base antialiased">
         <link rel="preconnect" href="https://player.vimeo.com" />
@@ -71,6 +73,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SiteEvents />
       </body>
       {GA_ID && <GoogleAnalytics gaId={GA_ID} />}
+      {CLARITY_ID && (
+        <Script id="clarity" strategy="afterInteractive">
+          {`(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y)})(window,document,"clarity","script","${CLARITY_ID}");`}
+        </Script>
+      )}
     </html>
   );
 }
