@@ -347,10 +347,12 @@ export type FacultyMember = {
   name?: string;
   /** The seat: what they are to the cohort, not where they work. */
   seat: string;
+  /** For the execution team: which of the studio's functions they run. */
+  fn?: string;
   /** The class they take. */
   teaches: string;
   /** One line on why they’re in the room. */
-  note: string;
+  note?: string;
   src: string;
   alt: string;
 };
@@ -358,14 +360,16 @@ export type FacultyMember = {
 export type FacultyGroup = {
   id: string;
   kicker: string;
-  title: string;
+  title?: string;
   text: string;
   people: FacultyMember[];
+  /** The line that closes the group, since neither room is the full list. */
+  more: string;
 };
 
 /**
  * Two rooms: the investors who take the weekly masterclasses, and the studio
- * team that builds alongside the cohort for the whole quarter.
+ * team that builds alongside the cohort for all 100 days.
  *
  * Names and photos are stand-ins until each person is signed — drop a `name`
  * onto a member and the card swaps the seat for the name and loses the chip.
@@ -374,8 +378,8 @@ export const faculty: FacultyGroup[] = [
   {
     id: "investors",
     kicker: "Weekly masterclasses",
-    title: "With industry experts and people who write the cheques.",
-    text: "One working investor, live, every week of the quarter. Not a panel and not a fireside: a class, with your numbers on the table and the questions you’ll get asked in a real room.",
+    text: "Every week, an investor, founder or operator in the studio, working on your numbers.",
+    more: "…and more",
     people: [
       {
         seat: "Seed investor · Consumer",
@@ -425,47 +429,48 @@ export const faculty: FacultyGroup[] = [
     id: "studio",
     kicker: "The execution team",
     title: "The people who build it with you.",
-    text: "The same four functions the studio runs, as named people you work with every week, not a resourcing pool. They take the ten planning classes, then stay for the eighty days of building.",
+    text: "",
+    more: "…and more vetted partners",
     people: [
       {
         seat: "Growth lead",
+        fn: "Growth & Marketing",
         teaches: "Positioning before spend",
-        note: "Owns the story, the demand engine and the retention loop.",
         src: `${cdn}/f501cb2a0b61b54fc7a0702eb87c8df8e2198827-400x400.webp`,
         alt: "Person with long dark hair with green highlights, wearing glasses and a grey sweater, indoors",
       },
       {
         seat: "Technology lead",
+        fn: "Technology",
         teaches: "Shipping an MVP you don’t rebuild",
-        note: "Website, product and the ops stack behind them, inside the quarter.",
         src: `${cdn}/fd8f27d99b3ce35f5d1363da538df84586e72ad2-400x400.webp`,
         alt: "Person with short light brown hair, wearing a grey sweatshirt, standing outdoors",
       },
       {
         seat: "AI lead",
+        fn: "AI Enablement",
         teaches: "Where AI earns its place",
-        note: "Inside the product where it’s the point, behind it where it saves a hire.",
         src: `${cdn}/8fb0c09f3bc8e17a7b5eecf844bec1d653e3d63b-400x400.webp`,
         alt: "Person with shoulder-length blonde hair, wearing a black top, standing in front of a wooden staircase",
       },
       {
         seat: "Legal & compliance counsel",
+        fn: "Legal & Compliance",
         teaches: "Cap table, contracts, clean data room",
-        note: "The paperwork that decides whether a raise goes smoothly.",
         src: `${cdn}/ac769d3350cf47c71a58bae3ae7b59bcc4d5a1ea-400x400.webp`,
         alt: "Person with short light brown hair, wearing a black shirt, standing indoors near a window",
       },
       {
         seat: "Design lead",
+        fn: "Design",
         teaches: "Brand that survives contact with customers",
-        note: "Identity, product surface and the drop that has to convert.",
         src: `${cdn}/bf3058c905b49cf3dc71dc55257ec02fa40f5afb-400x400.webp`,
         alt: "Person with short dark hair and a beard, wearing a black jacket and grey t-shirt, indoors with warm lighting",
       },
       {
         seat: "Studio partner",
+        fn: "Your 1:1",
         teaches: "The weekly 1:1",
-        note: "One honest conversation a week about the calls only you can make.",
         src: `${cdn}/cfc12095e86efb371285ab2914add93ecdc9bc94-400x400.webp`,
         alt: "Person with dark hair tied back, wearing a beige turtleneck sweater and hoop earrings, standing indoors",
       },

@@ -41,13 +41,14 @@ function Syllabus({ group }: { group: FacultyGroup }) {
           </div>
         </li>
       ))}
+      <li className="text-dark-subtle py-5 text-sm lg:py-6">{group.more}</li>
     </ol>
   );
 }
 
 /**
  * The execution team is the opposite promise — the same faces, all at once, all
- * quarter — so it is drawn as one lineup: six portraits butted into a single strip
+ * 100 days — so it is drawn as one lineup: six portraits butted into a single strip
  * with hairline gaps, the way a team stands for a photograph, with each person's
  * seat and what they own underneath their column.
  */
@@ -60,10 +61,10 @@ function Lineup({ group }: { group: FacultyGroup }) {
             {img(person, "(min-width: 1024px) 16vw, (min-width: 640px) 33vw, 50vw", "")}
           </div>
           <div className="grow bg-white/55 px-3.5 pt-4 pb-5">
+            {person.fn && <p className="mono-text text-dark/70 mb-2.5 font-mono">{person.fn}</p>}
             <p className="leading-tight font-medium">{person.name ?? person.seat}</p>
             {person.name && <p className="text-dark-very-subtle mt-0.5 text-xs">{person.seat}</p>}
             <p className="mt-3 text-sm leading-snug">{person.teaches}</p>
-            <p className="text-dark-subtle mt-1 text-xs leading-snug">{person.note}</p>
           </div>
         </li>
       ))}
@@ -84,8 +85,8 @@ export default function Faculty() {
   return (
     <section id="faculty" className="py-12 md:py-28">
       <Container>
-        <SectionHeading lead="You don’t just get a studio. You get the room.">
-          Ten live classes to plan the quarter, then a working investor in front of the cohort every week, and the same four named leads building beside you the whole time.
+        <SectionHeading lead="You don’t just get a studio. You get the community.">
+          Weekly masterclasses with investors, founders and industry experts, and the same team building beside you for all 100 days.
         </SectionHeading>
 
         <div className="mt-12 space-y-1.5 lg:mt-20">
@@ -94,7 +95,7 @@ export default function Faculty() {
             <div className="grid gap-x-12 gap-y-10 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] xl:gap-x-20">
               <div className="lg:sticky lg:top-28 lg:self-start">
                 <span className="mono-text text-dark inline-block rounded-full border border-dark/20 px-3 py-1.5">{investors.kicker}</span>
-                <h3 className="mt-6 max-w-[16ch] text-3xl font-medium md:text-4xl">{investors.title}</h3>
+                {investors.title && <h3 className="mt-6 max-w-[16ch] text-3xl font-medium md:text-4xl">{investors.title}</h3>}
                 <p className="text-dark-subtle mt-5 max-w-[34rem] text-sm">{investors.text}</p>
               </div>
               <Syllabus group={investors} />
@@ -108,17 +109,14 @@ export default function Faculty() {
                 <span className="mono-text text-dark inline-block rounded-full border border-dark/20 px-3 py-1.5">{studio.kicker}</span>
                 <h3 className="mt-6 max-w-[16ch] text-3xl font-medium md:text-4xl">{studio.title}</h3>
               </div>
-              <p className="text-dark/80 max-w-[34rem] text-sm lg:pb-1">{studio.text}</p>
+              {studio.text && <p className="text-dark/80 max-w-[34rem] text-sm lg:pb-1">{studio.text}</p>}
             </div>
             <div className="mt-10 lg:mt-14">
               <Lineup group={studio} />
             </div>
+            <p className="text-dark-subtle mt-6 text-sm">{studio.more}</p>
           </div>
         </div>
-
-        <p className="text-dark-very-subtle mt-8 max-w-[42rem] text-xs">
-          Faculty is confirmed six weeks before each kickoff. Names and photographs go live as each person signs; the portraits above stand in until they do.
-        </p>
       </Container>
     </section>
   );
