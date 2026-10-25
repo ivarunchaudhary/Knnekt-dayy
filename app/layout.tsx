@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import MetaPixel from "@/components/MetaPixel";
 import { SITE_URL } from "@/lib/site";
 import "./globals.css";
@@ -41,6 +42,8 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title, description },
 };
 
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
+
 export const viewport: Viewport = {
   themeColor: "#3b81e3",
   width: "device-width",
@@ -58,6 +61,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {children}
         <MetaPixel />
       </body>
+      {GA_ID && <GoogleAnalytics gaId={GA_ID} />}
     </html>
   );
 }
