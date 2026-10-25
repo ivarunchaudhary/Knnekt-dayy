@@ -16,7 +16,7 @@ export default function Footer() {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:block md:space-y-6">
             <address className="not-italic">
               <span className="flex min-h-6 items-center">Studio</span>
-              <span className="text-dark-subtle block">Delhi NCR</span>
+              <span className="text-dark-subtle block">Gurugram</span>
               <span className="text-dark-subtle block">India</span>
               <a className={`text-dark-subtle hover:text-dark ${link}`} href="tel:+919140845927">+91 91408 45927</a>
             </address>
@@ -46,7 +46,8 @@ export default function Footer() {
             <p>
               <a className={link} href="mailto:hello@knnekt.studio">hello@knnekt.studio</a>
             </p>
-            <p>Knnekt® · Startup Operating Partner</p>
+            <p>Knnekt Studios</p>
+            <p>Startup Operating Score</p>
             <p className="text-dark-subtle">©{new Date().getFullYear()} All rights reserved</p>
           </div>
         </div>
