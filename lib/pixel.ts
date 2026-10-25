@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, type RefObject } from "react";
+import { sendGAEvent } from "@next/third-parties/google";
 import { PIXEL_ID, type CustomEvent, type ServerEvent, type StandardEvent } from "./metaEvents";
 
 export { PIXEL_ID };
@@ -27,6 +28,23 @@ export function loadPixel() {
   (window.fbq as Window["fbq"])?.("init", PIXEL_ID);
 }
 
+/** Empty: Google Analytics isn't loaded, and events only go to Meta. */
+export const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
+
+/**
+ * The GA4 name for each Meta event. PageView has none: GA counts page views
+ * itself, client-side navigations included. The form names stay clear of
+ * form_start and form_submit, which GA's enhanced measurement sends on its own.
+ */
+const GA_EVENTS: Partial<Record<ServerEvent, string>> = {
+  Lead: "generate_lead",
+  Contact: "contact",
+  FormView: "form_view",
+  FormStart: "form_begin",
+  FormStep: "form_step",
+  FormAbandon: "form_abandon",
+};
+
 const eventId = () =>
   typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}.${Math.random().toString(36).slice(2)}`;
 
@@ -34,7 +52,7 @@ const eventId = () =>
  * One event, sent twice under one ID: through the pixel in the browser and
  * through /api/meta to the Conversions API, so Meta keeps whichever arrives
  * and counts it once. keepalive lets the server copy finish even when it's
- * sent as the page is closing.
+ * sent as the page is closing. Google Analytics gets its own copy too.
  */
 function send(kind: "track" | "trackCustom", event: ServerEvent, params?: Params) {
   const id = eventId();
@@ -45,6 +63,8 @@ function send(kind: "track" | "trackCustom", event: ServerEvent, params?: Params
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ event, id, url: location.href, params, user }),
   }).catch(() => {});
+  const gaEvent = GA_EVENTS[event];
+  if (GA_ID && gaEvent) sendGAEvent("event", gaEvent, params ?? {});
 }
 
 /** Meta's standard events — the ones ads can optimise for. */
