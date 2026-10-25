@@ -5,18 +5,10 @@ import { CONTACT_EMAIL } from "@/lib/contact";
 import { identify, track, useFormTracking } from "@/lib/pixel";
 
 const stages = ["Idea, nothing built yet", "Building, pre-launch", "In market, early customers", "Raising, or about to"];
-const interests = [
-  "Start with the Startup Operating Score",
-  "The 90-Day Cohort",
-  "The Founder’s Roadmap",
-  "Build & Scale",
-  "Not sure yet, tell me what I need",
-];
-
-type Fields = { name: string; email: string; startup: string; stage: string; interest: string; message: string };
+type Fields = { name: string; email: string; startup: string; stage: string; message: string };
 type Errors = Partial<Record<keyof Fields, string>>;
 
-const empty: Fields = { name: "", email: "", startup: "", stage: stages[0], interest: interests[0], message: "" };
+const empty: Fields = { name: "", email: "", startup: "", stage: stages[0], message: "" };
 
 /** Deliberately loose: enough to catch a typo, never enough to reject a real address. */
 const looksLikeEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
@@ -26,6 +18,7 @@ function validate(f: Fields): Errors {
   if (!f.name.trim()) e.name = "Tell us who you are.";
   if (!f.email.trim()) e.email = "We need somewhere to reply.";
   else if (!looksLikeEmail(f.email)) e.email = "That address doesn’t look right.";
+  if (!f.startup.trim()) e.startup = "What’s your startup called?";
   if (f.message.trim().length < 10) e.message = "A sentence or two is plenty, but we need one.";
   return e;
 }
@@ -50,13 +43,12 @@ export default function ContactForm() {
   const funnel = useFormTracking("contact", formRef, "Contact form");
 
   const mailto = useMemo(() => {
-    const subject = `New enquiry: ${fields.name.trim() || "Founder"}${fields.startup.trim() ? ` · ${fields.startup.trim()}` : ""}`;
+    const subject = `New enquiry: ${fields.name.trim() || "Founder"} · ${fields.startup.trim()}`;
     const body = [
       `Name: ${fields.name.trim()}`,
       `Email: ${fields.email.trim()}`,
-      `Startup: ${fields.startup.trim() || "not given"}`,
+      `Startup: ${fields.startup.trim()}`,
       `Stage: ${fields.stage}`,
-      `Looking for: ${fields.interest}`,
       "",
       fields.message.trim(),
     ].join("\n");
@@ -79,7 +71,7 @@ export default function ContactForm() {
     }
     funnel.submit();
     identify({ email: fields.email.trim().toLowerCase(), name: fields.name.trim() });
-    track("Contact", { content_name: "Contact form", stage: fields.stage, interest: fields.interest });
+    track("Contact", { content_name: "Contact form", stage: fields.stage });
     window.location.href = mailto;
     setSent(true);
   };
@@ -89,7 +81,7 @@ export default function ContactForm() {
       <div className="text-dark rounded-xl bg-white p-6 md:p-10">
         <p className="mono-text text-dark-very-subtle font-mono">Handed to your mail app</p>
         <p className="mt-5 text-xl leading-tight font-medium lg:text-2xl">
-          Your message is drafted and addressed. Hit send and we’ll come back inside two working days.
+          Your message is drafted and addressed. Hit send and we’ll call you within 24 hours.
         </p>
         <p className="text-dark-subtle mt-5 text-sm leading-tight">
           Nothing opened?{" "}
@@ -123,7 +115,7 @@ export default function ContactForm() {
     <form ref={formRef} noValidate onSubmit={onSubmit} className="text-dark rounded-xl bg-white p-6 md:p-8 lg:p-10">
       <h3 className="font-medium">Tell us where you are.</h3>
       <p className="text-dark-subtle mt-1 text-sm leading-tight">
-        Five fields. We read every one of these ourselves and reply inside two working days.
+        Five fields. We read every one of these ourselves, and we call you within 24 hours.
       </p>
 
       <div className="mt-8 grid gap-5 sm:grid-cols-2">
@@ -173,7 +165,7 @@ export default function ContactForm() {
         </p>
         <p>
           <label className={labelClass} htmlFor="contact-startup">
-            Startup <span className="text-dark-very-subtle">(optional)</span>
+            Startup
           </label>
           <input
             id="contact-startup"
@@ -183,7 +175,14 @@ export default function ContactForm() {
             placeholder="What it’s called"
             value={fields.startup}
             onChange={set("startup")}
+            aria-invalid={!!errors.startup}
+            aria-describedby={errors.startup ? "contact-startup-error" : undefined}
           />
+          {errors.startup && (
+            <span id="contact-startup-error" className={errorClass}>
+              {errors.startup}
+            </span>
+          )}
         </p>
         <p>
           <label className={labelClass} htmlFor="contact-stage">
@@ -191,16 +190,6 @@ export default function ContactForm() {
           </label>
           <select id="contact-stage" name="stage" className={fieldClass} value={fields.stage} onChange={set("stage")}>
             {stages.map((s) => (
-              <option key={s}>{s}</option>
-            ))}
-          </select>
-        </p>
-        <p className="sm:col-span-2">
-          <label className={labelClass} htmlFor="contact-interest">
-            What you’re after
-          </label>
-          <select id="contact-interest" name="interest" className={fieldClass} value={fields.interest} onChange={set("interest")}>
-            {interests.map((s) => (
               <option key={s}>{s}</option>
             ))}
           </select>
