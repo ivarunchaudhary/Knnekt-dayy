@@ -25,6 +25,13 @@
  *     reachable. Every line has to read normally before a submission can land.
  *  7. Share the Sheet, and the Drive folder named below, with whoever reads it.
  *
+ * ── Half-filled scores ──────────────────────────────────────────────────────
+ *  Founders who start and leave land in the "Half filled" tab, with whatever
+ *  they had entered and the page they stopped on. The row updates as they get
+ *  further and disappears when they finish (they're in Submissions then).
+ *  After pasting a new version of this file: Deploy → Manage deployments →
+ *  pencil → Version: New version → Deploy. The /exec URL stays the same.
+ *
  * ── Changing the quiz ───────────────────────────────────────────────────────
  *  Nothing to do. Columns are found by their header text and created on demand,
  *  so a new or reworded question in `lib/score.ts` just becomes a new column.
@@ -45,6 +52,15 @@ var SHEET_ID = '';
 
 /** Tab that collects submissions, created if absent. */
 var SHEET_NAME = 'Submissions';
+
+/**
+ * Tab for founders who started the score and haven't finished: one row per
+ * session, overwritten as they get further, removed once they finish.
+ */
+var PARTIAL_SHEET_NAME = 'Half filled';
+
+/** The column both tabs use to tie a half-filled row to its finished one. */
+var SESSION_COLUMN = 'Session';
 
 /** Drive folder the report PDFs land in, created if absent. */
 var FOLDER_NAME = 'Startup Operating Score — Reports';
@@ -97,7 +113,12 @@ function doPost(e) {
     var lock = LockService.getScriptLock();
     lock.waitLock(30000);
     try {
-      appendSubmission(data);
+      if (data.event === 'partial') {
+        savePartial(data);
+      } else {
+        appendSubmission(data);
+        clearPartial(data.session_id);
+      }
     } finally {
       lock.releaseLock();
     }
@@ -146,6 +167,13 @@ function doGet(e) {
   }
 
   try {
+    var partial = getPartialSheet();
+    out.push('Half filled: tab “' + partial.getName() + '”, ' + Math.max(partial.getLastRow() - 1, 0) + ' unfinished score(s).');
+  } catch (err) {
+    out.push('Half filled: FAILED — ' + err);
+  }
+
+  try {
     out.push('Reports folder: “' + getFolder().getName() + '” is reachable.');
   } catch (err) {
     out.push('Reports folder: FAILED — ' + err);
@@ -185,6 +213,7 @@ function appendSubmission(data) {
   row['Community opt-in'] = data.community_optin ? 'Yes' : 'No';
   row['Report emailed'] = data.emailed ? 'Yes' : 'No';
   row['Instrument version'] = data.instrument_version;
+  row[SESSION_COLUMN] = data.session_id || '';
 
   if (data.benchmark) {
     row['Benchmark model'] = data.benchmark.model;
@@ -216,6 +245,61 @@ function appendSubmission(data) {
   writeRow(sheet, row);
 }
 
+/**
+ * A founder who started and hasn't finished. Their row is found by session and
+ * overwritten, so each person is one row however many times they're saved. A
+ * save that arrives after they've already finished is ignored.
+ */
+function savePartial(data) {
+  var session = String(data.session_id || '');
+  if (!session) return;
+  if (findRow(getSheet(), session)) return;
+
+  var row = {};
+  row['Last activity'] = data.updated_at ? new Date(data.updated_at) : new Date();
+  row['Name'] = data.name;
+  row['Email'] = data.email;
+  row['Phone'] = data.phone;
+  row['Stopped at'] = data.stopped_at;
+  row['Questions answered'] = data.answered;
+  row['Community opt-in'] = data.community_optin ? 'Yes' : 'No';
+  row[SESSION_COLUMN] = session;
+
+  var seen = {};
+  (data.responses || []).forEach(function (r) {
+    var header = String(r.question || '').trim();
+    if (!header) return;
+    seen[header] = (seen[header] || 0) + 1;
+    if (seen[header] > 1) header += ' (' + seen[header] + ')';
+    row[header] = r.answer;
+  });
+
+  var sheet = getPartialSheet();
+  writeRow(sheet, row, findRow(sheet, session));
+}
+
+/** They finished: their half-filled row has served its purpose. */
+function clearPartial(session) {
+  if (!session) return;
+  var sheet = getPartialSheet();
+  var at = findRow(sheet, String(session));
+  if (at) sheet.deleteRow(at);
+}
+
+/** The row number holding `session` in the Session column, or 0. */
+function findRow(sheet, session) {
+  var width = sheet.getLastColumn();
+  if (!session || sheet.getLastRow() < 2 || width < 1) return 0;
+  var col = sheet.getRange(1, 1, 1, width).getValues()[0].indexOf(SESSION_COLUMN);
+  if (col < 0) return 0;
+  var hit = sheet
+    .getRange(2, col + 1, sheet.getLastRow() - 1, 1)
+    .createTextFinder(session)
+    .matchEntireCell(true)
+    .findNext();
+  return hit ? hit.getRow() : 0;
+}
+
 /** Decodes the attached report into Drive and returns a clickable link. */
 function savePdf(data) {
   if (!data.report_pdf_base64) return '';
@@ -226,10 +310,14 @@ function savePdf(data) {
   return '=HYPERLINK("' + file.getUrl() + '", "Open PDF")';
 }
 
-/** Places each value under its own header, adding columns that don't exist yet. */
-function writeRow(sheet, row) {
-  var width = Math.max(sheet.getLastColumn(), 1);
-  var headers = sheet.getRange(1, 1, 1, width).getValues()[0];
+/**
+ * Places each value under its own header, adding columns that don't exist yet.
+ * Appends a new row, or overwrites row `at` when one is given.
+ */
+function writeRow(sheet, row, at) {
+  // A brand-new tab has no columns at all; start its headers in column A.
+  var width = sheet.getLastColumn();
+  var headers = width ? sheet.getRange(1, 1, 1, width).getValues()[0] : [];
   var index = {};
   headers.forEach(function (h, i) {
     if (h !== '') index[h] = i;
@@ -254,17 +342,25 @@ function writeRow(sheet, row) {
     var v = row[header];
     values[index[header]] = v === null || v === undefined ? '' : v;
   });
-  sheet.getRange(sheet.getLastRow() + 1, 1, 1, values.length).setValues([values]);
+  sheet.getRange(at || sheet.getLastRow() + 1, 1, 1, values.length).setValues([values]);
 }
 
 function getSheet() {
+  return getTab(SHEET_NAME);
+}
+
+function getPartialSheet() {
+  return getTab(PARTIAL_SHEET_NAME);
+}
+
+function getTab(name) {
   var ss = SHEET_ID ? SpreadsheetApp.openById(SHEET_ID) : SpreadsheetApp.getActive();
   if (!ss) {
     throw new Error(
       'No spreadsheet: this script is not attached to one. Set SHEET_ID at the top of this file to the id in the Sheet’s address.'
     );
   }
-  return ss.getSheetByName(SHEET_NAME) || ss.insertSheet(SHEET_NAME);
+  return ss.getSheetByName(name) || ss.insertSheet(name);
 }
 
 function getFolder() {

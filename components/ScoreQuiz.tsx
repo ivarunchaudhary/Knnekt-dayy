@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { IconBrandWhatsapp } from "@tabler/icons-react";
 import { createPortal } from "react-dom";
 import { feeIncludes, ledgerIn, paymentSteps, pricing, pricingFacts, scorePillars } from "@/lib/data";
@@ -83,9 +83,11 @@ const looksLikeEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.tri
 const looksLikePhone = (v: string) => v.replace(/\D/g, "").length >= 8;
 
 /** Page one: who we're scoring, where the report goes, and the community box. */
-function IdentityForm({ initial, onNext }: { initial: Identity; onNext: (id: Identity) => void }) {
+function IdentityForm({ initial, onDraft, onNext }: { initial: Identity; onDraft: (id: Identity) => void; onNext: (id: Identity) => void }) {
   const [id, setId] = useState<Identity>(initial);
   const [errors, setErrors] = useState<Errors>({});
+  // What's typed so far, before Continue, so a founder who leaves here is still kept.
+  useEffect(() => onDraft(id), [id, onDraft]);
   const set = (key: "name" | "email" | "phone") => (e: React.ChangeEvent<HTMLInputElement>) => {
     setId((v) => ({ ...v, [key]: e.target.value }));
     setErrors((prev) => (prev[key] ? { ...prev, [key]: undefined } : prev));
@@ -1039,6 +1041,55 @@ const scoreBand = (n: number) => (n < 40 ? "0–39" : n < 60 ? "40–59" : n < 8
 
 type Stage = { at: "identity" } | { at: "page"; page: number } | { at: "scoring" } | { at: "report"; result: Result };
 
+const newSession = () =>
+  typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+
+/**
+ * Keeps the Sheet's "Half filled" tab current for a founder who hasn't finished:
+ * whatever they've entered so far is sent each time they reach a new page and
+ * once more as they leave — tab closed or hidden, dialog shut. Leaving goes as
+ * a beacon, which the browser delivers even as the page goes away. Nothing is
+ * sent before they've typed or picked anything, nor after they finish (the
+ * finished score clears their half-filled row instead).
+ */
+function usePartialSave(snapshot: () => { identity: Identity; answers: Answers; catOther: string; page: number; done: boolean }) {
+  const session = useRef("");
+  const last = useRef("");
+  const read = useRef(snapshot);
+  // Declared before the caller's own effects, so it has the latest state by the time they save.
+  useEffect(() => {
+    read.current = snapshot;
+  });
+
+  const save = useCallback((leaving: boolean) => {
+    const s = read.current();
+    if (s.done) return;
+    const typed = s.identity.name.trim() || s.identity.email.trim() || s.identity.phone.trim();
+    const picked = s.answers.some((a) => (Array.isArray(a) ? a.length > 0 : typeof a === "string" ? a.trim() !== "" : a !== null));
+    if (!typed && !picked) return;
+    session.current ||= newSession();
+    const body = JSON.stringify({ session: session.current, identity: s.identity, answers: s.answers, catOther: s.catOther, page: s.page });
+    if (body === last.current) return;
+    last.current = body;
+    if (leaving && typeof navigator !== "undefined" && navigator.sendBeacon?.("/api/score/partial", new Blob([body], { type: "application/json" }))) return;
+    fetch("/api/score/partial", { method: "POST", headers: { "Content-Type": "application/json" }, body, keepalive: true }).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    const leave = () => save(true);
+    const hidden = () => document.visibilityState === "hidden" && leave();
+    window.addEventListener("pagehide", leave);
+    document.addEventListener("visibilitychange", hidden);
+    return () => {
+      window.removeEventListener("pagehide", leave);
+      document.removeEventListener("visibilitychange", hidden);
+      leave(); // the score dialog closing, or a client-side navigation away
+    };
+  }, [save]);
+
+  return { save, session: () => (session.current ||= newSession()) };
+}
+
 /**
  * The Startup Operating Score. Page one takes the founder's details; then one
  * page per section — company context, each of the six pillars, resourcing —
@@ -1056,6 +1107,18 @@ export default function ScoreQuiz({ bare = false }: { bare?: boolean }) {
   const [file, setFile] = useState<ReportFile | null>(null);
   const top = useRef<HTMLDivElement>(null);
   const funnel = useFormTracking("score", top, "Your details");
+  const draft = useRef(identity);
+  const done = useRef(false);
+  const onDraft = useCallback((id: Identity) => {
+    draft.current = id;
+  }, []);
+  const partial = usePartialSave(() => ({
+    identity: stage.at === "identity" ? draft.current : identity,
+    answers,
+    catOther,
+    page: stage.at === "page" ? stage.page : -1,
+    done: done.current,
+  }));
 
   // Step 1 is the founder's details; each section page after it is one more.
   const go = (s: Stage) => {
@@ -1078,7 +1141,13 @@ export default function ScoreQuiz({ bare = false }: { bare?: boolean }) {
     top.current?.scrollIntoView({ behavior: reduceMotion() ? "auto" : "smooth", block: "start" });
   }, [stageKey]);
 
+  // Each new page reached is progress worth keeping, in case this is where they stop.
+  useEffect(() => {
+    if (stageKey.startsWith("page-")) partial.save(false);
+  }, [stageKey, partial]);
+
   const finish = () => {
+    done.current = true;
     funnel.submit();
     track("generate_lead", {}, { event: "Lead", params: { content_name: "Startup Operating Score" } });
     go({ at: "scoring" });
@@ -1089,7 +1158,7 @@ export default function ScoreQuiz({ bare = false }: { bare?: boolean }) {
     const send = fetch("/api/score", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ identity, answers, catOther }),
+      body: JSON.stringify({ identity, answers, catOther, session: partial.session() }),
     })
       .then(async (res) => {
         const body = (await res.json().catch(() => null)) as { emailed?: boolean; pdf?: ReportFile } | null;
@@ -1108,6 +1177,7 @@ export default function ScoreQuiz({ bare = false }: { bare?: boolean }) {
     stage.at === "identity" ? (
       <IdentityForm
         initial={identity}
+        onDraft={onDraft}
         onNext={(id) => {
           setIdentity(id);
           identify({ email: id.email, phone: id.phone, name: id.name });

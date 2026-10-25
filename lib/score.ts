@@ -292,6 +292,37 @@ export function touched(i: number, answers: Answers, catOther = ""): boolean {
   return answered(i, answers, catOther);
 }
 
+/**
+ * Raw answers off the wire, cut to what the instrument can hold: an option
+ * index that exists, a list of them, or text no longer than the question
+ * allows. Anything else becomes unanswered. Null when the shape is wrong.
+ */
+export function cleanAnswers(raw: unknown): Answers | null {
+  if (!Array.isArray(raw) || raw.length !== questions.length) return null;
+  return raw.map((a, i): Answers[number] => {
+    const q = questions[i];
+    if (q.kind === "single") return typeof a === "number" && Number.isInteger(a) && a >= 0 && a < q.options.length ? a : null;
+    if (q.kind === "multi") return Array.isArray(a) ? a.filter((n): n is number => typeof n === "number" && Number.isInteger(n) && n >= 0 && n < q.options.length) : [];
+    return typeof a === "string" ? a.slice(0, q.max) : null;
+  });
+}
+
+/** Whether the founder put anything at all into a question, even text too short to accept yet. */
+export function started(i: number, answers: Answers): boolean {
+  const a = answers[i];
+  if (Array.isArray(a)) return a.length > 0;
+  if (typeof a === "string") return a.trim().length > 0;
+  return a !== null;
+}
+
+/** Where a founder who left was standing: the details step, or a section page by name. */
+export function stepLabel(page: number): string {
+  if (page < 0 || page >= pages.length) return "Your details";
+  const sec = pages[page].sec;
+  const name = sec === 0 ? "Company context" : sec === 7 ? "Resourcing" : pillars[sec - 1].name;
+  return `${name} (page ${page + 1} of ${pages.length})`;
+}
+
 export type Gate = "COMMITMENT" | "CAPITAL" | "DEMAND" | "RESOURCING";
 export type Archetype = "Explorer" | "Visionary" | "Builder" | "Operator" | "Architect" | "Scaler";
 export type Route = "STOP" | "B" | "A" | "WAIT";

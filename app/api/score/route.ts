@@ -1,15 +1,14 @@
 import { NextResponse } from "next/server";
-import { answered, grade, payload, questions, type Answers, type Identity } from "@/lib/score";
+import { answered, cleanAnswers, grade, payload, type Identity } from "@/lib/score";
 import { sendMail } from "@/lib/mailer";
 import { reportEmailHtml, reportEmailText, reportSubject } from "@/lib/scoreEmail";
 import { reportFilename, reportPdfBase64 } from "@/lib/scoreReport";
+import { forwardToSheet } from "@/lib/scoreWebhook";
 
 const looksLikeEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
 const looksLikePhone = (v: string) => v.replace(/\D/g, "").length >= 8;
 
-type Body = { identity?: Partial<Identity>; answers?: unknown; catOther?: unknown };
-/** What the webhook answers with. See the note where it is read. */
-type Reply = { ok?: boolean; message?: string } | null;
+type Body = { identity?: Partial<Identity>; answers?: unknown; catOther?: unknown; session?: unknown };
 
 /**
  * A finished score. Re-graded here from the raw answers so the number the
@@ -37,17 +36,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Name, email and phone are required" }, { status: 400 });
   }
 
-  const answers = body.answers;
   const catOther = typeof body.catOther === "string" ? body.catOther.slice(0, 80) : "";
-  if (!Array.isArray(answers) || answers.length !== questions.length) {
-    return NextResponse.json({ error: "Answers don't match the instrument" }, { status: 400 });
-  }
-  const clean = answers.map((a, i): Answers[number] => {
-    const q = questions[i];
-    if (q.kind === "single") return typeof a === "number" && Number.isInteger(a) && a >= 0 && a < q.options.length ? a : null;
-    if (q.kind === "multi") return Array.isArray(a) ? a.filter((n): n is number => typeof n === "number" && Number.isInteger(n) && n >= 0 && n < q.options.length) : [];
-    return typeof a === "string" ? a.slice(0, q.max) : null;
-  });
+  const clean = cleanAnswers(body.answers);
+  if (!clean) return NextResponse.json({ error: "Answers don't match the instrument" }, { status: 400 });
   const missing = clean.map((_, i) => i).filter((i) => !answered(i, clean, catOther));
   if (missing.length) return NextResponse.json({ error: "Unanswered questions", missing }, { status: 400 });
 
@@ -74,35 +65,11 @@ export async function POST(request: Request) {
     console.error("[score] report email not sent", { email: id.email, overall: result.overall, reason: mail.reason, how });
   }
 
-  // The lead, forwarded wherever the studio files it. A failure here must not
-  // cost us the submission, so it's logged and reported, never thrown.
-  let forwarded = false;
-  const url = process.env.SCORE_WEBHOOK_URL;
-  if (url) {
-    try {
-      const data = { ...payload(result, id, clean, "result"), report_pdf_filename: filename, report_pdf_base64: pdf, emailed: mail.sent };
-      const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
-      const text = await res.text().catch(() => "");
-      if (!res.ok) throw new Error(`Webhook responded ${res.status}: ${text.slice(0, 300)}`);
-      // A Google Apps Script web app always answers 200 — the platform gives it
-      // no way to set a status code. So the status tells us nothing and the body
-      // is the only place a rejected token or a thrown error can show up.
-      let said: Reply = null;
-      try {
-        said = JSON.parse(text.trim() || "null") as Reply;
-      } catch {
-        // Not JSON: almost always Google's sign-in page, i.e. the web app isn't
-        // deployed with "Who has access: Anyone".
-        throw new Error(`Webhook answered with ${text.slice(0, 200)}`);
-      }
-      if (said && said.ok === false) throw new Error(`Webhook refused: ${said.message}`);
-      forwarded = true;
-    } catch (err) {
-      console.error("[score] webhook failed", err);
-    }
-  } else {
-    console.log("[score] SCORE_WEBHOOK_URL not set; submission not forwarded", { email: id.email, overall: result.overall, route: result.route });
-  }
+  // The lead, filed in the Sheet. The session lets the Sheet clear this
+  // founder's row from the half-filled tab now that they've finished.
+  const session = typeof body.session === "string" ? body.session.slice(0, 64) : "";
+  const data = { ...payload(result, id, clean, "result"), session_id: session, report_pdf_filename: filename, report_pdf_base64: pdf, emailed: mail.sent };
+  const forwarded = await forwardToSheet(data, "score");
 
   return NextResponse.json({ ok: true, emailed: mail.sent, forwarded, pdf: pdf ? { filename, base64: pdf } : null });
 }
