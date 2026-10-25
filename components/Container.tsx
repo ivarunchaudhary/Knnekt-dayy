@@ -31,7 +31,7 @@ export function SectionHeading({
   id,
   as: Tag = "h2",
 }: {
-  lead: string;
+  lead: ReactNode;
   children: ReactNode;
   className?: string;
   id?: string;

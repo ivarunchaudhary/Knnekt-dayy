@@ -518,3 +518,14 @@ body {
   .kn-price-grid .kn-compare { margin-top: auto; }
   .kn-price-grid .kn-promises-side { margin-top: auto; }
 }
+
+/* intro: "not pitches" is struck through like a pen, a quick stroke across that lifts away and returns */
+.pen-strike { position: relative; display: inline; white-space: nowrap; transition: color 0.5s ease 0.5s; }
+.pen-strike-ink { position: absolute; left: -3%; top: 22%; width: 106%; height: 66%; overflow: visible; pointer-events: none; }
+.pen-strike-ink path { fill: none; stroke: #e5484d; stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; stroke-dasharray: 1600; stroke-dashoffset: 1600; }
+@media (min-width: 48rem) { .pen-strike-ink path { stroke-width: 4.5; } }
+.pen-strike.is-crossed { color: rgb(22 37 63 / 0.5); }
+.pen-strike.is-crossed path { stroke-dashoffset: 0; transition: stroke-dashoffset 0.5s cubic-bezier(0.55, 0.05, 0.35, 1); }
+.pen-strike.is-lifting { color: inherit; }
+.pen-strike.is-lifting .pen-strike-ink { opacity: 0; transition: opacity 0.35s ease; }
+@media (prefers-reduced-motion: reduce) { .pen-strike, .pen-strike-ink path { transition: none !important; } }

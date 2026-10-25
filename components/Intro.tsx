@@ -1,5 +1,6 @@
 import { proofPoints } from "@/lib/data";
 import { containerClass, SectionHeading } from "./Container";
+import PenStrike from "./PenStrike";
 import ScoreButton from "./ScoreButton";
 
 /** One pass of the ticker. Three identical rows sit side by side so the loop is seamless. */
@@ -25,7 +26,12 @@ export default function Intro() {
   return (
     <section className="overflow-hidden pt-10 pb-14 md:pt-20 md:pb-20">
       <div className={containerClass}>
-        <SectionHeading as="h1" lead="Investors fund proof, not pitches. We build the proof with you.">
+        <SectionHeading as="h1" lead={
+            <>
+              Investors fund proof, <PenStrike>not pitches</PenStrike>. We build the proof with you.
+            </>
+          }
+        >
           15 founders. 10 days to plan, 90 days to build, in our studio in Gurugram, with weekly masterclasses with investors, founders
           and industry experts, and Pitch Day on Day 100.
         </SectionHeading>
