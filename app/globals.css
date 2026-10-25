@@ -311,6 +311,17 @@ body {
   filter: blur(56px);
 }
 
+/* On a phone the banks drift unblurred. Their gradients already fall off to
+   nothing, and three 56px blurs over layers bigger than the screen, re-composited
+   on every frame of the drift, are the one thing here a phone's GPU feels. */
+@media (max-width: 47.99rem) {
+  .hero-fog-a,
+  .hero-fog-b,
+  .hero-fog-c {
+    filter: none;
+  }
+}
+
 /* Hero film and its poster: `cover`, in whichever cut fits the screen (see
    HeroBackground). The backdrop is what shows for the frame before the poster
    decodes, so on an upright screen it is the portrait cut's own ramp, the navy
