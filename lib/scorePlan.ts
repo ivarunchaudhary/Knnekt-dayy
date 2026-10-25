@@ -235,7 +235,7 @@ export type Plan = {
   /** The rung the work starts on, and the rung the founder has already built up to. */
   ladder: { start: number; built: number };
   months: Month[];
-  /** "90-day roadmap", or "30-day" when everything left fits in the first month. */
+  /** "100-day roadmap", or "30-day" when everything left fits in the first month. */
   roadmapLabel: string;
 };
 
@@ -329,7 +329,7 @@ export function plan(r: Result): Plan {
     },
   ];
 
-  const roadmapLabel = startPhase === 2 && !unfinished.length ? "scale plan" : `${box[1].you.length ? 90 : 30}-day roadmap`;
+  const roadmapLabel = startPhase === 2 && !unfinished.length ? "scale plan" : `${box[1].you.length ? 100 : 30}-day roadmap`;
 
   return { stage, check, ladder: { start: startPhase, built: posPhase }, months, roadmapLabel };
 }
@@ -347,8 +347,8 @@ export const planCopy = {
     note: "One path, launch → investor-ready. Checkpoints are estimates from founders on a similar path — yours moves with the work you put in.",
   },
   fee: {
-    h: "One price, published.",
-    d: "One fee for the whole studio, growth, tech, AI and legal, for one quarter. The scope moves when your business needs it to. The number doesn’t.",
+    h: "One price.",
+    d: "One fee for the whole studio, growth, tech, AI and legal, for 100 days. The scope moves when your business needs it to. The number doesn’t.",
   },
   lrDone: (n: number) => (n ? `You’ve already got ${n} of these sorted. Ticked means done. The arrows are what’s still left before you can launch.` : "Nothing locked in yet. Each arrow below is a step towards being ready to launch."),
 };

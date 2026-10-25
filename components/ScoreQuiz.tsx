@@ -808,7 +808,7 @@ function Fee() {
         </ol>
         <p className="mt-4 text-xs leading-tight text-dark/70">
           Total <span className="font-medium text-dark">{pricing.total}</span>. Every rupee is scheduled before you start: no milestone invoices, no change
-          orders, no surprise line at day 70.
+          orders, no surprise line at Day 70.
         </p>
       </div>
 
@@ -859,7 +859,7 @@ function Included() {
   return (
     <div className="rounded-lg border border-dark/20 bg-gray-100 p-5 @md:p-7">
       <p className="flex flex-wrap items-baseline gap-3 text-xl font-medium">
-        Included <span className="mono-text font-mono text-dark/50">in the 90</span>
+        Included <span className="mono-text font-mono text-dark/50">in the 100</span>
       </p>
       <p className="mt-2 text-xs leading-tight text-dark/70">Everything the roadmap needs to hit the goal.</p>
       <ul className="mt-5 @xl:columns-2 @xl:gap-x-7">

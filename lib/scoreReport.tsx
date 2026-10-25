@@ -446,7 +446,7 @@ function ReportDoc({ r, id }: { r: Result; id: Identity }) {
                 ))}
               </View>
               <Text style={[s.small, { marginTop: 8 }]}>
-                Total <Text style={{ fontFamily: "Mono", color: DEEP }}>{pricing.total}</Text>. Every rupee is scheduled before you start: no milestone invoices, no change orders, no surprise line at day
+                Total <Text style={{ fontFamily: "Mono", color: DEEP }}>{pricing.total}</Text>. Every rupee is scheduled before you start: no milestone invoices, no change orders, no surprise line at Day
                 70.
               </Text>
             </View>
@@ -483,7 +483,7 @@ function ReportDoc({ r, id }: { r: Result; id: Identity }) {
         <View wrap={false} style={{ backgroundColor: GREEN.bg, borderWidth: 0.75, borderColor: GREEN.line, borderRadius: 6, paddingVertical: 11, paddingHorizontal: 13, marginTop: 12 }}>
           <Text style={{ fontSize: 12.5, fontWeight: 600 }}>
             Included{"  "}
-            <Text style={[s.mono, { color: GREEN.fg }]}>in the 90</Text>
+            <Text style={[s.mono, { color: GREEN.fg }]}>in the 100</Text>
           </Text>
           <Text style={[s.small, { marginTop: 2 }]}>Everything the roadmap needs to hit the goal.</Text>
           <View style={{ flexDirection: "row", gap: 14, marginTop: 6 }}>
