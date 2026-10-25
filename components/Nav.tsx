@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const items = [
   { href: "#score", label: "Score" },
@@ -16,6 +16,9 @@ const items = [
 const spring =
   "before:ease-[linear(0,0.468_6.8%,0.822_14.1%,1.064_21.9%,1.146_26.1%,1.205_30.6%,1.231_33.9%,1.246_37.4%,1.25_41.1%,1.243_45.1%,1.208_52.6%,1.087_70.3%,1.039_79.1%,1.008_88.9%,1)]";
 
+const mask = ({ start, end }: { start: boolean; end: boolean }) =>
+  `linear-gradient(to right, ${start ? "black" : "transparent"} 0%, black 1.25rem, black calc(100% - 1.25rem), ${end ? "black" : "transparent"} 100%)`;
+
 /**
  * Floating pill navigation. The dot marks whichever section currently fills the
  * viewport. Off the home page the same links point back at it, so the pill is
@@ -23,7 +26,40 @@ const spring =
  */
 export default function Nav() {
   const [active, setActive] = useState<string | null>(null);
+  const [edges, setEdges] = useState({ start: true, end: false });
+  const row = useRef<HTMLDivElement>(null);
   const onHome = usePathname() === "/en";
+
+  // On a phone the row is wider than the pill. Fade only the side that has more
+  // links behind it (at rest that is the right, so "Score" isn't half-hidden),
+  // and keep the marked link in view as the sections go by, or the dot would
+  // land on a link scrolled out of sight.
+  useEffect(() => {
+    const el = row.current;
+    if (!el) return;
+    const measure = () => {
+      const max = el.scrollWidth - el.clientWidth;
+      const start = el.scrollLeft <= 1;
+      const end = el.scrollLeft >= max - 1;
+      setEdges((e) => (e.start === start && e.end === end ? e : { start, end }));
+    };
+    measure();
+    el.addEventListener("scroll", measure, { passive: true });
+    window.addEventListener("resize", measure);
+    return () => {
+      el.removeEventListener("scroll", measure);
+      window.removeEventListener("resize", measure);
+    };
+  }, []);
+
+  useEffect(() => {
+    const el = row.current;
+    const link = active && el?.querySelector<HTMLElement>(`a[href="${active}"]`);
+    if (!el || !link || el.scrollWidth <= el.clientWidth) return;
+    const left = link.offsetLeft - (el.clientWidth - link.offsetWidth) / 2;
+    const smooth = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    el.scrollTo({ left, behavior: smooth ? "smooth" : "auto" });
+  }, [active]);
 
   useEffect(() => {
     if (!onHome) return;
@@ -55,8 +91,9 @@ export default function Nav() {
     <nav className="fixed bottom-7 left-1/2 isolate z-40 max-w-[calc(100vw-1.5rem)] -translate-x-1/2 overflow-hidden rounded-full bg-gray-200/70 py-1.5 pr-5 pl-2.5 text-[0.9375rem] leading-[125%] font-medium tracking-[-0.00938rem] backdrop-blur-xl">
       {/* Five items don't fit a phone: the row scrolls, and the mask doubles as the affordance. */}
       <div
+        ref={row}
         className="hide-scrollbars -mr-4 -ml-1.5 overflow-x-auto overscroll-x-contain pr-4 pl-1.5"
-        style={{ maskImage: "linear-gradient(to right, transparent 0%, black 1.25rem, black calc(100% - 1.25rem), transparent 100%)" }}
+        style={{ maskImage: mask(edges), WebkitMaskImage: mask(edges) }}
       >
         <ul className="flex w-max select-none">
           {items.map((item) => {
