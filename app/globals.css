@@ -622,3 +622,67 @@ body {
   .kn-float,.kn-bridge i,.kn-hub::before{animation:none}
   .kn-piece,.kn-hub,.kn-bridge{transition:none}
 }
+
+/* ---- Faculty: masterclass experts on a navy panel, then the execution team on the sky ---- */
+.fc-master{position:relative;isolation:isolate;overflow:hidden;margin-top:3rem;padding:1.75rem 1.25rem 2rem;border-radius:1rem;color:#fff;
+  background:radial-gradient(60% 80% at 10% 0%,rgb(59 129 227/.45),transparent 60%),linear-gradient(160deg,#0a1433 0%,#10234f 55%,#163a7a 100%)}
+@media (min-width:48rem){.fc-master{margin-top:5rem;padding:2.5rem 2.5rem 2.75rem}}
+.fc-master-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:1.25rem;margin-bottom:2rem}
+.fc-pill{display:inline-block;color:rgb(255 255 255/.85);border:1px solid rgb(255 255 255/.25)}
+.fc-summary{margin-top:1rem;max-width:40rem;font-size:1.25rem;line-height:1.3;font-weight:500;color:#fff}
+@media (min-width:64rem){.fc-summary{font-size:1.5rem}}
+.fc-arrows{display:flex;gap:.5rem}
+.fc-arrows button{display:grid;place-items:center;width:2.75rem;height:2.75rem;border-radius:9999px;background:rgb(255 255 255/.1);color:#fff;font-size:1.05rem;box-shadow:inset 0 0 0 1px rgb(255 255 255/.22);transition:background .2s,opacity .2s}
+.fc-arrows button:hover,.fc-arrows button:focus-visible{background:rgb(255 255 255/.22)}
+.fc-arrows button:disabled{opacity:.35;cursor:default}
+
+/* two rows deep, three columns in view on a wide screen; the rest scroll in from the right */
+.fc-scroll{display:grid;grid-auto-flow:column;grid-template-rows:repeat(2,auto);grid-auto-columns:minmax(18.5rem,86%);gap:1rem;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;padding:.25rem .25rem 1rem;margin:-.25rem;
+  scrollbar-width:thin;scrollbar-color:rgb(255 255 255/.35) transparent;-webkit-mask:linear-gradient(90deg,#000 calc(100% - 3rem),transparent);mask:linear-gradient(90deg,#000 calc(100% - 3rem),transparent)}
+@media (min-width:48rem){.fc-scroll{grid-auto-columns:calc((100% - 1rem) / 2.15)}}
+@media (min-width:80rem){.fc-scroll{grid-auto-columns:calc((100% - 2rem) / 3.12);-webkit-mask:linear-gradient(90deg,#000 calc(100% - 2.5rem),transparent);mask:linear-gradient(90deg,#000 calc(100% - 2.5rem),transparent)}}
+.fc-scroll:focus-visible{outline:2px solid #fff;outline-offset:4px;border-radius:1.25rem}
+.fc-scroll > li{scroll-snap-align:start;min-height:14rem}
+.fc-card{position:relative;display:grid;grid-template-columns:1.1fr .9fr;border-radius:1.25rem;overflow:hidden;border:1px solid rgb(255 255 255/.12);
+  background:radial-gradient(70% 90% at 80% 20%,rgb(91 156 240/.35),transparent 60%),linear-gradient(160deg,#13295a,#0c1a3d)}
+.fc-card-text{position:relative;z-index:1;display:flex;flex-direction:column;align-items:flex-start;padding:1.15rem 0 1.15rem 1.15rem}
+.fc-name{font-size:1.1875rem;line-height:1.2}
+.fc-name span{font-weight:600}
+.fc-rule{display:block;width:85%;height:1px;margin:.65rem 0 .8rem;background:rgb(255 255 255/.25)}
+.fc-role{font-family:Georgia,"Times New Roman",serif;font-style:italic;font-size:1.125rem;line-height:1.2;color:#fff}
+.fc-at{margin:.25rem 0 .4rem;font-size:.8125rem;color:rgb(255 255 255/.6)}
+.fc-logo{display:inline-grid;place-items:center;height:2.25rem;padding:0 .9rem;border:1.5px dashed rgb(255 255 255/.35);border-radius:.5rem;font-size:.5625rem;color:rgb(255 255 255/.6)}
+.fc-logo-img{height:2.25rem;width:auto;max-width:8rem;object-fit:contain}
+.fc-qual{margin-top:.55rem;font-size:.8125rem;color:rgb(255 255 255/.7)}
+.fc-badge{margin-top:auto;padding:.35rem .75rem;border-radius:9999px;background:#3b81e3;color:#fff;font-size:.75rem;font-weight:500;box-shadow:0 8px 18px -10px rgb(59 129 227/.9)}
+.fc-card-photo{position:relative;display:grid;place-items:end center;background:linear-gradient(180deg,rgb(255 255 255/.06),rgb(255 255 255/.12))}
+.fc-card-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.fc-card-photo .fc-sil{width:88%}
+.fc-more{display:grid;place-items:center;grid-row:span 2;border-radius:1.25rem;border:1.5px dashed rgb(255 255 255/.3)}
+.fc-more p{font-size:1.375rem;color:rgb(255 255 255/.9)}
+
+/* photo placeholders */
+.fc-sil{width:62%;height:auto;color:rgb(255 255 255/.28)}
+.fc-ph-label{position:absolute;left:.75rem;bottom:.6rem;font-size:.5625rem;color:rgb(255 255 255/.55)}
+
+/* the execution team: one row, each portrait ringed in its function's colour, every line level across the cards */
+.fc-team{margin-top:4rem}
+@media (min-width:64rem){.fc-team{margin-top:6rem}}
+.fc-team-panel{position:relative;margin-top:2rem;padding:1.75rem 1.25rem 2rem;border-radius:1rem;
+  background:radial-gradient(60% 80% at 90% 0%,rgb(255 255 255/.85),transparent 60%),linear-gradient(160deg,#eef5fd 0%,#dbe9fb 100%);box-shadow:inset 0 0 0 1px rgb(59 129 227/.14)}
+@media (min-width:48rem){.fc-team-panel{padding:2.5rem}}
+.fc-team-row{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(12.5rem,70%);grid-template-rows:repeat(4,auto);gap:0 1rem;overflow-x:auto;scroll-snap-type:x mandatory;padding:.5rem .5rem;margin:-.5rem;scrollbar-width:thin}
+@media (min-width:40rem){.fc-team-row{grid-auto-columns:minmax(12rem,38%)}}
+@media (min-width:80rem){.fc-team-row{grid-auto-flow:row;grid-template-columns:repeat(6,minmax(0,1fr)) minmax(9rem,.9fr);overflow:visible}}
+.fc-member{display:grid;grid-row:1 / span 4;grid-template-rows:subgrid;align-content:start;scroll-snap-align:start}
+.fc-member-photo{position:relative;display:block;aspect-ratio:1;border-radius:1.25rem;overflow:hidden;background:#fff;box-shadow:0 0 0 4px #fff,0 0 0 6px var(--c)}
+.fc-member-photo img{width:100%;height:100%;object-fit:cover}
+.fc-member-photo.fc-ph{display:grid;place-items:end center;background:linear-gradient(160deg,color-mix(in srgb,var(--c) 18%,#fff),color-mix(in srgb,var(--c) 34%,#eef5fd))}
+.fc-member-photo .fc-sil{width:68%;color:rgb(255 255 255/.85)}
+.fc-member-photo .fc-ph-label{color:rgb(22 37 63/.5)}
+.fc-member-fn{margin-top:1.1rem;align-self:end;font-size:.5625rem;color:var(--c);filter:saturate(1.2) brightness(.85)}
+.fc-member-role{margin-top:.35rem;align-self:start;font-size:1.1875rem;line-height:1.2;font-weight:600;color:#16253f}
+.fc-member-title{margin-top:.45rem;align-self:start;font-size:.9375rem;line-height:1.25;font-weight:500;color:#16253f}
+.fc-team-more{display:flex;align-items:center;grid-row:1 / span 4;padding-left:.5rem;scroll-snap-align:start}
+.fc-team-more p{font-size:1.1875rem;line-height:1.3;color:rgb(22 37 63/.75)}
+.fc-team-more b{color:#16253f}
