@@ -3,7 +3,7 @@
 import { IconArrowLeft, IconArrowRight } from "@tabler/icons-react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import Image from "next/image";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 export type AnimatedTestimonial = {
@@ -33,7 +33,20 @@ export const AnimatedTestimonials = ({
 }) => {
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [inView, setInView] = useState(false);
+  const root = useRef<HTMLDivElement>(null);
   const reduceMotion = useReducedMotion();
+
+  // Nothing turns over while the section is off screen: a new quote changes the
+  // block's height, and on iOS (no scroll anchoring) that would move the FAQ
+  // under someone reading it.
+  useEffect(() => {
+    const el = root.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting));
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   const handleNext = useCallback(() => {
     setActive((prev) => (prev + 1) % testimonials.length);
@@ -45,9 +58,11 @@ export const AnimatedTestimonials = ({
 
   const isActive = (index: number) => index === active;
 
-  // Autoplay holds while the pointer or keyboard focus is inside, and never
-  // runs under reduced motion.
-  const playing = autoplay && !paused && !reduceMotion;
+  // Autoplay holds while a mouse or keyboard focus is inside, and never runs
+  // under reduced motion. Taps don't count: a tap fires mouseenter too, and on a
+  // phone nothing would ever un-hover it, so one tap on an arrow stopped autoplay
+  // for good.
+  const playing = autoplay && inView && !paused && !reduceMotion;
   useEffect(() => {
     if (!playing) return;
     const interval = setInterval(handleNext, 5000);
@@ -58,10 +73,11 @@ export const AnimatedTestimonials = ({
 
   return (
     <div
+      ref={root}
       className={cn("mx-auto max-w-sm px-4 py-20 md:max-w-4xl md:px-8 lg:px-12", className)}
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      onFocus={() => setPaused(true)}
+      onPointerEnter={(e) => e.pointerType === "mouse" && setPaused(true)}
+      onPointerLeave={(e) => e.pointerType === "mouse" && setPaused(false)}
+      onFocus={(e) => e.target.matches(":focus-visible") && setPaused(true)}
       onBlur={(e) => {
         if (!e.currentTarget.contains(e.relatedTarget)) setPaused(false);
       }}
@@ -141,13 +157,13 @@ export const AnimatedTestimonials = ({
                     reduceMotion
                       ? false
                       : {
-                          filter: "blur(10px)",
                           opacity: 0,
                           y: 5,
                         }
                   }
+                  // Opacity and position only. A per-word blur was one filtered
+                  // layer per word, dozens of them, every five seconds on a phone.
                   animate={{
-                    filter: "blur(0px)",
                     opacity: 1,
                     y: 0,
                   }}
@@ -168,7 +184,7 @@ export const AnimatedTestimonials = ({
               type="button"
               onClick={handlePrev}
               aria-label="Previous testimonial"
-              className="group/button focus-visible:outline-dark flex h-7 w-7 items-center justify-center rounded-full bg-gray-200 focus-visible:outline-2 focus-visible:outline-offset-2"
+              className="group/button focus-visible:outline-dark flex size-11 items-center justify-center rounded-full bg-gray-200 focus-visible:outline-2 focus-visible:outline-offset-2 md:size-7"
             >
               <IconArrowLeft
                 aria-hidden="true"
@@ -179,7 +195,7 @@ export const AnimatedTestimonials = ({
               type="button"
               onClick={handleNext}
               aria-label="Next testimonial"
-              className="group/button focus-visible:outline-dark flex h-7 w-7 items-center justify-center rounded-full bg-gray-200 focus-visible:outline-2 focus-visible:outline-offset-2"
+              className="group/button focus-visible:outline-dark flex size-11 items-center justify-center rounded-full bg-gray-200 focus-visible:outline-2 focus-visible:outline-offset-2 md:size-7"
             >
               <IconArrowRight
                 aria-hidden="true"
