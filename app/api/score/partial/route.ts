@@ -21,8 +21,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Bad JSON" }, { status: 400 });
   }
 
+  // The quiz's own session ID (a UUID, or a timestamp and random fallback); the Sheet finds rows by it.
   const session = field(body.session, 64);
-  if (!session) return NextResponse.json({ error: "No session" }, { status: 400 });
+  if (!/^[a-z0-9][a-z0-9-]{7,63}$/i.test(session)) return NextResponse.json({ error: "No session" }, { status: 400 });
   const answers = cleanAnswers(body.answers);
   if (!answers) return NextResponse.json({ error: "Answers don't match the instrument" }, { status: 400 });
   const catOther = field(body.catOther, 80);

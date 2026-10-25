@@ -2,6 +2,20 @@
 type Reply = { ok?: boolean; message?: string } | null;
 
 /**
+ * Whatever a founder typed reaches a spreadsheet, and the routes that send it
+ * are open to anyone, so a value that begins like a formula (= + - @, or a tab
+ * or return before one) would run as one. A leading apostrophe makes Sheets
+ * keep it as plain text; it doesn't show in the cell. A phone number like
+ * +91… is text either way, so it reads the same.
+ */
+function plain(v: unknown): unknown {
+  if (typeof v === "string") return /^[=+\-@\t\r]/.test(v) ? `'${v}` : v;
+  if (Array.isArray(v)) return v.map(plain);
+  if (v && typeof v === "object") return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, plain(x)]));
+  return v;
+}
+
+/**
  * POSTs one record to SCORE_WEBHOOK_URL — the Apps Script that files score
  * submissions into the Sheet (scripts/sheet-webhook.gs). Never throws: a lost
  * row must not cost the founder their report, so a failure is logged under
@@ -14,7 +28,7 @@ export async function forwardToSheet(data: Record<string, unknown>, tag: string)
     return false;
   }
   try {
-    const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
+    const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(plain(data)) });
     const text = await res.text().catch(() => "");
     if (!res.ok) throw new Error(`Webhook responded ${res.status}: ${text.slice(0, 300)}`);
     // A Google Apps Script web app always answers 200 — the platform gives it
