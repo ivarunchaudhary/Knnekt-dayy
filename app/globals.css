@@ -311,13 +311,10 @@ body {
   filter: blur(56px);
 }
 
-/* Hero film and its poster. `cover` down to a 4:5 screen, which still shows the
-   middle 45% of the 16:9 frame, enough for the wordmark and the claim set into it.
-   Taller than that, the frame is drawn at 220% of the width instead, so the type
-   stays whole and the sides crop. It is then feathered into the backdrop: the
-   top edge of the film is a steady navy (#2B5087), so the sky above it continues
-   seamlessly, and the foot fades into the page's white. The backdrop's hard split
-   at 50% always sits behind the frame. */
+/* Hero film and its poster: `cover`, in whichever cut fits the screen (see
+   HeroBackground). The backdrop is what shows for the frame before the poster
+   decodes, so on an upright screen it is the portrait cut's own ramp, the navy
+   sky running down into the white of the page. */
 .hero-backdrop {
   background-color: var(--color-sky-soft);
 }
@@ -330,18 +327,7 @@ body {
 }
 @media (max-aspect-ratio: 4/5) {
   .hero-backdrop {
-    background: linear-gradient(#2b5087 50%, #fff 50%);
-  }
-  .hero-frame {
-    inset: auto;
-    top: 50%;
-    left: 50%;
-    width: 220%;
-    max-width: none;
-    height: auto;
-    aspect-ratio: 16 / 9;
-    translate: -50% -50%;
-    mask-image: linear-gradient(transparent, #000 6%, #000 72%, transparent);
+    background: linear-gradient(#2b5087 25%, var(--color-sky-soft) 50%, #fff 80%);
   }
 }
 
