@@ -10,6 +10,7 @@ import Journey from "@/components/Journey";
 import Nav from "@/components/Nav";
 import Pricing from "@/components/Pricing";
 import Score from "@/components/Score";
+import Selection from "@/components/Selection";
 import Services from "@/components/Services";
 import Testimonials from "@/components/Testimonials";
 
@@ -33,6 +34,7 @@ export default function HomePage() {
             <Collaboration />
             <Facts />
             <Journey />
+            <Selection />
             <Pricing />
             <Faculty />
             <Testimonials />
