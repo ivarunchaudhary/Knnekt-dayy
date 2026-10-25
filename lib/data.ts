@@ -343,7 +343,7 @@ export const scoreVimeoAspect = 1280 / 536;
  * ------------------------------------------------------------------------- */
 
 export type FacultyMember = {
-  /** Real name, once the person is signed. Absent → the card shows the seat and a "named at kickoff" chip. */
+  /** Real name, once the person is signed. Absent → the card shows "Expert name" (or the seat, for the team). */
   name?: string;
   /** The seat: what they are to the cohort, not where they work. */
   seat: string;
@@ -353,8 +353,12 @@ export type FacultyMember = {
   teaches: string;
   /** One line on why they’re in the room. */
   note?: string;
-  src: string;
-  alt: string;
+  /** For the masterclasses: their title, and the company it's at (a logo, once we have it). */
+  role?: string;
+  company?: { name: string; logo: string };
+  /** A real photo, once the person is signed. Absent → the card shows a silhouette marked "Photo". */
+  src?: string;
+  alt?: string;
 };
 
 export type FacultyGroup = {
@@ -371,8 +375,9 @@ export type FacultyGroup = {
  * Two rooms: the investors who take the weekly masterclasses, and the studio
  * team that builds alongside the cohort for all 100 days.
  *
- * Names and photos are stand-ins until each person is signed — drop a `name`
- * onto a member and the card swaps the seat for the name and loses the chip.
+ * Until each person is signed the cards are placeholders — "Expert name",
+ * "Designation", a dashed logo slot and a silhouette. Drop a `name`, `role`,
+ * `company` or `src` onto a member and that slot fills in.
  */
 export const faculty: FacultyGroup[] = [
   {
@@ -385,43 +390,41 @@ export const faculty: FacultyGroup[] = [
         seat: "Seed investor · Consumer",
         teaches: "What a seed round actually buys",
         note: "Why most decks answer a question nobody asked.",
-        src: `${cdn}/dcb621c0f613969c6d206a3ab4857a5aba9d02b0-400x400.webp`,
-        alt: "Person with long blonde hair wearing a white top and hoop earrings, standing outdoors in front of a window",
       },
       {
         seat: "Early-stage VC · B2B SaaS",
         teaches: "The metrics that survive diligence",
         note: "Which numbers hold up under a data room, and which quietly don’t.",
-        src: `${cdn}/811759779651a949df88ca8ce197173b0d082693-400x400.webp`,
-        alt: "Person with short brown hair and a beard, wearing a grey sweatshirt indoors",
       },
       {
         seat: "Angel · 30+ cheques",
         teaches: "Writing the first cheque",
         note: "What makes an angel say yes in the first ten minutes.",
-        src: `${cdn}/bd9e5e51e3b9e7739cd84135f09c6c1f96c1b39e-400x400.webp`,
-        alt: "Person with dark curly hair wearing a brown jacket and hoop earrings, standing indoors",
       },
       {
         seat: "Growth-stage investor",
         teaches: "From traction to a Series A story",
         note: "The narrative that turns 100 customers into a round.",
-        src: `${cdn}/fe5ae30ece1efe816083177137ee19377ac0a83f-400x400.webp`,
-        alt: "Person with short curly hair and beard, wearing a black shirt, standing in front of a wooden staircase",
       },
       {
         seat: "Family office · India",
         teaches: "Capital that isn’t venture",
         note: "Revenue-based, strategic and patient money, and when it beats a VC.",
-        src: `${cdn}/a5591c65324bcacfd21cabe16ed535bd7853edd5-400x400.webp`,
-        alt: "Person with long wavy brown hair, wearing a black turtleneck, standing in front of shelves",
       },
       {
         seat: "Founder-turned-investor",
         teaches: "Both sides of the table",
         note: "What they wish someone had told them before their own raise.",
-        src: `${cdn}/a029c831eb3986aec632ec8e71a00b096cd0369c-400x400.webp`,
-        alt: "Person with short dark hair and glasses, wearing a white shirt, standing in front of light curtains",
+      },
+      {
+        seat: "Legal partner · Corporate law",
+        teaches: "Term sheets without surprises",
+        note: "The clauses that cost founders the most, read before they sign.",
+      },
+      {
+        seat: "Distribution leader · FMCG",
+        teaches: "Getting onto the shelf",
+        note: "How distribution really works in India, from the people who run it.",
       },
     ],
   },
@@ -436,43 +439,31 @@ export const faculty: FacultyGroup[] = [
         seat: "Growth lead",
         fn: "Growth & Marketing",
         teaches: "Positioning before spend",
-        src: `${cdn}/f501cb2a0b61b54fc7a0702eb87c8df8e2198827-400x400.webp`,
-        alt: "Person with long dark hair with green highlights, wearing glasses and a grey sweater, indoors",
       },
       {
         seat: "Technology lead",
         fn: "Technology",
         teaches: "Shipping an MVP you don’t rebuild",
-        src: `${cdn}/fd8f27d99b3ce35f5d1363da538df84586e72ad2-400x400.webp`,
-        alt: "Person with short light brown hair, wearing a grey sweatshirt, standing outdoors",
       },
       {
         seat: "AI lead",
         fn: "AI Enablement",
         teaches: "Where AI earns its place",
-        src: `${cdn}/8fb0c09f3bc8e17a7b5eecf844bec1d653e3d63b-400x400.webp`,
-        alt: "Person with shoulder-length blonde hair, wearing a black top, standing in front of a wooden staircase",
       },
       {
         seat: "Legal & compliance counsel",
         fn: "Legal & Compliance",
         teaches: "Cap table, contracts, clean data room",
-        src: `${cdn}/ac769d3350cf47c71a58bae3ae7b59bcc4d5a1ea-400x400.webp`,
-        alt: "Person with short light brown hair, wearing a black shirt, standing indoors near a window",
       },
       {
         seat: "Design lead",
         fn: "Design",
         teaches: "Brand that survives contact with customers",
-        src: `${cdn}/bf3058c905b49cf3dc71dc55257ec02fa40f5afb-400x400.webp`,
-        alt: "Person with short dark hair and a beard, wearing a black jacket and grey t-shirt, indoors with warm lighting",
       },
       {
         seat: "Studio partner",
         fn: "Your 1:1",
         teaches: "The weekly 1:1",
-        src: `${cdn}/cfc12095e86efb371285ab2914add93ecdc9bc94-400x400.webp`,
-        alt: "Person with dark hair tied back, wearing a beige turtleneck sweater and hoop earrings, standing indoors",
       },
     ],
   },
