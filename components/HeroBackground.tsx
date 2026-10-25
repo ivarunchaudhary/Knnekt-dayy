@@ -1,46 +1,46 @@
 import Image from "next/image";
+import HeroVideo from "./HeroVideo";
 
 /**
- * Hero backdrop: a full-bleed still — a studio crew at work on a white marble
- * set, under an open azure sky — with the site's film-grain overlay above it.
+ * Hero backdrop: the studio film, a 20-second walk through the knnekt studio with
+ * the wordmark and the claim set into the frame itself, over a still of its own
+ * first frame, with the site's film-grain overlay above both.
  *
- * The frame is already the shape of a hero: a 1594x986 landscape, roughly 16:10,
- * with every figure held along the bottom third and the whole upper half given
- * over to empty sky. So `cover` barely scales at all and `object-bottom` is the
- * whole framing rule — pinning the foot keeps the crew in shot at every viewport
- * height, and the sky above them is what absorbs the crop on a tall screen. That
- * empty sky is also the reason the wordmark and the claim can sit where they do:
- * they land on flat colour rather than on anybody's head.
+ * The still is the LCP element and the only thing the first paint waits for:
+ * a 58 KB WebP served through next/image and preloaded. <HeroVideo/> fades in
+ * over it once it is playing, and since it opens on that exact frame the hand-off
+ * doesn't show.
  *
- * The picture is light, which is the point of it, but that means the top band is
- * mid-luminance azure (#3B81E3) rather than something white type sits on
- * comfortably — white holds only 3.9:1 there. <Hero/> lays a navy scrim over the
- * top 60% for that, which brings the claim's blend to about 5:1 while leaving the
- * lower two-thirds of the photograph untouched.
+ * Both share `.hero-frame`, which is `cover` on anything landscape or near it.
+ * On a tall phone screen `cover` would crop the 16:9 frame down to its middle
+ * quarter and cut the type set in it, so below a 4:5 aspect the frame is sized to
+ * keep the type whole instead and feathered top and bottom into a backdrop split
+ * the same way (the film's own navy above, the page's white below). The rules
+ * are in globals.css.
  *
- * Two motions, both slow enough to read as atmosphere rather than animation, and
- * both behind `motion-safe` so a reduced-motion visitor gets the still frame:
- *   1. the picture fades up with a slight push-in, once, on load;
- *   2. a Ken Burns drift on a separate wrapper, so it composes with the reveal's
- *      transform instead of fighting it for the same property.
- * The grain stays on this outer element so it never rides along with the drift.
+ * The picture fades up with a slight push-in, once, on load, behind
+ * `motion-safe`. It sits on the wrapper so the film inherits the same transform
+ * and the two never disagree mid-reveal. There is no Ken Burns drift on this one:
+ * rescaling a playing 1080p layer every frame is real compositor work, and the
+ * film already moves.
  *
  * Dissolving the foot of the frame into the white page belongs to <HeroFog/>, which
- * paints above this one: a fade drawn here would sit under the fog and the hero would
- * meet <Intro/> on a hard line of colour halfway through the scroll.
+ * paints above this one.
  */
 export default function HeroBackground() {
   return (
-    <div className="after:animate-grain after:bg-grain absolute inset-0 overflow-hidden bg-sky-soft after:absolute after:top-0 after:left-0 after:size-[140%] after:opacity-[0.04]">
-      <div className="motion-safe:animate-hero-drift relative size-full">
+    <div className="hero-backdrop after:animate-grain after:bg-grain absolute inset-0 overflow-hidden after:absolute after:top-0 after:left-0 after:size-[140%] after:opacity-[0.04]">
+      <div className="motion-safe:animate-hero-reveal relative size-full">
         <Image
-          src="/images/hero--studio.webp"
+          src="/images/hero--video-poster.webp"
           alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="motion-safe:animate-hero-reveal object-cover object-bottom"
+          width={1920}
+          height={1080}
+          preload
+          sizes="(max-aspect-ratio: 4/5) 220vw, 100vw"
+          className="hero-frame"
         />
+        <HeroVideo />
       </div>
     </div>
   );
