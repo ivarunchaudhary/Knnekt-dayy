@@ -541,12 +541,6 @@ export const testimonials: Testimonial[] = [
     image: { src: `${cdn}/25d452de1b87378bd8baa6e3860b17d5b656edaf-1200x1560.webp`, alt: "Person in a grey sweater reading a message on their phone" },
   },
   {
-    quote: "Pitch day put me in front of people I’d been cold-emailing for a year. Two of those conversations are still going.",
-    attribution: "Founder · Marketplace · Raising",
-    result: "Warm intros, day 90",
-    image: { src: `${cdn}/747377142fa2afc1e416f378ebd1d672a90a184d-1200x1601.webp`, alt: "Four people talking on a bench outside an office building" },
-  },
-  {
     quote: "We shipped the MVP in week seven and had paying users in week nine. Nothing about that was normal for us.",
     attribution: "Founder · Vertical SaaS · In market",
     result: "MVP by week 7",
@@ -557,18 +551,6 @@ export const testimonials: Testimonial[] = [
     attribution: "Founder · Consumer app · In market",
     result: "Clean data room",
     image: { src: `${cdn}/a7836cfbeb7410fcc0226cd2f630461ff0199920-1200x1601.webp`, alt: "Person working at a counter beside a large plant, in a sunlit room" },
-  },
-  {
-    quote: "Fifteen founders in the same room, all one quarter deep. I stopped feeling like the only one having that week.",
-    attribution: "Founder · Edtech · Building",
-    result: "Cohort of 15",
-    image: { src: `${cdn}/6d4203a26a935285c7869dcc83ff68ed568778c1-1200x1249.webp`, alt: "A group gathered around a table with laptops, mid-discussion" },
-  },
-  {
-    quote: "I came in wanting a rebrand. I left with positioning, a product and customers. The rebrand never mattered.",
-    attribution: "Founder · B2B services · In market",
-    result: "100 customers",
-    image: { src: `${cdn}/2e36adf958deec74eccfb3384d2da6277f206d96-1200x1601.webp`, alt: "Person assembling something at a wooden workbench in a studio" },
   },
 ];
 
