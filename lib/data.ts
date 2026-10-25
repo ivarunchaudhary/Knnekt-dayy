@@ -9,11 +9,11 @@ const own = "/cases";
 export const proofPoints: [string, string][] = [
   ["300+", "startups behind the playbook"],
   ["15", "founders a cohort, no more"],
-  ["90", "days, kickoff to pitch day"],
-  ["100", "first customers, in market"],
-  ["6", "pillars in one honest score"],
-  ["4", "functions under one roof"],
-  ["Any", "stage, any industry"],
+  ["100", "days, plan to Pitch Day"],
+  ["4", "functions, one team"],
+  ["Weekly", "masterclasses"],
+  ["30 days", "don’t feel right? We refund your instalment."],
+  ["+30 days", "of building with you, free, if we miss your goal"],
 ];
 
 export type WorkItem = {
