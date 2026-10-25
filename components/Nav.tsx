@@ -7,8 +7,8 @@ import { useEffect, useState } from "react";
 const items = [
   { href: "#score", label: "Score" },
   { href: "#services", label: "Services" },
-  { href: "#about", label: "Studio" },
   { href: "#pricing", label: "Pricing" },
+  { href: "#faculty", label: "Studio" },
   { href: "#insights", label: "Insights" },
   { href: "#contact", label: "Contact" },
 ];
