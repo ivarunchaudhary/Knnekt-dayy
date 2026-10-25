@@ -563,3 +563,62 @@ body {
 .pen-strike.is-lifting { color: inherit; }
 .pen-strike.is-lifting .pen-strike-ink { opacity: 0; transition: opacity 0.35s ease; }
 @media (prefers-reduced-motion: reduce) { .pen-strike, .pen-strike-ink path { transition: none !important; } }
+
+/* problem: the startup in pieces, one block with one gradient, a light sweep, then it splits */
+.kn-icon{width:2.75rem;height:2.75rem}
+.kn-pieces{--g:clamp(2.25rem,5vw,4.5rem);position:relative}
+.kn-pieces-grid{position:relative;display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;gap:var(--g)}
+.kn-card{border:1px solid rgb(59 129 227/.16);background-image:linear-gradient(135deg,#ffffff 0%,#eef5fd 42%,#cfe3fa 100%);background-size:calc(200% + var(--g)) calc(200% + var(--g));box-shadow:inset 0 1px 0 rgb(255 255 255/.9),0 22px 44px -30px rgb(22 37 63/.45);transition:box-shadow 1.2s ease,border-color 1.2s ease}
+.kn-piece:nth-child(1) .kn-card{background-position:0 0}
+.kn-piece:nth-child(2) .kn-card{background-position:100% 0}
+.kn-piece:nth-child(3) .kn-card{background-position:0 100%}
+.kn-piece:nth-child(4) .kn-card{background-position:100% 100%}
+.kn-pieces.is-packed .kn-card{box-shadow:none;border-color:transparent}
+.kn-piece{transition:transform 1.6s var(--ease-out-expo)}
+.kn-piece:nth-child(1){transform:rotate(-1.5deg);--fx:-3px;--fy:-5px}
+.kn-piece:nth-child(2){transform:rotate(1.2deg);--fx:3px;--fy:-4px}
+.kn-piece:nth-child(3){transform:rotate(1deg);--fx:-4px;--fy:4px}
+.kn-piece:nth-child(4){transform:rotate(-1.2deg);--fx:3px;--fy:5px}
+.kn-pieces.is-packed .kn-piece:nth-child(1){transform:translate(calc(var(--g)/2),calc(var(--g)/2))}
+.kn-pieces.is-packed .kn-piece:nth-child(2){transform:translate(calc(var(--g)/-2),calc(var(--g)/2))}
+.kn-pieces.is-packed .kn-piece:nth-child(3){transform:translate(calc(var(--g)/2),calc(var(--g)/-2))}
+.kn-pieces.is-packed .kn-piece:nth-child(4){transform:translate(calc(var(--g)/-2),calc(var(--g)/-2))}
+.kn-float{animation:kn-float 7s ease-in-out infinite alternate}
+.kn-piece:nth-child(2) .kn-float{animation-duration:8.2s;animation-delay:-2.4s}
+.kn-piece:nth-child(3) .kn-float{animation-duration:7.6s;animation-delay:-4.1s}
+.kn-piece:nth-child(4) .kn-float{animation-duration:8.8s;animation-delay:-1.3s}
+.kn-pieces.is-packed .kn-float{animation-play-state:paused}
+@keyframes kn-float{from{transform:translate(0,0)}to{transform:translate(var(--fx),var(--fy))}}
+.kn-pieces-grid::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 38%,rgb(255 255 255/.85) 50%,transparent 62%);transform:translateX(-110%);opacity:0}
+.kn-pieces.is-sheen .kn-pieces-grid::after{animation:kn-sheen 1s cubic-bezier(.4,0,.2,1) forwards}
+@keyframes kn-sheen{0%{opacity:1;transform:translateX(-110%)}100%{opacity:1;transform:translateX(110%)}}
+/* bridges reach for each other and never meet */
+.kn-bridge{position:absolute;display:flex;justify-content:space-between;pointer-events:none;transition:opacity .6s ease 1s}
+.kn-bridge i{display:block;flex:none;animation:kn-march 1.6s linear infinite,kn-reach 3.4s ease-in-out infinite}
+.kn-bridge-t,.kn-bridge-b{left:calc(50% - var(--g)/2);width:var(--g);height:1.5px}
+.kn-bridge-t{top:calc((100% - var(--g))/4)}
+.kn-bridge-b{top:calc(100% - (100% - var(--g))/4)}
+.kn-bridge-l,.kn-bridge-r{top:calc(50% - var(--g)/2);height:var(--g);width:1.5px;flex-direction:column}
+.kn-bridge-l{left:calc((100% - var(--g))/4)}
+.kn-bridge-r{left:calc(100% - (100% - var(--g))/4)}
+.kn-bridge-t i,.kn-bridge-b i{height:100%;background:repeating-linear-gradient(90deg,rgb(45 111 174/.6) 0 4px,transparent 4px 8px)}
+.kn-bridge-l i,.kn-bridge-r i{width:100%;background:repeating-linear-gradient(180deg,rgb(45 111 174/.6) 0 4px,transparent 4px 8px);animation-name:kn-march-y,kn-reach-y}
+.kn-bridge-t i:first-child,.kn-bridge-b i:first-child{-webkit-mask:linear-gradient(90deg,#000 55%,transparent);mask:linear-gradient(90deg,#000 55%,transparent)}
+.kn-bridge-t i:last-child,.kn-bridge-b i:last-child{-webkit-mask:linear-gradient(270deg,#000 55%,transparent);mask:linear-gradient(270deg,#000 55%,transparent)}
+.kn-bridge-l i:first-child,.kn-bridge-r i:first-child{-webkit-mask:linear-gradient(180deg,#000 55%,transparent);mask:linear-gradient(180deg,#000 55%,transparent)}
+.kn-bridge-l i:last-child,.kn-bridge-r i:last-child{-webkit-mask:linear-gradient(0deg,#000 55%,transparent);mask:linear-gradient(0deg,#000 55%,transparent)}
+.kn-bridge-b i,.kn-bridge-r i{animation-delay:0s,-1.7s}
+@keyframes kn-march{to{background-position:16px 0}}
+@keyframes kn-march-y{to{background-position:0 16px}}
+@keyframes kn-reach{0%,100%{width:26%}50%{width:42%}}
+@keyframes kn-reach-y{0%,100%{height:26%}50%{height:42%}}
+.kn-hub{position:absolute;left:50%;top:50%;z-index:1;display:grid;place-items:center;width:calc(var(--g)*1.2);aspect-ratio:1;border-radius:9999px;background:radial-gradient(circle at 32% 26%,#ffffff 0%,#e9f1fb 55%,#cfe3fa 100%);box-shadow:0 0 0 1.5px rgb(59 129 227/.35),0 12px 28px -14px rgb(45 111 174/.7);color:var(--color-sky-deep);text-align:center;font-size:.5rem;line-height:1.25;transform:translate(-50%,-50%);transition:opacity .6s ease 1.1s,transform .9s var(--ease-out-expo) 1.1s}
+.kn-hub::before{content:"";position:absolute;inset:-1px;border-radius:inherit;border:1.5px solid rgb(59 129 227/.45);animation:kn-ripple 2.8s ease-out infinite}
+@keyframes kn-ripple{0%{transform:scale(1);opacity:.9}100%{transform:scale(1.55);opacity:0}}
+@media (min-width:40rem){.kn-hub{font-size:.5625rem}}
+.kn-pieces.is-packed .kn-bridge,.kn-pieces.is-packed .kn-hub{opacity:0;transition-delay:0s}
+.kn-pieces.is-packed .kn-hub{transform:translate(-50%,-50%) scale(.6)}
+@media (prefers-reduced-motion:reduce){
+  .kn-float,.kn-bridge i,.kn-hub::before{animation:none}
+  .kn-piece,.kn-hub,.kn-bridge{transition:none}
+}
