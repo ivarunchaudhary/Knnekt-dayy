@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { NextResponse } from "next/server";
+import { parseConsent } from "@/lib/consent";
 import { PIXEL_ID, SERVER_EVENTS, type ServerEvent } from "@/lib/metaEvents";
 
 const GRAPH_URL = `https://graph.facebook.com/v26.0/${PIXEL_ID}/events`;
@@ -31,7 +32,9 @@ const cookie = (header: string, name: string) => header.match(new RegExp(`(?:^|;
  * event ID, so Meta counts it once and still gets it when an ad blocker or
  * Safari's tracking protection eats the browser copy. Whatever the founder
  * has told us — email, phone, name — goes along hashed, which is what lets
- * Meta tie the event to a person. Without META_CAPI_TOKEN this is a no-op.
+ * Meta tie the event to a person. Without META_CAPI_TOKEN this is a no-op,
+ * and so it is for anyone who hasn't allowed advertising cookies: the browser
+ * doesn't post without that consent, and the saved choice is checked here too.
  */
 export async function POST(request: Request) {
   const token = process.env.META_CAPI_TOKEN;
@@ -41,6 +44,9 @@ export async function POST(request: Request) {
   const origin = request.headers.get("origin");
   const host = request.headers.get("host");
   if (!origin || !host || new URL(origin).host !== host) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+  const cookies = request.headers.get("cookie") ?? "";
+  if (!parseConsent(cookies)?.ads) return new NextResponse(null, { status: 204 });
 
   const text = await request.text();
   if (text.length > 4000) return NextResponse.json({ error: "Too large" }, { status: 413 });
@@ -69,7 +75,6 @@ export async function POST(request: Request) {
     }
   }
 
-  const cookies = request.headers.get("cookie") ?? "";
   const fbclid = url ? new URL(url).searchParams.get("fbclid") : null;
   const fbc = cookie(cookies, "_fbc") || (fbclid ? `fb.1.${Date.now()}.${fbclid}` : "");
   const fbp = cookie(cookies, "_fbp");

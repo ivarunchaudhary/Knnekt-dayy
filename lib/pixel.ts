@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, type RefObject } from "react";
 import { sendGAEvent } from "@next/third-parties/google";
-import { PIXEL_ID, type CustomEvent, type ServerEvent, type StandardEvent } from "./metaEvents";
+import { allowed } from "./consent";
+import { PIXEL_ID, STANDARD_EVENTS, type ServerEvent } from "./metaEvents";
 
 export { PIXEL_ID };
 
@@ -17,7 +18,11 @@ export const identify = (details: typeof user) => {
   user = { ...user, ...details };
 };
 
-/** Meta's base code, run once. Repeat calls are no-ops: the snippet returns early once fbq exists. */
+/**
+ * Meta's base code, run once and only once advertising is allowed. Consent is
+ * granted before init, so the pixel never runs a moment without it. Repeat
+ * calls are no-ops: the snippet returns early once fbq exists.
+ */
 export function loadPixel() {
   if (window.fbq) return;
   /* eslint-disable */
@@ -25,52 +30,58 @@ export function loadPixel() {
   !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
   /* eslint-enable */
   // The snippet just defined fbq; TypeScript still has it narrowed to undefined from the guard above.
-  (window.fbq as Window["fbq"])?.("init", PIXEL_ID);
+  const fbq = window.fbq as Window["fbq"];
+  fbq?.("consent", "grant");
+  fbq?.("init", PIXEL_ID);
 }
 
-/** Empty: Google Analytics isn't loaded, and events only go to Meta. */
 export const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
-
-/**
- * The GA4 name for each Meta event. PageView has none: GA counts page views
- * itself, client-side navigations included. The form names stay clear of
- * form_start and form_submit, which GA's enhanced measurement sends on its own.
- */
-const GA_EVENTS: Partial<Record<ServerEvent, string>> = {
-  Lead: "generate_lead",
-  Contact: "contact",
-  FormView: "form_view",
-  FormStart: "form_begin",
-  FormStep: "form_step",
-  FormAbandon: "form_abandon",
-};
 
 const eventId = () =>
   typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}.${Math.random().toString(36).slice(2)}`;
 
 /**
- * One event, sent twice under one ID: through the pixel in the browser and
- * through /api/meta to the Conversions API, so Meta keeps whichever arrives
- * and counts it once. keepalive lets the server copy finish even when it's
- * sent as the page is closing. Google Analytics gets its own copy too.
+ * One Meta event, sent twice under one ID: through the pixel in the browser
+ * and through /api/meta to the Conversions API, so Meta keeps whichever
+ * arrives and counts it once. keepalive lets the server copy finish even when
+ * it's sent as the page is closing. Nothing goes until advertising is allowed.
  */
-function send(kind: "track" | "trackCustom", event: ServerEvent, params?: Params) {
+export function meta(event: ServerEvent, params?: Params) {
+  if (!allowed("ads")) return;
   const id = eventId();
-  window.fbq?.(kind, event, params ?? {}, { eventID: id });
+  window.fbq?.(STANDARD_EVENTS.includes(event) ? "track" : "trackCustom", event, params ?? {}, { eventID: id });
   fetch("/api/meta", {
     method: "POST",
     keepalive: true,
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ event, id, url: location.href, params, user }),
   }).catch(() => {});
-  const gaEvent = GA_EVENTS[event];
-  if (GA_ID && gaEvent) sendGAEvent("event", gaEvent, params ?? {});
 }
 
-/** Meta's standard events — the ones ads can optimise for. */
-export const track = (event: StandardEvent, params?: Params) => send("track", event, params);
+/**
+ * Every tracked moment goes through here, so the names can't drift between
+ * tools. GA4 gets the event with its parameters; Clarity gets it as a custom
+ * event and each parameter as a tag recordings can be filtered by; Meta gets
+ * its own name for it, when it has one. GA4 and Clarity apply the consent
+ * mode themselves, Meta is held back by meta() above. Never pass anything
+ * personal: the parameters reach GA4 and Clarity as they are.
+ */
+export function track(name: string, params: Params = {}, metaEvent?: { event: ServerEvent; params?: Params }) {
+  if (GA_ID) sendGAEvent("event", name, params);
+  if (window.clarity) {
+    window.clarity("event", name);
+    for (const [k, v] of Object.entries(params)) window.clarity("set", k, String(v));
+  }
+  if (metaEvent) meta(metaEvent.event, metaEvent.params ?? params);
+}
 
-export const trackCustom = (event: CustomEvent, params?: Params) => send("trackCustom", event, params);
+/**
+ * The forms GA4 follows step by step, and the names it knows them by. Others
+ * (the contact form) report their funnel to Meta only.
+ */
+const FUNNELS: Record<string, { start: string; step: string; tag: string }> = {
+  score: { start: "score_form_start", step: "score_form_step", tag: "score_step" },
+};
 
 /**
  * The funnel around one form: FormView when it comes into sight, FormStart on
@@ -78,9 +89,12 @@ export const trackCustom = (event: CustomEvent, params?: Params) => send("trackC
  * leaves after starting without submitting — closing the dialog, navigating
  * away or closing the tab. Every event carries `form`, so one set of names
  * covers every form on the site. The submit itself is a standard event the
- * caller sends, since that's the one ads optimise for.
+ * caller sends, since that's the one ads optimise for. A form listed in
+ * FUNNELS also reports its start and each new step to GA4, and tags Clarity
+ * with the step the visitor is on.
  */
 export function useFormTracking(form: string, ref: RefObject<HTMLElement | null>, firstStep = "form") {
+  const funnel = FUNNELS[form];
   const state = useRef({ viewed: false, started: false, done: false, abandoned: false, step: 1, name: firstStep, furthest: 1 });
 
   useEffect(() => {
@@ -90,7 +104,7 @@ export function useFormTracking(form: string, ref: RefObject<HTMLElement | null>
       ([entry]) => {
         if (!entry.isIntersecting || state.current.viewed) return;
         state.current.viewed = true;
-        trackCustom("FormView", { form });
+        meta("FormView", { form });
         io.disconnect();
       },
       { threshold: 0.3 },
@@ -104,7 +118,7 @@ export function useFormTracking(form: string, ref: RefObject<HTMLElement | null>
       const s = state.current;
       if (!s.started || s.done || s.abandoned) return;
       s.abandoned = true;
-      trackCustom("FormAbandon", { form, step: s.step, step_name: s.name, furthest_step: s.furthest });
+      meta("FormAbandon", { form, step: s.step, step_name: s.name, furthest_step: s.furthest });
     };
     window.addEventListener("pagehide", abandon);
     // Unmounting mid-form is a drop too: the score dialog closing, or a client-side navigation.
@@ -120,15 +134,21 @@ export function useFormTracking(form: string, ref: RefObject<HTMLElement | null>
         const s = state.current;
         if (s.started) return;
         s.started = true;
-        trackCustom("FormStart", { form });
+        meta("FormStart", { form });
+        if (funnel) {
+          track(funnel.start);
+          window.clarity?.("set", funnel.tag, String(s.step));
+        }
       },
       step(step: number, name: string) {
         const s = state.current;
         s.step = step;
         s.name = name;
+        if (funnel) window.clarity?.("set", funnel.tag, String(step));
         if (step <= s.furthest) return; // going back isn't progress
         s.furthest = step;
-        trackCustom("FormStep", { form, step, step_name: name });
+        meta("FormStep", { form, step, step_name: name });
+        if (funnel) track(funnel.step, { step, step_name: name });
       },
       submit() {
         state.current.done = true;
@@ -138,6 +158,6 @@ export function useFormTracking(form: string, ref: RefObject<HTMLElement | null>
         Object.assign(state.current, { started: false, done: false, abandoned: false, step: 1, name: firstStep, furthest: 1 });
       },
     }),
-    [form, firstStep],
+    [form, firstStep, funnel],
   );
 }

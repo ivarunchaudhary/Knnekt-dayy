@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import CookieBanner from "@/components/CookieBanner";
 import MetaPixel from "@/components/MetaPixel";
+import { consentBootstrap } from "@/lib/consent";
 import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
@@ -53,12 +55,17 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`relative scroll-smooth ${ftSystemBlank.variable} ${ftSystemMono.variable}`}>
+      <head>
+        {/* Consent defaults, before any tag: see lib/consent.ts. */}
+        <script dangerouslySetInnerHTML={{ __html: consentBootstrap() }} />
+      </head>
       <body className="text-dark font-sans text-base antialiased">
         <link rel="preconnect" href="https://player.vimeo.com" />
         <link rel="preconnect" href="https://i.vimeocdn.com" />
         <link rel="preconnect" href="https://f.vimeocdn.com" />
         <link rel="preconnect" href="https://vod-adaptive-ak.vimeocdn.com" />
         {children}
+        <CookieBanner />
         <MetaPixel />
       </body>
       {GA_ID && <GoogleAnalytics gaId={GA_ID} />}

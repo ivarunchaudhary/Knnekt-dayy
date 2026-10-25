@@ -40,6 +40,12 @@ export default function Footer() {
               <li>
                 <Link className={`text-dark-subtle hover:text-dark ${link}`} href="/en/terms-and-conditions">Terms &amp; Conditions</Link>
               </li>
+              <li>
+                {/* Reopens the cookie banner on its settings (components/CookieBanner.tsx), to change or withdraw consent. */}
+                <button type="button" data-kc-consent-open className={`text-dark-subtle hover:text-dark cursor-pointer uppercase ${link}`}>
+                  Cookie settings
+                </button>
+              </li>
             </ul>
           </nav>
           <div>

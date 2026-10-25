@@ -22,7 +22,7 @@ import {
   type Identity,
   type Result,
 } from "@/lib/score";
-import { identify, track, useFormTracking } from "@/lib/pixel";
+import { identify, meta, track, useFormTracking } from "@/lib/pixel";
 import { LADDER, plan as planFor, planCopy, type Month, type Plan } from "@/lib/scorePlan";
 import GradientBackground from "./GradientBackground";
 
@@ -890,7 +890,7 @@ function Report({ result, identity, answers, delivery, file }: { result: Result;
   const tone = result.confidence.tone;
 
   return (
-    <div className="@container motion-safe:animate-[score-in_0.5s_var(--ease-out-expo)_both]">
+    <div data-report className="@container motion-safe:animate-[score-in_0.5s_var(--ease-out-expo)_both]">
       <div className="-mx-1 px-1 pt-1">
         {identity.optin && WHATSAPP_URL && <WhatsAppBar url={WHATSAPP_URL} />}
         <div className="flex items-center justify-between gap-3 border-b border-dark/15 pb-3">
@@ -1034,6 +1034,9 @@ function Report({ result, identity, answers, delivery, file }: { result: Result;
   );
 }
 
+/** Where the score falls, as analytics reports it. */
+const scoreBand = (n: number) => (n < 40 ? "0–39" : n < 60 ? "40–59" : n < 80 ? "60–79" : "80–100");
+
 type Stage = { at: "identity" } | { at: "page"; page: number } | { at: "scoring" } | { at: "report"; result: Result };
 
 /**
@@ -1053,6 +1056,7 @@ export default function ScoreQuiz({ bare = false }: { bare?: boolean }) {
   const [file, setFile] = useState<ReportFile | null>(null);
   const top = useRef<HTMLDivElement>(null);
   const funnel = useFormTracking("score", top, "Your details");
+  const led = useRef(false);
 
   // Step 1 is the founder's details; each section page after it is one more.
   const go = (s: Stage) => {
@@ -1077,7 +1081,7 @@ export default function ScoreQuiz({ bare = false }: { bare?: boolean }) {
 
   const finish = () => {
     funnel.submit();
-    track("Lead", { content_name: "Startup Operating Score" });
+    meta("SubmitApplication", { content_name: "Startup Operating Score" });
     go({ at: "scoring" });
     const result = grade(answers, catOther);
     setDelivery("sending");
@@ -1094,7 +1098,10 @@ export default function ScoreQuiz({ bare = false }: { bare?: boolean }) {
         if (res.ok && body?.pdf) setFile(body.pdf);
       })
       .catch(() => setDelivery("failed"));
-    pause.then(() => go({ at: "report", result }));
+    pause.then(() => {
+      go({ at: "report", result });
+      track("score_form_complete", { route: verdicts[result.route].band, archetype: archetypes[result.arch].name, score_band: scoreBand(result.overall) });
+    });
     void send;
   };
 
@@ -1105,6 +1112,11 @@ export default function ScoreQuiz({ bare = false }: { bare?: boolean }) {
         onNext={(id) => {
           setIdentity(id);
           identify({ email: id.email, phone: id.phone, name: id.name });
+          // Page 1 is in: that's the lead. Counted once, however often they come back to it.
+          if (!led.current) {
+            led.current = true;
+            track("generate_lead", {}, { event: "Lead", params: { content_name: "Startup Operating Score" } });
+          }
           go({ at: "page", page: 0 });
         }}
       />

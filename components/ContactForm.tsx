@@ -71,7 +71,7 @@ export default function ContactForm() {
     }
     funnel.submit();
     identify({ email: fields.email.trim().toLowerCase(), name: fields.name.trim() });
-    track("Contact", { content_name: "Contact form", stage: fields.stage });
+    track("contact_form_submit", { stage: fields.stage }, { event: "Contact", params: { content_name: "Contact form", stage: fields.stage } });
     window.location.href = mailto;
     setSent(true);
   };
@@ -112,7 +112,8 @@ export default function ContactForm() {
   }
 
   return (
-    <form ref={formRef} noValidate onSubmit={onSubmit} className="text-dark rounded-xl bg-white p-6 md:p-8 lg:p-10">
+    // Masked in Clarity recordings: what a founder types here is theirs.
+    <form ref={formRef} noValidate onSubmit={onSubmit} data-clarity-mask="true" className="text-dark rounded-xl bg-white p-6 md:p-8 lg:p-10">
       <h3 className="font-medium">Tell us where you are.</h3>
       <p className="text-dark-subtle mt-1 text-sm leading-tight">
         Five fields. We read every one of these ourselves, and we call you within 24 hours.

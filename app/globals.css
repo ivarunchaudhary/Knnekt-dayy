@@ -711,3 +711,204 @@ body {
 .kf-item[open] .kf-a{animation:kf-in .35s ease}
 @keyframes kf-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.kf-item[open] .kf-a{animation:none}.kf-icon::before,.kf-icon::after{transition:none}}
+
+/* Cookie banner (components/CookieBanner.tsx), from the tracking spec's
+   Appendix A. A card bottom-left above the floating nav; a bottom sheet on
+   phones, with the buttons under the thumb. It sets in the site's own face
+   rather than the spec's system stack, and the button and link fonts are
+   written out longhand: `font: 600 .875rem/1 inherit` isn't valid CSS, so
+   the spec's shorthand was dropped whole. */
+.kc-consent,
+.kc-consent * {
+  box-sizing: border-box;
+}
+.kc-consent {
+  --ink: #16253f;
+  --muted: rgb(22 37 63 / 0.66);
+  --line: rgb(22 37 63 / 0.12);
+  --blue: #2d6fae;
+  position: fixed;
+  z-index: 60;
+  left: 1.5rem;
+  bottom: 6.5rem;
+  width: min(25rem, calc(100vw - 3rem));
+  font: 400 15px/1.45 var(--font-sans);
+  color: var(--ink);
+}
+.kc-consent-card {
+  padding: 1.25rem 1.25rem 1.1rem;
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow: 0 24px 60px -24px rgb(10 20 40 / 0.45), 0 0 0 1px var(--line);
+  animation: kc-consent-in 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes kc-consent-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.kc-consent-title {
+  margin: 0 0 0.4rem;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.kc-consent-text {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+.kc-consent-text a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  text-decoration-color: rgb(22 37 63 / 0.35);
+}
+.kc-consent-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+.kc-consent-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.75rem;
+  padding: 0 1rem;
+  border-radius: 9999px;
+  border: 1.5px solid var(--ink);
+  background: #fff;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.kc-consent-btn:hover {
+  background: #f1f4f9;
+}
+.kc-consent-btn.is-primary {
+  background: var(--ink);
+  color: #fff;
+}
+.kc-consent-btn.is-primary:hover {
+  background: var(--blue);
+  border-color: var(--blue);
+}
+.kc-consent-link {
+  display: block;
+  margin: 0.75rem auto 0;
+  padding: 0.25rem 0.5rem;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.2;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  text-decoration-color: rgb(22 37 63 / 0.35);
+  cursor: pointer;
+}
+.kc-consent-btn:focus-visible,
+.kc-consent-link:focus-visible,
+.kc-consent-switch input:focus-visible + span {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+.kc-consent-opt {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.25rem 1rem;
+  align-items: center;
+  padding: 0.8rem 0;
+  border-top: 1px solid var(--line);
+}
+.kc-consent-title + .kc-consent-opt {
+  border-top: 0;
+}
+.kc-consent-opt b {
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+.kc-consent-opt p {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+.kc-consent-always {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+.kc-consent-switch {
+  position: relative;
+  display: inline-block;
+  width: 2.75rem;
+  height: 1.6rem;
+}
+.kc-consent-switch input {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  cursor: pointer;
+}
+.kc-consent-switch span {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: rgb(22 37 63 / 0.2);
+  transition: background 0.2s;
+  pointer-events: none;
+}
+.kc-consent-switch span::after {
+  content: "";
+  position: absolute;
+  left: 0.2rem;
+  top: 0.2rem;
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 9999px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
+  transition: transform 0.2s;
+}
+.kc-consent-switch input:checked + span {
+  background: var(--blue);
+}
+.kc-consent-switch input:checked + span::after {
+  transform: translateX(1.15rem);
+}
+@media (max-width: 47.99rem) {
+  .kc-consent {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+  }
+  .kc-consent-card {
+    border-radius: 1.25rem 1.25rem 0 0;
+    padding: 1.15rem 1.25rem calc(1.1rem + env(safe-area-inset-bottom, 0px));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .kc-consent-card {
+    animation: none;
+  }
+  .kc-consent-switch span,
+  .kc-consent-switch span::after {
+    transition: none;
+  }
+}
