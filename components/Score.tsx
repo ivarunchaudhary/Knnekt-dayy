@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { scorePillars, scoreSample, scoredThisMonth } from "@/lib/data";
+import { scorePillars, scoreSample } from "@/lib/data";
 import Container from "./Container";
 import GradientBackground from "./GradientBackground";
 import ScoreDialog from "./ScoreDialog";
 
 /** How long each slide of the sample report holds before the next one. */
 const HOLD = 3800;
-const SLIDES = 5;
+const SLIDES = 4;
 
 const reduceMotion = () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -34,12 +34,6 @@ function useCountUp(to: number, ms: number, run: boolean) {
   }, [to, ms, run]);
   return n;
 }
-
-const check = (
-  <svg aria-hidden="true" viewBox="0 0 16 16" fill="none" className="size-2.5">
-    <path d="M3 8.5l3.2 3.2L13 5" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
 
 function Eyebrow({ left, right }: { left: string; right: string }) {
   return (
@@ -200,37 +194,8 @@ function ClimbSlide() {
   );
 }
 
-/** Slide 5 — the first lines of the 90-day roadmap the report hands back. */
-function RoadmapSlide() {
-  return (
-    <>
-      <Eyebrow left="Your 90-day roadmap" right="Preview" />
-      <div className="mt-5 rounded-lg border border-dark/10 bg-gray-100 px-5 py-4">
-        <p className="font-medium">Your 90-Day Roadmap</p>
-        <ul className="mt-3">
-          {scoreSample.roadmap.map(([item, done]) => (
-            <li key={item} className="flex items-center gap-2.5 border-t border-dark/10 py-2 text-xs leading-tight first:border-t-0">
-              <span
-                aria-hidden="true"
-                className={`flex size-[0.9375rem] shrink-0 items-center justify-center rounded-[4px] ${done ? "bg-sky-deep text-white" : "border-[1.5px] border-dark/50"}`}
-              >
-                {done && check}
-              </span>
-              {item}
-              <span className="sr-only">{done ? ", done" : ", next"}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <p className="mt-4 text-sm leading-tight text-dark/80">
-        The full 90-day plan to your first 100 customers: <span className="font-medium text-sky-deep">solo (₹20k), or built with you if you’re one of the 15.</span>
-      </p>
-    </>
-  );
-}
-
 /**
- * The sample report: five slides that rotate on a timer, hold while the pointer
+ * The sample report: four slides that rotate on a timer, hold while the pointer
  * is over the card, and can be stepped with the dots. Nothing runs until the
  * card has actually scrolled into view, so the count-up is seen, not missed.
  */
@@ -283,7 +248,7 @@ function Report({ onStart }: { onStart: () => void }) {
     >
       <div key={slide} className="flex-1 motion-safe:animate-[score-in_0.5s_var(--ease-out-expo)_both]" aria-live="polite">
         {live &&
-          (slide === 0 ? <ScoreSlide live={live} /> : slide === 1 ? <QuestionSlide onStart={start} /> : slide === 2 ? <ConstraintsSlide /> : slide === 3 ? <ClimbSlide /> : <RoadmapSlide />)}
+          (slide === 0 ? <ScoreSlide live={live} /> : slide === 1 ? <QuestionSlide onStart={start} /> : slide === 2 ? <ConstraintsSlide /> : <ClimbSlide />)}
       </div>
       <div className="mt-5 flex justify-center gap-1.5" role="tablist" aria-label="Pages of the sample report">
         {Array.from({ length: SLIDES }, (_, i) => (
@@ -312,37 +277,18 @@ function Report({ onStart }: { onStart: () => void }) {
 export default function Score() {
   const [pulse, setPulse] = useState(false);
   const [open, setOpen] = useState(false);
-  const band = useRef<HTMLDivElement>(null);
-  const [seen, setSeen] = useState(false);
-  const scored = useCountUp(scoredThisMonth, 1400, seen);
-
-  useEffect(() => {
-    const el = band.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((e) => e.isIntersecting)) {
-          setSeen(true);
-          io.disconnect();
-        }
-      },
-      { threshold: 0.2 },
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
 
   return (
     <Container id="score" className="py-12 md:py-20">
-      <div ref={band} className="bg-panel relative isolate overflow-hidden rounded-xl">
+      <div className="bg-panel relative isolate overflow-hidden rounded-xl">
         <GradientBackground />
         <div className="relative z-10 grid items-center gap-x-1.5 gap-y-12 px-4 py-8 sm:p-8 lg:grid-cols-12 lg:p-12">
           <div className="lg:col-span-6 lg:pr-8 xl:col-span-6">
-            <p className="mono-text font-mono text-dark/75">Every startup has a number. We built the one that decides who we build with.</p>
-            <h2 className="mt-5 max-w-[14ch] text-3xl font-medium md:text-4xl">See exactly what’s in your way.</h2>
-            <p className="mt-4 max-w-[30ch] text-lg text-dark/80 lg:text-xl">Six pillars. One honest score. No flattery.</p>
-            <p className="mono-text mt-3 max-w-[52ch] font-mono text-dark/60">
-              Wherever you’re starting from, it’s step one, and the first read we use to choose the 15 we build with.
+            <h2 className="max-w-[14ch] text-3xl font-medium md:text-4xl">See exactly what’s in your way.</h2>
+            <p className="mt-4 max-w-[30ch] text-lg text-dark/80 lg:text-xl">Six metrics. One honest score. No flattery.</p>
+            <p className="mt-4 max-w-[46ch] text-sm text-dark/70">
+              Five minutes, free. Get <span className="font-medium text-dark">your score</span>, <span className="font-medium text-dark">your top constraints</span> and{" "}
+              <span className="font-medium text-dark">your next move</span>, yours to keep.
             </p>
 
             {/*
@@ -369,28 +315,11 @@ export default function Score() {
                 </span>
               </button>
             </p>
-            <p className="mt-4 text-sm text-dark/70 italic">The gap you can’t see is the one that ends you.</p>
-
-            <p className="mono-text mt-4 flex flex-wrap items-center gap-x-3 gap-y-1.5 font-mono text-dark/60">
-              <span>Free · 5 min · no card</span>
-              <span className="inline-flex items-center gap-2">
-                <span aria-hidden="true" className="size-1.5 rounded-full bg-sky-deep motion-safe:animate-[score-pip_2s_infinite]" />
-                <span className="text-dark tabular-nums">{scored.toLocaleString("en-IN")}</span> founders scored this month
-              </span>
-            </p>
-
-            <p className="mt-6 max-w-[56ch] border-t border-dark/15 pt-5 text-xs leading-tight text-dark/70">
-              You walk away with your <span className="font-medium text-dark">free report</span>: your <span className="font-medium text-dark">archetype</span>, your{" "}
-              <span className="font-medium text-dark">top constraints</span> and a <span className="font-medium text-dark">clear next move</span>, yours to keep, even if we never
-              work together.
-            </p>
+            <p className="mono-text mt-4 font-mono text-dark/60">Free · 5 min · no card</p>
           </div>
 
           <div className="flex flex-col items-center gap-4 lg:col-span-6">
             <Report onStart={() => setPulse(true)} />
-            <p className="max-w-[36ch] text-center text-sm text-dark/70">
-              <span className="font-medium text-dark">The honest number every founder should know.</span> 5 minutes to find yours.
-            </p>
           </div>
         </div>
       </div>

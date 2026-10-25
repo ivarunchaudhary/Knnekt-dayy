@@ -882,7 +882,7 @@ export const getPost = (slug: string) => insights.find((p) => p.slug === slug);
 /**
  * The Startup Operating Score section: the six pillars and the sample report the
  * card cycles through — a founder scored at 61, what it flagged, where that puts
- * them on the climb, and the first lines of the roadmap it hands back.
+ * them on the climb.
  */
 export const scorePillars = ["Clarity", "Evidence", "Product", "Traction", "Ops", "Invest"];
 
@@ -911,13 +911,4 @@ export const scoreSample = {
   ] as [string, string][],
   /** Where the sample founder sits on the track, in percent, and the marks they climb past. */
   climb: { you: 34, marks: [[46, "Median"], [68, "Scale-ready"], [87, "Investor-ready"]] as [number, string][] },
-  roadmap: [
-    ["Prove demand before building further", true],
-    ["Ship the pre-order page", true],
-    ["Run 10 problem interviews", false],
-    ["Get delivery out of your hands", false],
-  ] as [string, boolean][],
 };
-
-/** Edit from the admin panel as the real count comes in. */
-export const scoredThisMonth = 1284;
