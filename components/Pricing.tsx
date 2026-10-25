@@ -28,7 +28,7 @@ const check = (
 export default function Pricing() {
   return (
     <section id="pricing" className="py-12 md:py-28">
-      <Container>
+      <Container as="div">
         <SectionHeading lead="One price.">
           One fee for the whole studio, growth, tech, AI and legal, for 100 days. The scope moves when your business needs it to. The number doesn’t.
         </SectionHeading>
@@ -119,7 +119,9 @@ export default function Pricing() {
                   <span className="text-4xl leading-none font-medium">{pricing.fee}</span>
                   <span className="mono-text font-mono text-dark/70">{pricing.gst}</span>
                 </p>
-                <p className="kn-fee-sch">Scholarships: one full scholarship, and 20–30% off on four tracks.</p>
+                <p className="kn-fee-sch">
+                  Scholarships: one full scholarship, and 20–30% off on four tracks. <a href="#scholarships">See scholarships ↓</a>
+                </p>
               </div>
 
               <ul className="mt-7 space-y-3 text-sm leading-tight">
@@ -171,7 +173,7 @@ export default function Pricing() {
         <div className="mt-16 lg:mt-28">
           <h3 className="text-3xl font-medium md:text-4xl">One price. Clarity both ways.</h3>
           <div className="mt-8 grid gap-1.5 lg:mt-12 lg:grid-cols-[1.5fr_1fr]">
-            <section className="border-dark/20 rounded-xl border bg-gray-100 p-6 md:p-10">
+            <section className="kn-inc border-dark/20 rounded-xl border bg-gray-100 p-6 md:p-10">
               <h4 className="flex flex-wrap items-baseline gap-3 text-xl font-medium lg:text-2xl">
                 Included <span className="mono-text text-dark-very-subtle font-mono">in the 100</span>
               </h4>
@@ -185,7 +187,7 @@ export default function Pricing() {
                 ))}
               </ul>
             </section>
-            <section className="rounded-xl border border-dark/10 bg-gray-200 p-6 md:p-10">
+            <section className="kn-notinc rounded-xl border p-6 md:p-10">
               <h4 className="flex flex-wrap items-baseline gap-3 text-xl font-medium lg:text-2xl">
                 Not included <span className="mono-text text-dark-very-subtle font-mono">your call</span>
               </h4>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from "react";
 import { services } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import ServiceAnimation from "./ServiceAnimation";
@@ -14,24 +14,90 @@ const capabilityClass =
 /** The chip for whichever capability the drawing above is acting out right now. */
 const activeCapabilityClass = "bg-sky-soft before:bg-brand";
 
+const WIDE = "(min-width: 64rem)";
+const subscribeWide = (cb: () => void) => {
+  const m = window.matchMedia(WIDE);
+  m.addEventListener("change", cb);
+  return () => m.removeEventListener("change", cb);
+};
+
 /**
  * Four full-height panels stack on top of each other while scrolling (sticky cards).
  * The dark, image-backed background is itself sticky and cross-fades per active service.
+ *
+ * Below `lg` each function's title moves inside its card, and the panels stack the
+ * same way (`kn-stack`) only if every one of them fits the screen; otherwise they
+ * scroll past one another like any other block.
  */
 export default function Services() {
   const root = useRef<HTMLElement>(null);
   const cards = useRef<(HTMLDivElement | null)[]>([]);
   const [active, setActive] = useState(0);
+  const [stacked, setStacked] = useState(false);
+  /** The function whose title and photo are up, and whose proof card last popped. */
+  const shown = useRef(-1);
+  const wide = useSyncExternalStore(subscribeWide, () => window.matchMedia(WIDE).matches, () => true);
+
+  // Desktop: size each drawing to the room left in its panel, so the card always clears the bottom nav.
+  // Phone and tablet: stack the panels if each, titled, fits under the ones before it.
+  useEffect(() => {
+    const el = root.current;
+    if (!el) return;
+    const panels = Array.from(el.querySelectorAll<HTMLElement>("[data-panel]"));
+    const fit = () => {
+      cards.current.forEach((card) => {
+        const svg = card?.querySelector<SVGSVGElement>("svg[data-svc]");
+        const box = card?.firstElementChild as HTMLElement | null;
+        const panel = card?.closest<HTMLElement>("[data-panel]");
+        if (!svg || !box || !panel) return;
+        if (!wide) {
+          svg.style.maxHeight = "";
+          return;
+        }
+        const cs = getComputedStyle(panel);
+        svg.style.maxHeight = "none";
+        // layout sizes, unaffected by the stacking transform
+        const room = window.innerHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) - (box.offsetHeight - svg.clientHeight) - 8;
+        svg.style.maxHeight = `${Math.max(120, Math.floor(room))}px`;
+      });
+    };
+    const stackFit = () => {
+      if (wide) {
+        setStacked(false);
+        return;
+      }
+      const phone = window.innerWidth < 768;
+      const top = phone ? 62 : 20;
+      const step = phone ? 8 : 14;
+      setStacked(panels.every((p, i) => p.offsetHeight <= window.innerHeight - top - i * step - 8));
+    };
+    const layout = () => {
+      fit();
+      stackFit();
+    };
+    layout();
+    window.addEventListener("resize", layout);
+    window.addEventListener("load", layout);
+    return () => {
+      window.removeEventListener("resize", layout);
+      window.removeEventListener("load", layout);
+    };
+  }, [wide]);
 
   useEffect(() => {
     const el = root.current;
     if (!el) return;
     const panels = Array.from(el.querySelectorAll<HTMLElement>("[data-panel]"));
-    // The panels only stack from `lg` up, where they are sticky. Below that they
-    // scroll past one another like any other block, and pushing a card back as the
-    // next one approached would fade it out while it is still being read.
-    const stacked = window.matchMedia("(min-width: 64rem)");
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
     let raf = 0;
+    // The proof card pops in each time its function comes up.
+    const pop = (i: number) => {
+      const proof = cards.current[i]?.querySelector("[data-proof]");
+      if (!proof || reduced.matches) return;
+      proof.classList.remove("is-pop");
+      void (proof as HTMLElement).offsetWidth;
+      proof.classList.add("is-pop");
+    };
     const update = () => {
       raf = 0;
       const vh = window.innerHeight;
@@ -42,12 +108,21 @@ export default function Services() {
         const next = panels[i + 1];
         const card = cards.current[i];
         if (!card) return;
-        const covered =
-          next && stacked.matches ? Math.min(1, Math.max(0, 1 - next.getBoundingClientRect().top / vh)) : 0;
-        card.style.opacity = String(Math.max(0, 1 - covered * 1.4));
-        card.style.transform = `scale(${1 - covered * 0.06}) translateY(${-covered * 40}px)`;
+        const covered = next && (wide || stacked) ? Math.min(1, Math.max(0, 1 - next.getBoundingClientRect().top / vh)) : 0;
+        if (stacked) {
+          // phone and tablet deck: solid cards, the earlier ones shrink a little behind
+          card.style.opacity = "1";
+          card.style.transform = `scale(${1 - covered * 0.05})`;
+        } else {
+          card.style.opacity = String(Math.max(0, 1 - covered * 1.4));
+          card.style.transform = `scale(${1 - covered * 0.06}) translateY(${-covered * 40}px)`;
+        }
       });
+      const box = el.getBoundingClientRect();
+      if (box.bottom < 0 || box.top > vh || idx === shown.current) return;
+      shown.current = idx;
       setActive(idx);
+      pop(idx);
     };
     const schedule = () => {
       if (!raf) raf = requestAnimationFrame(update);
@@ -56,22 +131,26 @@ export default function Services() {
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", schedule);
     return () => {
+      cancelAnimationFrame(raf);
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", schedule);
     };
-  }, []);
+  }, [wide, stacked]);
 
   return (
-    <section id="services" ref={root} className="relative isolate lg:px-9">
+    <section id="services" ref={root} className={cn("relative isolate lg:px-9", stacked && "kn-stack")}>
       {services.map((s, i) => {
+        const title = (
+          <h2 className={cn("text-2xl font-medium text-white lg:sr-only", !wide && "kn-in-card")}>
+            <span className="block text-white/50">
+              <span className="text-white">Under one roof,</span> we run
+            </span>
+            <span className="block">{s.title}</span>
+          </h2>
+        );
         return (
-          <div key={s.id} data-panel className={panelClass}>
-            <h2 className="text-2xl font-medium text-white lg:sr-only">
-              <span className="block text-white/50">
-                <span className="text-white">Under one roof,</span> we run
-              </span>
-              <span className="block">{s.title}</span>
-            </h2>
+          <div key={s.id} data-panel className={panelClass} style={{ "--i": i } as CSSProperties}>
+            {wide && title}
             <div
               className="mt-8 lg:col-start-2 lg:mt-0 lg:h-(--card-height)"
               data-service-card="true"
@@ -80,7 +159,7 @@ export default function Services() {
               }}
               style={{ transformOrigin: "top center", willChange: "transform, opacity" }}
             >
-              <ServiceCard service={s} />
+              <ServiceCard service={s} title={wide ? null : title} />
             </div>
           </div>
         );
@@ -98,7 +177,7 @@ export default function Services() {
               </div>
               <div className="relative h-1/2">
                 {services.map((s, i) => (
-                  <span key={s.id} className={`absolute inset-0 transition duration-300 ${i === active ? "" : "opacity-0 translate-y-10"}`}>
+                  <span key={s.id} data-service-label className={`absolute inset-0 transition duration-300 ${i === active ? "" : "opacity-0 translate-y-10"}`}>
                     {s.title}
                   </span>
                 ))}
@@ -116,6 +195,7 @@ export default function Services() {
               height={1112}
               sizes="100vw"
               src={s.bg}
+              data-service-bg
               className={`absolute inset-0 -z-20 grid h-screen w-full object-cover transition-opacity duration-1000 ${i === active ? "" : "opacity-0"}`}
             />
           ))}
@@ -125,10 +205,11 @@ export default function Services() {
   );
 }
 
-function ServiceCard({ service: s }: { service: (typeof services)[number] }) {
+function ServiceCard({ service: s, title }: { service: (typeof services)[number]; title: React.ReactNode }) {
   const [step, setStep] = useState<string>();
   return (
     <div className="overflow-hidden rounded-lg bg-white px-4 pt-5 lg:max-w-170 lg:rounded-xl lg:pt-8">
+      {title}
       <div className="px-2 lg:px-10">
         <ServiceAnimation id={s.id} title={`${s.title}: ${s.capabilities.join(", ")}`} onStep={setStep} />
       </div>
@@ -138,6 +219,7 @@ function ServiceCard({ service: s }: { service: (typeof services)[number] }) {
           What that covers
         </p>
         <ul
+          data-covers
           className="mt-3.5 grid grid-cols-2 gap-1.5 text-xs leading-tight lg:gap-2 lg:[@media(max-height:910px)]:mt-2"
           aria-labelledby={`service-list-title-${s.id}`}
         >
@@ -147,15 +229,18 @@ function ServiceCard({ service: s }: { service: (typeof services)[number] }) {
             </li>
           ))}
         </ul>
-        <div
-          role="group"
-          aria-labelledby={`service-proof-title-${s.id}`}
-          className="mt-6 rounded-lg border border-sky-deep/25 bg-sky-soft/40 px-4 py-3.5 lg:[@media(max-height:910px)]:mt-4"
-        >
-          <p id={`service-proof-title-${s.id}`} className="mono-text font-mono leading-tight text-sky-deep">
-            The proof it creates
-          </p>
-          <p className="mt-1.5 text-sm leading-tight font-medium">{s.proof}</p>
+        <div className="kn-proof" data-proof role="group" aria-labelledby={`service-proof-title-${s.id}`}>
+          <span className="kn-proof-ico">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 12.5l4.5 4.5L19 7.5" />
+            </svg>
+          </span>
+          <div>
+            <p id={`service-proof-title-${s.id}`} className="kn-proof-label mono-text font-mono leading-tight">
+              The proof it creates
+            </p>
+            <p className="kn-proof-text">{s.proof}</p>
+          </div>
         </div>
       </div>
     </div>

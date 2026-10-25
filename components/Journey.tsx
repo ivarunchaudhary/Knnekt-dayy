@@ -1,88 +1,74 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 import { journeyPhases } from "@/lib/data";
+import { stageCalendars } from "@/lib/journeyCalendars";
 import Container, { SectionHeading } from "./Container";
+import JourneyCalendar from "./JourneyCalendar";
 
 /** Pitch Day: the last day on the spine. */
 const LAST_DAY = 100;
 
-/** Which pose the founder is in on any given day of the 100 — one scene per status. */
-const statusFor = (day: number) => (day <= 3 ? 0 : day <= 10 ? 1 : day <= 30 ? 2 : day <= 55 ? 3 : day <= 85 ? 4 : day < LAST_DAY ? 5 : 6);
-/** Customers only start landing once what we built is in market. */
-const customersFor = (day: number) => Math.max(0, Math.min(100, Math.round(((day - 55) / 30) * 100)));
+/** The day each of the founder's seven scenes begins. */
+const sceneStarts = [1, 2, 8, 11, 31, 71, LAST_DAY];
+const sceneFor = (day: number) => sceneStarts.findLastIndex((d) => day >= d);
+/** The live stage: the one whose days the counter is in, so the two never disagree. */
+const stageFor = (day: number) => Math.max(0, journeyPhases.findLastIndex((phase) => day >= phase.from));
 
 /** Decade marks on the spine, so the eye has something to measure the travel against. */
 const decades = [10, 20, 30, 40, 50, 60, 70, 80, 90];
+const ALL_HIDDEN = (1 << decades.length) - 1;
 
-/** One pose per status, drawn as the founder lives the 100 days. */
+/** One pose per scene, drawn as the founder lives the 100 days. */
 const poses = ["01-start", "02-classes", "03-roadmap", "04-building", "05-customers", "06-traction", "07-pitch"].map(
   (name) => `/founder/knnekt-founder-${name}.webp`,
 );
 
-/* The ring round the disc fills over the 100 days; a tick lights as each status begins. */
-const ringTicks = [4, 11, 31, 56, 86, LAST_DAY].map((d) => {
-  const a = ((-90 + ((d - 1) / (LAST_DAY - 1)) * 360) * Math.PI) / 180;
-  return { d, cx: (100 + 96 * Math.cos(a)).toFixed(2), cy: (100 + 96 * Math.sin(a)).toFixed(2) };
+/* The ring round the disc fills over the 100 days; a tick lights at each milestone, clockwise from the top. */
+const ringTicks = [2, 8, 11, 31, 71, LAST_DAY].map((d) => {
+  const a = ((d - 1) / (LAST_DAY - 1)) * Math.PI * 2;
+  return { d, cx: (100 + 96 * Math.sin(a)).toFixed(2), cy: (100 - 96 * Math.cos(a)).toFixed(2) };
 });
 
-/* Twenty seats on an arc under the founder, filling in as the customers land. */
+/* Twenty seats on an arc under the founder, one filling every five days. */
 const seats = Array.from({ length: 20 }, (_, k) => {
   const a = ((38 + k * (104 / 19)) * Math.PI) / 180;
   return { cx: (100 + 106 * Math.cos(a)).toFixed(2), cy: (100 + 106 * Math.sin(a)).toFixed(2) };
 }).reverse();
 
-/* The four disciplines light up one by one through the build. */
+/* The four disciplines light up one by one from Day 11, five days apart. */
 const pills = [
-  { label: "AI", day: 34, x: 6, y: -2, w: 34, delay: "" },
-  { label: "Tech", day: 40, x: 158, y: -4, w: 44, delay: "d2" },
-  { label: "Legal", day: 46, x: -6, y: 180, w: 48, delay: "d3" },
-  { label: "Growth", day: 52, x: 156, y: 180, w: 56, delay: "d4" },
+  { label: "AI", x: 6, y: -2, w: 34, delay: "" },
+  { label: "Tech", x: 158, y: -4, w: 44, delay: "d2" },
+  { label: "Legal", x: -6, y: 180, w: 48, delay: "d3" },
+  { label: "Growth", x: 156, y: 180, w: 56, delay: "d4" },
 ];
 
 /**
  * The founder who rides the spine: a sky disc inside a progress ring, with the founder
- * cut out of it so the head breaks the top edge. Each status swaps the pose and pops one
+ * cut out of it so the head breaks the top edge. Each scene swaps the pose and pops one
  * small overlay beside the disc — the question marks of day one, the class count, the
- * roadmap, the disciplines, the customer seats, the chart and, on pitch day, the room.
+ * roadmap, the disciplines, the day count over its seats, the chart and, on pitch day,
+ * the room.
  */
-function FounderAvatar({ day }: { day: number }) {
-  const scene = statusFor(day);
-  const customers = customersFor(day);
-  const lit = Math.round((customers / 100) * seats.length);
-  const ava = useRef<HTMLDivElement>(null);
-  const studio = useRef<SVGGElement>(null);
+function FounderAvatar({ day, ref: ava }: { day: number; ref: RefObject<HTMLDivElement | null> }) {
+  const scene = sceneFor(day);
   const shownScene = useRef(scene);
 
-  // A small bump of the disc each time the founder moves on to a new status.
+  // A small bump of the disc each time the founder moves on to a new scene.
   useEffect(() => {
     const el = ava.current;
     if (!el || shownScene.current === scene) return;
     shownScene.current = scene;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    el.classList.remove("bump");
     void el.offsetWidth;
     el.classList.add("bump");
-    const t = setTimeout(() => el.classList.remove("bump"), 600);
+    const t = setTimeout(() => el.classList.remove("bump"), 560);
     return () => clearTimeout(t);
-  }, [scene]);
-
-  // The "In studio" chip is sized to its label once the page font is in.
-  useEffect(() => {
-    const fit = () => {
-      const g = studio.current;
-      const text = g?.querySelector("text");
-      const rect = g?.querySelector("rect");
-      if (!text || !rect) return;
-      const w = text.getBBox().width;
-      if (w) rect.setAttribute("width", (w + 33).toFixed(1));
-    };
-    fit();
-    document.fonts?.ready.then(fit);
-  }, []);
+  }, [scene, ava]);
 
   return (
-    <div ref={ava} className={`founder-ava sc${scene}`} aria-hidden="true">
+    <div ref={ava} className={`founder-ava sc${scene}`} aria-hidden="true" data-fa="">
       <svg className="orbit" viewBox="0 0 200 200">
         <circle className="trk" cx="100" cy="100" r="96" />
         <circle
@@ -96,7 +82,7 @@ function FounderAvatar({ day }: { day: number }) {
         />
         <g>
           {ringTicks.map((t) => (
-            <circle key={t.d} className={`tick ${day >= t.d ? "on" : ""}`} r="3" cx={t.cx} cy={t.cy} />
+            <circle key={t.d} className={`tick${day >= t.d ? " on" : ""}`} r="3" cx={t.cx} cy={t.cy} />
           ))}
         </g>
       </svg>
@@ -105,7 +91,7 @@ function FounderAvatar({ day }: { day: number }) {
         <div className="stage">
           {poses.map((src, i) => (
             // eslint-disable-next-line @next/next/no-img-element
-            <img key={src} src={src} alt="" width={640} height={640} decoding="async" draggable={false} className={`pose ${i === scene ? "on" : ""}`} />
+            <img key={src} src={src} alt="" width={640} height={640} decoding="async" draggable={false} className={`pose${i === scene ? " on" : ""}`} />
           ))}
         </div>
       </div>
@@ -135,8 +121,8 @@ function FounderAvatar({ day }: { day: number }) {
         </g>
         <g className="s s1">
           <g transform="translate(-14 176)">
-            <g ref={studio} className="pop">
-              <rect className="chip" width="78" height="22" rx="11" />
+            <g className="pop">
+              <rect className="chip" width="85.8" height="22" rx="11" />
               <circle className="studio" cx="12" cy="11" r="3" />
               <text className="ct" x="21" y="15" style={{ textAnchor: "start" }}>
                 In studio
@@ -147,7 +133,7 @@ function FounderAvatar({ day }: { day: number }) {
             <g className="pop d2">
               <rect className="chip" width="92" height="22" rx="11" />
               <text className="ct" x="46" y="15">
-                Class {Math.min(10, Math.max(1, day))} of 10
+                Class <tspan data-class-n="">{Math.min(10, Math.max(1, day))}</tspan> of 10
               </text>
             </g>
           </g>
@@ -162,19 +148,19 @@ function FounderAvatar({ day }: { day: number }) {
               <circle cx="47" cy="26.8" r="2.1" fill="#fff" />
             </g>
           </g>
-          <g transform="translate(106 176)">
+          <g transform="translate(112 176)">
             <g className="pop d2">
-              <rect className="chip" width="96" height="22" rx="11" />
-              <text className="ct" x="48" y="15">
+              <rect className="chip" width="88" height="22" rx="11" />
+              <text className="ct" x="44" y="15">
                 100-day plan
               </text>
             </g>
           </g>
         </g>
         <g className="s s3">
-          {pills.map((p) => (
+          {pills.map((p, i) => (
             <g key={p.label} transform={`translate(${p.x} ${p.y})`}>
-              <g className={`pop pil ${p.delay} ${day >= p.day ? "lit" : ""}`}>
+              <g className={`pop pil${p.delay ? ` ${p.delay}` : ""}${day >= 11 + i * 5 ? " lit" : ""}`}>
                 <rect width={p.w} height="22" rx="11" />
                 <text x={p.w / 2} y="15">
                   {p.label}
@@ -188,14 +174,14 @@ function FounderAvatar({ day }: { day: number }) {
             <g className="pop">
               <rect className="cnt" width="76" height="26" rx="13" />
               <text className="cntt" x="38" y="17.6">
-                <tspan>{customers}</tspan>
+                <tspan data-day-n="">{day}</tspan>
                 <tspan className="of"> / 100</tspan>
               </text>
             </g>
           </g>
           <g>
             {seats.map((c, i) => (
-              <circle key={i} className={`cd ${i < lit ? "on" : ""}`} r="2.7" cx={c.cx} cy={c.cy} />
+              <circle key={i} className={`cd${i < Math.floor(day / 5) ? " on" : ""}`} r="2.7" cx={c.cx} cy={c.cy} />
             ))}
           </g>
         </g>
@@ -236,138 +222,112 @@ function FounderAvatar({ day }: { day: number }) {
 
 /**
  * The 100 days as a spine: a ruled rail that fills as you scroll, a founder riding it
- * from Day 1 → Pitch Day on Day 100, and the four phases lighting up as it passes them. Position is
- * written straight to the DOM; only the day and the active phase (which change a few
- * dozen times across the whole section) go through state.
+ * from Day 1 → Pitch Day on Day 100, and the four stages lighting up as it passes them.
+ * The rail runs from the first stage's heading to the last one's, and each heading is
+ * the day its stage opens on, so the counter reads "Day 11" just as "Days 11–30" comes
+ * level with the founder. Position is written straight to the DOM; only the day and
+ * which decade marks the founder covers (which change a few dozen times across the
+ * whole section) go through state.
  *
- * The founder is the readout. Rather than a counter, the section shows what the day
- * means — the founder's expression changes scene by scene, from worried on day one
- * to composed on pitch day — with the day and the status hung underneath as two
- * slugs: a hairline one for the day, and the solid ink one for the phase.
+ * Each stage card also opens its calendar, the stage week by week (see `JourneyCalendar`).
  */
 export default function Journey() {
   const rail = useRef<HTMLDivElement>(null);
-  const marker = useRef<HTMLDivElement>(null);
+  const ava = useRef<HTMLDivElement>(null);
+  const founder = useRef<HTMLDivElement>(null);
   const caption = useRef<HTMLDivElement>(null);
-  const line = useRef<HTMLSpanElement>(null);
-  const fill = useRef<HTMLSpanElement>(null);
+  const base = useRef<HTMLSpanElement>(null);
+  const progress = useRef<HTMLSpanElement>(null);
   const startDot = useRef<HTMLSpanElement>(null);
   const endDot = useRef<HTMLSpanElement>(null);
   const ticks = useRef<(HTMLSpanElement | null)[]>([]);
   const cards = useRef<(HTMLLIElement | null)[]>([]);
   const [day, setDay] = useState(1);
-  const [active, setActive] = useState(0);
-  // How many days above and below the founder the marker physically covers, so a decade
-  // mark can get out of the way before the avatar (or the caption under it) clips it.
-  const [reach, setReach] = useState<[number, number]>([11, 16]);
+  // The decade marks the founder (or the day under it) would sit on, one bit per mark.
+  const [covered, setCovered] = useState(ALL_HIDDEN);
 
   useEffect(() => {
     const railEl = rail.current;
-    const markerEl = marker.current;
-    const lineEl = line.current;
-    const fillEl = fill.current;
-    if (!railEl || !markerEl || !lineEl || !fillEl) return;
+    const avaEl = ava.current;
+    const baseEl = base.current;
+    const progressEl = progress.current;
+    if (!railEl || !avaEl || !baseEl || !progressEl) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    // The line stops half a marker short of each end, so the marker never hangs off the rail.
-    let lineTop = 8;
-    let lineBot = 92;
-    // Where each card starts along the rail, paired with the day it opens on, so the
-    // counter reads "Day 11" exactly as the "Days 11–30" card arrives. The last anchor is
-    // Pitch Day; the counter holds at 100 from there.
-    let anchors: [number, number][] = journeyPhases.map((phase, i) => [i / journeyPhases.length, phase.from]);
+    // [px down the rail, day] at the middle of each stage's heading.
+    let anchors: [number, number][] = [];
+    let tickY: number[] = [];
     let raf = 0;
 
-    const dayAt = (progress: number) => {
-      if (progress <= anchors[0][0]) return 1;
-      for (let i = 1; i < anchors.length; i++) {
-        const [p0, d0] = anchors[i - 1];
-        const [p1, d1] = anchors[i];
-        if (progress < p1) return d0 + ((progress - p0) / Math.max(0.0001, p1 - p0)) * (d1 - d0);
-      }
-      return LAST_DAY;
-    };
-    const progressAt = (day: number) => {
-      for (let i = 1; i < anchors.length; i++) {
-        const [p0, d0] = anchors[i - 1];
-        const [p1, d1] = anchors[i];
-        if (day <= d1) return p0 + ((day - d0) / Math.max(1, d1 - d0)) * (p1 - p0);
+    const dayToY = (d: number) => {
+      for (let i = 0; i < anchors.length - 1; i++) {
+        const [ya, da] = anchors[i];
+        const [yb, db] = anchors[i + 1];
+        if (d <= db) return ya + (yb - ya) * ((d - da) / (db - da));
       }
       return anchors[anchors.length - 1][0];
     };
-
-    const place = () => {
-      const r = railEl.getBoundingClientRect();
-      const railH = r.height || 1;
-      const halfPx = markerEl.offsetHeight / 2;
-      const half = Math.min(32, (halfPx / railH) * 100);
-      lineTop = half;
-      lineBot = 100 - half;
-      lineEl.style.top = `${lineTop}%`;
-      lineEl.style.height = `${lineBot - lineTop}%`;
-      fillEl.style.top = `${lineTop}%`;
-      fillEl.style.height = `${lineBot - lineTop}%`;
-      if (startDot.current) startDot.current.style.top = `${lineTop}%`;
-      if (endDot.current) endDot.current.style.top = `${lineBot}%`;
-      anchors = journeyPhases.map((phase, i) => {
-        const card = cards.current[i];
-        const p = card ? (card.getBoundingClientRect().top - r.top) / railH : i / journeyPhases.length;
-        return [Math.max(0, Math.min(0.985, p)), phase.from];
-      });
-      // Each decade mark sits where the counter reads it. Day 100 is the end dot already.
-      const span = lineBot - lineTop;
-      decades.forEach((d, i) => {
-        const tick = ticks.current[i];
-        if (tick) tick.style.top = `${lineTop + progressAt(d) * span}%`;
-      });
-      const pitchStart = anchors[anchors.length - 1][0];
-      const daysPerPx = (LAST_DAY - 2) / Math.max(0.0001, (pitchStart * span * railH) / 100);
-      const below = halfPx + (caption.current?.offsetHeight ?? 0) + 12;
-      setReach([halfPx * daysPerPx + 1, below * daysPerPx + 1]);
+    const yToDay = (y: number) => {
+      for (let i = 0; i < anchors.length - 1; i++) {
+        const [ya, da] = anchors[i];
+        const [yb, db] = anchors[i + 1];
+        if (y <= yb) return da + (db - da) * ((y - ya) / (yb - ya || 1));
+      }
+      return LAST_DAY;
     };
 
-    const settle = () => {
-      // Reduced motion: show the finished 100 days rather than animating them.
-      markerEl.style.top = `${lineBot}%`;
-      fillEl.style.transform = "none";
-      setDay(LAST_DAY);
-      setActive(journeyPhases.length - 1);
+    const layout = () => {
+      const top = railEl.getBoundingClientRect().top;
+      anchors = journeyPhases.map((phase, i) => {
+        const h = cards.current[i]?.querySelector("h3")?.getBoundingClientRect();
+        return [h ? h.top + h.height / 2 - top : 0, phase.from];
+      });
+      const H = railEl.offsetHeight || 1;
+      const y0 = anchors[0][0];
+      const y1 = anchors[anchors.length - 1][0];
+      const pct = (v: number) => `${(v / H) * 100}%`;
+      baseEl.style.top = progressEl.style.top = pct(y0);
+      baseEl.style.height = pct(y1 - y0);
+      if (startDot.current) startDot.current.style.top = pct(y0);
+      if (endDot.current) endDot.current.style.top = pct(y1);
+      tickY = decades.map((d, i) => {
+        const y = dayToY(d);
+        const tick = ticks.current[i];
+        if (tick) tick.style.top = pct(y);
+        return y;
+      });
     };
 
     const update = () => {
       raf = 0;
-      const r = railEl.getBoundingClientRect();
-      const focus = window.innerHeight * 0.42;
-      const progress = Math.max(0, Math.min(1, (focus - r.top) / (r.height || 1)));
-      const centre = lineTop + progress * (lineBot - lineTop);
-      // Both move on transforms, not `top`/`height`: this runs on every scroll frame
-      // over a rail thousands of pixels tall, and a phone shouldn't relayout for it.
-      markerEl.style.transform = `translate3d(0, ${(centre / 100) * r.height}px, 0)`;
-      fillEl.style.transform = `scaleY(${progress})`;
-      const today = Math.max(1, Math.min(LAST_DAY, Math.round(dayAt(progress))));
-      setDay(today);
-      // The live card is the one whose days the counter is in, so the two never disagree.
-      setActive(Math.max(0, journeyPhases.findLastIndex((phase) => today >= phase.from)));
+      const H = railEl.offsetHeight || 1;
+      const y0 = anchors[0][0];
+      const y1 = anchors[anchors.length - 1][0];
+      // Reduced motion: the founder waits at the end of the 100 days rather than riding the rail.
+      const y = reduce ? y1 : Math.min(y1, Math.max(y0, window.innerHeight * 0.5 - railEl.getBoundingClientRect().top));
+      avaEl.style.top = `${(y / H) * 100}%`;
+      progressEl.style.height = `${((y - y0) / H) * 100}%`;
+      // A decade mark gets out of the way before the founder, or the day under it, runs over it.
+      const half = (founder.current?.offsetWidth || 118) / 2;
+      const below = half + (caption.current ? caption.current.offsetHeight + 14 : 0) + 12;
+      setCovered(tickY.reduce((bits, ty, i) => ((ty >= y ? ty - y < below : y - ty < half + 1) ? bits | (1 << i) : bits), 0));
+      setDay(Math.max(1, Math.min(LAST_DAY, Math.round(yToDay(y)))));
     };
-
-    place();
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      settle();
-      return;
-    }
 
     const schedule = () => {
       if (!raf) raf = requestAnimationFrame(update);
     };
+    // Re-measured whenever the rail changes size: a resize, the fonts landing, a calendar opening.
     const onResize = () => {
-      place();
+      layout();
       schedule();
     };
+    layout();
     update();
-    window.addEventListener("scroll", schedule, { passive: true });
+    if (!reduce) window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", onResize);
     const ro = new ResizeObserver(onResize);
     ro.observe(railEl);
-    ro.observe(markerEl);
     return () => {
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", onResize);
@@ -376,75 +336,80 @@ export default function Journey() {
     };
   }, []);
 
-  // The slugs under the founder name the movement of the 100 days they're in.
-  const phase = journeyPhases.find((p) => day <= p.to) ?? journeyPhases[journeyPhases.length - 1];
+  const active = stageFor(day);
+  const phase = journeyPhases[active];
 
   return (
     <section id="journey" className="pt-12 pb-24 md:py-28">
-      <Container>
+      <Container as="div">
         <SectionHeading lead="Day 1 to Pitch Day.">
           Ten days to plan it with you. Ninety days to build it with you. Then you pitch it, live.
         </SectionHeading>
 
         <div className="mt-10 grid grid-cols-[6rem_1fr] gap-x-2.5 md:grid-cols-[11rem_1fr] md:gap-x-4 lg:mt-16 lg:grid-cols-[12rem_1fr] lg:gap-x-6">
-          <div ref={rail} className="relative">
-            <span ref={line} className="bg-dark/10 absolute left-1/2 w-px -translate-x-1/2 rounded" />
+          <div ref={rail} className="relative" data-rail="">
+            <span ref={base} data-rail-base="" className="bg-dark/10 absolute left-1/2 w-px -translate-x-1/2 rounded" style={{ top: "6.5%", height: "87%" }} />
             <span
-              ref={fill}
-              className="bg-dark absolute left-1/2 w-px origin-top -translate-x-1/2 rounded transition-transform duration-100 ease-linear"
-              style={{ transform: "scaleY(0)" }}
+              ref={progress}
+              data-rail-progress=""
+              className="bg-dark absolute left-1/2 w-px -translate-x-1/2 rounded transition-[height] duration-100 ease-linear"
+              style={{ top: "6.5%", height: "0%" }}
             />
             {/* Decade marks: the rail as a ruler, so the travel is measured and not just long. */}
-            {decades.map((d, i) => {
-              const hidden = d >= day ? d - day < reach[1] : day - d < reach[0];
-              return (
+            {decades.map((d, i) => (
+              <span
+                key={d}
+                aria-hidden="true"
+                data-rail-tick=""
+                ref={(el) => {
+                  ticks.current[i] = el;
+                }}
+                className={`ease-in-out-quart absolute left-1/2 -translate-x-1/2 -translate-y-1/2 transition-opacity duration-500 ${covered & (1 << i) ? "opacity-0" : "opacity-100"}`}
+              >
+                <span className={`ease-in-out-quart block h-px w-2.5 transition-colors duration-500 md:w-3 ${day >= d ? "bg-dark" : "bg-dark/15"}`} />
                 <span
-                  key={d}
-                  aria-hidden="true"
-                  ref={(el) => {
-                    ticks.current[i] = el;
-                  }}
-                  className={`ease-in-out-quart absolute left-1/2 -translate-x-1/2 -translate-y-1/2 transition-opacity duration-500 ${hidden ? "opacity-0" : "opacity-100"}`}
+                  className={`mono-text ease-in-out-quart absolute top-1/2 left-5 hidden -translate-y-1/2 tabular-nums transition-colors duration-500 md:block ${
+                    day >= d ? "text-dark" : "text-dark-very-subtle"
+                  }`}
                 >
-                  <span className={`ease-in-out-quart block h-px w-2.5 transition-colors duration-500 md:w-3 ${day >= d ? "bg-dark" : "bg-dark/15"}`} />
-                  <span
-                    className={`mono-text ease-in-out-quart absolute top-1/2 left-5 hidden -translate-y-1/2 tabular-nums transition-colors duration-500 md:block ${
-                      day >= d ? "text-dark-subtle" : "text-dark-very-subtle"
-                    }`}
-                  >
-                    {d}
-                  </span>
+                  {d}
                 </span>
-              );
-            })}
-            <span ref={startDot} className="border-dark absolute left-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 bg-white" />
-            <span ref={endDot} className="bg-dark absolute left-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full" />
+              </span>
+            ))}
+            <span
+              ref={startDot}
+              data-rail-start=""
+              className="border-dark absolute left-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 bg-white"
+              style={{ top: "6.5%" }}
+            />
+            <span ref={endDot} data-rail-end="" className="bg-dark absolute left-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ top: "93.5%" }} />
 
             <div
-              ref={marker}
-              className="absolute top-0 left-1/2 z-10 -translate-x-1/2 -translate-y-1/2 transition-transform duration-100 ease-linear [--fa-size:96px] md:[--fa-size:clamp(118px,13vw,190px)]"
+              ref={ava}
+              data-ava=""
+              className="absolute top-0 left-1/2 z-10 -translate-x-1/2 -translate-y-1/2 transition-[top] duration-100 ease-linear [--fa-size:118px] md:[--fa-size:clamp(118px,13vw,190px)]"
+              style={{ top: "6.5%" }}
             >
-              <p className="sr-only">
-                {phase.days}: {phase.tag}.
+              <p className="sr-only" data-ava-sr="" aria-live="polite">
+                {`${phase.days}: ${phase.tag}.`}
               </p>
-              <FounderAvatar day={day} />
+              <FounderAvatar ref={founder} day={day} />
               <div ref={caption} aria-hidden="true" className="absolute top-full left-1/2 mt-3.5 flex -translate-x-1/2 flex-col items-center gap-2">
-                <span className="mono-text border-dark/15 text-dark rounded-full border bg-white px-3 py-1.5 whitespace-nowrap tabular-nums">Day {day}</span>
-                {/* Too wide for the phone rail ("Set up and prove" would run off the screen), and
-                    the live card beside it carries the same tag. */}
-                <span className="bg-dark mono-text rounded-full px-3 py-1.5 whitespace-nowrap text-white max-md:hidden">{phase.tag}</span>
+                <span data-ava-day="" className="mono-text border-dark/15 text-dark rounded-full border bg-white px-3 py-1.5 whitespace-nowrap tabular-nums">
+                  {`Day ${day}`}
+                </span>
+                <span data-ava-stage="" className="bg-dark mono-text hidden rounded-full px-3 py-1.5 whitespace-nowrap text-white sm:block">
+                  {phase.tag}
+                </span>
               </div>
             </div>
           </div>
 
-          <ol className="flex flex-col gap-1.5 lg:gap-2">
+          <ol className="flex flex-col gap-1.5 lg:gap-2" data-stages="">
             {journeyPhases.map((phase, i) => {
               const on = active === i;
-              // The last phase is the one the section is driving at, so it gets the
-              // panel fill — the deepest step on the sky ramp — while its siblings sit on
-              // white or `gray-100`. It used to invert to navy instead, which is why the
-              // branches below collapsed once the page stopped having a dark plate: on a
-              // light panel the type is the page's own ink either way.
+              // The last stage is the one the section is driving at, so it keeps the panel
+              // fill and full ink throughout; only its corners follow the live card.
               const feature = i === journeyPhases.length - 1;
               return (
                 <li
@@ -452,6 +417,7 @@ export default function Journey() {
                   ref={(el) => {
                     cards.current[i] = el;
                   }}
+                  data-stage=""
                   className={`ease-in-out-quart border p-6 transition-all duration-500 md:p-10 ${on ? "rounded-2xl" : "rounded-lg"} ${
                     feature ? "bg-panel border-transparent" : on ? "border-dark/15 bg-white" : "border-dark/5 bg-gray-100"
                   }`}
@@ -481,6 +447,7 @@ export default function Journey() {
                       </li>
                     ))}
                   </ul>
+                  <JourneyCalendar cal={stageCalendars[i]} />
                 </li>
               );
             })}

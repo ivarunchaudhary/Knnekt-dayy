@@ -64,38 +64,29 @@ export default function Footer() {
           is sized off the container rather than the viewport (`cqi`) so the
           single line always fits the measure it is given — `nowrap` is then
           safe at every width. From md up the picture is pulled up 14% of the
-          width, which would otherwise bring its top-left foliage in behind the
-          line; the 15% foot cancels that pull and leaves the line a whole
-          percent of clear white to sit on. The line is then nudged down 8cqi
-          (a width fraction, so it tracks the picture) to sit where the white
-          starts fading into the sky. */}
+          width, which would otherwise bring the olive tree's crown in behind
+          the line; the 15% foot cancels that pull and leaves the line a whole
+          percent of clear white to sit on. The tree reaches the picture's top
+          edge, so the line stays above it rather than being nudged down into
+          the sky. */}
       <div className={`${containerClass} @container relative z-10 pb-10 md:pb-[15%]`}>
-        <p className="text-dark text-center translate-y-[8cqi] font-sans text-[min(4.6cqi,4rem)] leading-none font-medium tracking-tight whitespace-nowrap normal-case">
+        <p className="text-dark text-center font-sans text-[min(4.6cqi,4rem)] leading-none font-medium tracking-tight whitespace-nowrap normal-case">
           Every Startup Needs One Friend
         </p>
       </div>
-      {/* The picture keeps its own 2100x747 ratio from md up, so nothing is
-          cropped — both figures, the books, the print and the dog all stay in
-          frame. Its top rows are white, which is what lets it slide up under
-          the text on a negative margin and join the page with no visible seam.
-          The overlap is a percentage, so it tracks the width: the image is
-          35.6% of the width tall, and pulling it up 14% puts the text's last
-          rows — socials and the legal links — over the top 39% of the sky,
-          which measures 12:1 or better against #141a22. Any deeper and they'd
-          reach the blue, where the 50%-opacity legal links stop holding up.
-          Below md that ratio leaves a ~140px sliver the floating nav covers, so
-          the band is cropped to 4:3, pinned bottom-left to the corner that
-          holds all three figures, and sits under the text rather than beneath
-          it. */}
-      <div className="relative z-0 aspect-[4/3] w-full sm:aspect-[2/1] md:-mt-[14%] md:aspect-auto">
+      {/* The picture runs the full width at its own 2100x750 ratio, so nothing
+          is cropped: the four of them, the books, the print and the dog all stay
+          in frame. Its top fades in from the page (`.kn-foot-img`), which is
+          what lets it slide up under the text on a negative margin from md up
+          and join the page with no visible seam. */}
+      <div className="kn-foot-art relative z-0 w-full md:-mt-[14%]">
         <Image
-          src="/images/footer--clouds.webp"
-          alt="Three people at work on marble steps above a bank of clouds"
+          src="/images/footer--team-olive.webp"
+          alt="The Knnekt team relaxing on marble steps above the clouds: two sharing a coffee, one reading beneath an olive tree, one throwing a paper plane, a dog asleep beside him"
           width={2100}
-          height={747}
+          height={750}
           sizes="100vw"
-          className="absolute inset-0 h-full w-full select-none object-cover object-left-bottom [mask-image:linear-gradient(to_bottom,transparent_0,#000_9%)] md:static md:h-auto md:object-contain"
-          priority={false}
+          className="kn-foot-img select-none"
         />
       </div>
     </footer>

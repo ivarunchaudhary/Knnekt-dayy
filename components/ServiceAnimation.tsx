@@ -1,27 +1,26 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { flat, legalBoard, markup, mixArt, type Art, type Step } from "@/lib/serviceArt";
 
 /**
  * One looping line drawing per service, each acting out that service's six
- * capabilities in order. Same vocabulary as the clips they replace — hairlines,
- * ink dots, a small mono caption — but every beat is one of the points listed
- * under the card, and the caption names the one on screen.
+ * capabilities in order: every beat is one of the points listed under the card.
  *
  * Each scene is a pure function of its clock `t` (seconds into the loop), so a
  * loop is just a timeline: things draw in, act, and the whole frame fades out
  * before it starts again. The clock only runs while the card is on screen.
+ *
+ * On the card the drawing plays, restyled flat, on the shared board from
+ * lib/serviceArt, with the founder and the studio team either side. Legal &
+ * Compliance plays the board's own six tiles instead.
  */
 
 export type Pt = [number, number];
-type Step = [from: number, to: number, capability: string];
 type Scene = { loop: number; still: number; steps: Step[]; Draw: (props: { t: number }) => React.ReactNode };
 
-const W = 1280;
-const H = 536;
 export const INK = "#16253f";
 export const ACCENT = "#3b81e3";
-const TAU = Math.PI * 2;
 
 export const clamp = (v: number) => Math.min(1, Math.max(0, v));
 export const prog = (t: number, a: number, b: number) => clamp((t - a) / (b - a));
@@ -430,110 +429,6 @@ function Enablement({ t }: { t: number }) {
   );
 }
 
-/* ------------------------------------------------------------------------- *
- * Legal & Compliance: the company gets written and signed, IP is assigned    *
- * in, the cap table is split, and every paper is filed, checked and locked.  *
- * ------------------------------------------------------------------------- */
-
-const L_DOC: Pt = [235, 245];
-const L_CAP: Pt = [640, 230];
-const L_SLICES = [
-  { start: 0, share: 0.6, color: INK, opacity: 0.85 },
-  { start: 0.6, share: 0.25, color: INK, opacity: 0.35 },
-  { start: 0.85, share: 0.15, color: ACCENT, opacity: 1 },
-];
-const L_TEXT = [210, 190, 215, 160, 205, 180, 212, 120];
-const L_SLOTS = Array.from({ length: 6 }, (_, i) => ({ x: 880 + (i % 3) * 115, y: 150 + Math.floor(i / 3) * 150, from: i === 3 || i === 5 ? L_CAP : L_DOC }));
-
-function Legal({ t }: { t: number }) {
-  const stamp = prog(t, 3.3, 3.7);
-  const ipP = inOut(prog(t, 3.9, 4.6));
-  const ip = quad([520, 450], [440, 330], [260, 317], ipP);
-  const shackle = out(prog(t, 10.6, 11.1));
-
-  return (
-    <g opacity={fade(t, 13)}>
-      {/* Incorporation and contracts: the page writes itself, then gets signed and sealed */}
-      <path d="M100 40H340L370 70V450H100Z" {...line} {...draw(inOut(prog(t, 0.1, 0.9)))} />
-      <path d="M340 40V70H370" {...line} {...draw(prog(t, 0.8, 1))} />
-      <line x1={130} y1={90} x2={270} y2={90} {...line} strokeWidth={5} {...draw(prog(t, 0.6, 1))} />
-      {L_TEXT.map((w, i) => (
-        <line key={i} x1={130} y1={125 + i * 24} x2={130 + w} y2={125 + i * 24} {...line} strokeWidth={2} strokeOpacity={0.4} {...draw(prog(t, 0.9 + i * 0.2, 1.25 + i * 0.2))} />
-      ))}
-      <line x1={130} y1={317} x2={280} y2={317} {...line} strokeWidth={2} stroke={ACCENT} {...draw(prog(t, 4.6, 5))} />
-      <line x1={130} y1={404} x2={300} y2={404} {...hair} {...draw(prog(t, 2.3, 2.6))} />
-      <path d="M140 392C155 360 165 402 178 380S200 360 205 388S230 400 240 372S262 380 290 384" {...line} {...draw(inOut(prog(t, 2.6, 3.3)))} />
-      {stamp > 0 && (
-        <g transform={`translate(330 392) scale(${1.5 - 0.5 * out(stamp)})`} opacity={out(stamp)}>
-          <circle r={30} {...line} fill="#fff" stroke={ACCENT} />
-          <circle r={21} {...line} stroke={ACCENT} strokeWidth={2} strokeDasharray="3 5" />
-          <path d="M-8 0l5 6l11 -12" {...line} stroke={ACCENT} />
-        </g>
-      )}
-
-      {/* IP assignment: the idea is carried into the paper */}
-      {ipP < 1 && (
-        <rect x={ip[0] - 9} y={ip[1] - 9} width={18} height={18} rx={2} fill={ACCENT} opacity={prog(t, 3.6, 3.9)} transform={`rotate(45 ${pt(ip)})`} />
-      )}
-
-      {/* Cap table */}
-      <circle cx={L_CAP[0]} cy={L_CAP[1]} r={120} {...hair} strokeOpacity={0.15} opacity={prog(t, 4.8, 5.1)} />
-      {L_SLICES.map(({ start, share, color, opacity }, i) => {
-        const p = inOut(prog(t, 5 + i * 0.45, 5.5 + i * 0.45));
-        const mid = (start + share / 2) * TAU - Math.PI / 2;
-        return (
-          <g key={i}>
-            <circle cx={L_CAP[0]} cy={L_CAP[1]} r={120} fill="none" stroke={color} strokeOpacity={opacity} strokeWidth={20} pathLength={1} strokeDasharray={`${Math.max(0, share * p - 0.008)} 1`} strokeDashoffset={-start} transform={`rotate(-90 ${pt(L_CAP)})`} visibility={p > 0 ? "visible" : "hidden"} />
-            <text x={L_CAP[0] + 170 * Math.cos(mid)} y={L_CAP[1] + 170 * Math.sin(mid) + 7} textAnchor="middle" fontSize={20} fill={INK} fillOpacity={0.55} opacity={prog(t, 5.4 + i * 0.45, 5.7 + i * 0.45)} style={mono}>
-              {Math.round(share * 100)}%
-            </text>
-          </g>
-        );
-      })}
-
-      {/* Data room: every paper gets filed and checked, then the room locks */}
-      {L_SLOTS.map(({ x, y, from }, i) => {
-        const s = 7.1 + i * 0.4;
-        const p = prog(t, s, s + 0.8);
-        const to: Pt = [x + 47, y + 68];
-        const pos = quad(from, [(from[0] + to[0]) / 2, Math.min(from[1], to[1]) - 140], to, inOut(p));
-        const tick = prog(t, s + 0.8, s + 1.1);
-        return (
-          <g key={i}>
-            <path d={`M${x} ${y}h36l8 12h51v108h-95Z`} {...line} strokeWidth={2} strokeOpacity={0.5} {...draw(inOut(prog(t, 6.2 + i * 0.1, 6.9 + i * 0.1)))} />
-            {p > 0 && (
-              <g transform={`translate(${pt(pos)}) scale(${lerp(0.8, 1, p)})`}>
-                {from === L_CAP ? (
-                  <>
-                    <circle r={17} {...line} strokeWidth={2} />
-                    <path d="M0 -17A17 17 0 0 1 16.2 5.3" {...line} strokeWidth={6} />
-                  </>
-                ) : (
-                  <>
-                    <rect x={-15} y={-20} width={30} height={40} rx={3} {...line} fill="#fff" strokeWidth={2} />
-                    <path d="M-8 -8H8M-8 0H8M-8 8H2" {...line} strokeWidth={2} strokeOpacity={0.5} />
-                  </>
-                )}
-              </g>
-            )}
-            {tick > 0 && (
-              <g transform={`translate(${x + 90} ${y + 20}) scale(${back(tick)})`}>
-                <circle r={12} fill={ACCENT} />
-                <path d="M-5 0l3.5 4l7 -8" {...line} stroke="#fff" strokeWidth={2.5} />
-              </g>
-            )}
-          </g>
-        );
-      })}
-      <rect x={860} y={120} width={360} height={330} rx={16} {...hair} {...draw(inOut(prog(t, 9.8, 10.6)))} />
-      <g opacity={prog(t, 10.2, 10.5)}>
-        <path d={`M1028 80V66A12 12 0 0 1 1052 66V80`} {...line} transform={`translate(0 ${-14 * (1 - shackle)})`} />
-        <rect x={1020} y={78} width={40} height={30} rx={6} {...line} fill={shackle >= 1 ? INK : "#fff"} />
-      </g>
-    </g>
-  );
-}
-
 const scenes: Record<string, Scene> = {
   growth: {
     loop: 13,
@@ -574,27 +469,32 @@ const scenes: Record<string, Scene> = {
       [8.8, 12, "Agentic workflows"],
     ],
   },
-  legal: {
-    loop: 13,
-    still: 11.6,
-    Draw: Legal,
-    steps: [
-      [0, 1.8, "Incorporation"],
-      [1.8, 3.6, "Contracts"],
-      [3.6, 5, "IP assignment"],
-      [5, 7, "Cap table"],
-      [7, 9.4, "Compliance"],
-      [9.4, 13, "Data room"],
-    ],
-  },
+};
+
+/**
+ * What each card plays: Legal & Compliance on the board's own tiles, the
+ * other three acting out their drawing on the board.
+ */
+const arts: Record<string, Art> = {
+  legal: legalBoard,
+  ...Object.fromEntries(
+    Object.entries(scenes).map(([id, { loop, still, steps, Draw }]) => [
+      id,
+      { loop, still, steps, render: (t: number) => mixArt(id, t, flat(markup(<Draw t={t} />)), steps) },
+    ]),
+  ),
 };
 
 const REDUCED = "(prefers-reduced-motion: reduce)";
-const subscribeReduced = (cb: () => void) => {
-  const m = window.matchMedia(REDUCED);
+/** Below 640px the board is cropped to its middle so the drawing stays legible. */
+const NARROW = "(max-width: 39.99rem)";
+const subscribe = (query: string) => (cb: () => void) => {
+  const m = window.matchMedia(query);
   m.addEventListener("change", cb);
   return () => m.removeEventListener("change", cb);
 };
+const subscribeReduced = subscribe(REDUCED);
+const subscribeNarrow = subscribe(NARROW);
 
 /**
  * Seconds into a `loop`-second cycle, advancing only while `el` is on screen.
@@ -639,29 +539,26 @@ type Props = {
 };
 
 export default function ServiceAnimation({ id, title, onStep }: Props) {
-  const scene = scenes[id];
+  const art = arts[id];
   const svg = useRef<SVGSVGElement>(null);
-  const t = useLoopClock(svg, scene?.loop ?? 1, scene?.still ?? 0);
-  const step = scene?.steps.find(([a, b]) => t >= a && t < b)?.[2];
+  const t = useLoopClock(svg, art?.loop ?? 1, art?.still ?? 0);
+  const narrow = useSyncExternalStore(subscribeNarrow, () => window.matchMedia(NARROW).matches, () => false);
+  const step = art?.steps.find(([a, b]) => t >= a && t < b)?.[2];
 
   useEffect(() => {
     onStep?.(step);
   }, [step, onStep]);
 
-  if (!scene) return null;
-  const { Draw, steps } = scene;
+  if (!art) return null;
 
   return (
-    <svg ref={svg} viewBox={`0 0 ${W} ${H}`} className="block h-auto w-full" role="img" aria-label={title}>
-      <Draw t={t} />
-      {steps.map(([a, b, name]) => {
-        const o = prog(t, a, a + 0.3) * (1 - prog(t, b - 0.3, b));
-        return o > 0 ? (
-          <text key={name} x={90} y={514 + (1 - o) * 8} fontSize={22} fill={INK} fillOpacity={0.5} opacity={o} style={mono}>
-            {name}
-          </text>
-        ) : null;
-      })}
-    </svg>
+    <svg
+      ref={svg}
+      data-svc={id}
+      viewBox={narrow ? "160 0 960 470" : "0 0 1280 470"}
+      role="img"
+      aria-label={title}
+      dangerouslySetInnerHTML={{ __html: art.render(t) }}
+    />
   );
 }

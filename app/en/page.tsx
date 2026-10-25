@@ -1,14 +1,13 @@
-import Collaboration from "@/components/Collaboration";
+import Community from "@/components/Community";
 import Contact from "@/components/Contact";
-import Faculty from "@/components/Faculty";
 import Faq from "@/components/Faq";
 import Footer from "@/components/Footer";
 import Hero from "@/components/Hero";
 import Intro from "@/components/Intro";
 import Journey from "@/components/Journey";
 import Nav from "@/components/Nav";
-import Pieces from "@/components/Pieces";
 import Pricing from "@/components/Pricing";
+import Problem from "@/components/Problem";
 import Scholarships from "@/components/Scholarships";
 import Score from "@/components/Score";
 import Selection from "@/components/Selection";
@@ -31,14 +30,13 @@ export default function HomePage() {
             <Hero />
             <Intro />
             <Score />
-            <Pieces />
+            <Problem />
             <Services />
-            <Collaboration />
             <Journey />
             <Selection />
             <Pricing />
             <Scholarships />
-            <Faculty />
+            <Community />
             <Testimonials />
             <Faq />
             <Contact />

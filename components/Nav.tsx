@@ -3,14 +3,15 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import MobileHeader from "./MobileHeader";
 
 const items = [
-  { href: "#score", label: "Score" },
-  { href: "#services", label: "Services" },
-  { href: "#pricing", label: "Pricing" },
-  { href: "#faculty", label: "Studio" },
-  { href: "#faq", label: "FAQ" },
-  { href: "#contact", label: "Contact" },
+  { href: "#score", label: "Score", blurb: "The free diagnostic" },
+  { href: "#services", label: "Services", blurb: "Four functions, one team" },
+  { href: "#pricing", label: "Pricing", blurb: "One price, two promises" },
+  { href: "#community", label: "Studio", blurb: "Masterclasses and the team" },
+  { href: "#faq", label: "FAQ", blurb: "Questions founders ask" },
+  { href: "#contact", label: "Contact", blurb: "Take the score, talk to us" },
 ];
 
 const spring =
@@ -22,7 +23,8 @@ const mask = ({ start, end }: { start: boolean; end: boolean }) =>
 /**
  * Floating pill navigation. The dot marks whichever section currently fills the
  * viewport. Off the home page the same links point back at it, so the pill is
- * never a row of dead anchors on a case or legal page.
+ * never a row of dead anchors on a case or legal page. On a phone the pill
+ * gives way to <MobileHeader/> (see `[data-nav]` in globals.css).
  */
 export default function Nav() {
   const [active, setActive] = useState<string | null>(null);
@@ -88,38 +90,41 @@ export default function Nav() {
   }, [onHome]);
 
   return (
-    <nav className="fixed bottom-7 left-1/2 isolate z-40 max-w-[calc(100vw-1.5rem)] -translate-x-1/2 overflow-hidden rounded-full bg-gray-200/70 py-1.5 pr-5 pl-2.5 text-[0.9375rem] leading-[125%] font-medium tracking-[-0.00938rem] backdrop-blur-xl">
-      {/* Five items don't fit a phone: the row scrolls, and the mask doubles as the affordance. */}
-      <div
-        ref={row}
-        className="hide-scrollbars -mr-4 -ml-1.5 overflow-x-auto overscroll-x-contain pr-4 pl-1.5"
-        style={{ maskImage: mask(edges), WebkitMaskImage: mask(edges) }}
-      >
-        <ul className="flex w-max select-none">
-          {items.map((item) => {
-            const on = active === item.href;
-            const className = `before:bg-dark flex items-center gap-1 rounded-full px-2 py-3 outline-dark transition-colors before:size-2.5 before:rounded-full before:transition before:duration-200 ${spring} hover:text-dark focus-visible:text-dark ${
-              on
-                ? "text-dark before:opacity-100 motion-safe:before:translate-y-0"
-                : "text-dark-subtle before:opacity-0 motion-safe:before:translate-y-2"
-            }`;
-            const label = <span className="-mt-0.5">{item.label}</span>;
-            return (
-              <li key={item.href}>
-                {onHome ? (
-                  <a href={item.href} aria-current={on ? "location" : undefined} className={className}>
-                    {label}
-                  </a>
-                ) : (
-                  <Link href={`/en${item.href}`} className={className}>
-                    {label}
-                  </Link>
-                )}
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-    </nav>
+    <>
+      <MobileHeader items={items} home={onHome ? "" : "/en"} />
+      <nav aria-label="Sections" data-nav className="fixed bottom-7 left-1/2 isolate z-40 max-w-[calc(100vw-1.5rem)] -translate-x-1/2 overflow-hidden rounded-full bg-gray-200/70 py-1.5 pr-5 pl-2.5 text-[0.9375rem] leading-[125%] font-medium tracking-[-0.00938rem] backdrop-blur-xl">
+        {/* Five items don't fit a phone: the row scrolls, and the mask doubles as the affordance. */}
+        <div
+          ref={row}
+          className="hide-scrollbars -mr-4 -ml-1.5 overflow-x-auto overscroll-x-contain pr-4 pl-1.5"
+          style={{ maskImage: mask(edges), WebkitMaskImage: mask(edges) }}
+        >
+          <ul className="flex w-max select-none">
+            {items.map((item) => {
+              const on = active === item.href;
+              const className = `before:bg-dark flex items-center gap-1 rounded-full px-2 py-3 outline-dark transition-colors before:size-2.5 before:rounded-full before:transition before:duration-200 ${spring} hover:text-dark focus-visible:text-dark ${
+                on
+                  ? "text-dark before:opacity-100 motion-safe:before:translate-y-0"
+                  : "text-dark-subtle before:opacity-0 motion-safe:before:translate-y-2"
+              }`;
+              const label = <span className="-mt-0.5">{item.label}</span>;
+              return (
+                <li key={item.href}>
+                  {onHome ? (
+                    <a href={item.href} aria-current={on ? "location" : undefined} className={className}>
+                      {label}
+                    </a>
+                  ) : (
+                    <Link href={`/en${item.href}`} className={className}>
+                      {label}
+                    </Link>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      </nav>
+    </>
   );
 }

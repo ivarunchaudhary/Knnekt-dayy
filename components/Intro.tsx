@@ -49,9 +49,11 @@ export default function Intro() {
           </p>
           <p className="mono-text mt-4 font-mono text-dark/60">Free · 5 minutes · we call you within 24 hours with your constraints and next moves</p>
           <p className="mt-6">
-            <a href="#journey" className="group inline-flex items-center gap-2 font-medium outline-offset-4 outline-dark hover:text-sky-deep">
-              <span className="underline decoration-dark/25 underline-offset-4 group-hover:decoration-sky-deep">See how the 100 days work</span>
-              <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-y-0.5">↓</span>
+            <a href="#journey" data-how className="kn-how group inline-flex items-center gap-2 outline-offset-4 outline-dark">
+              <span className="kn-how-text">See how the 100 days work</span>
+              <span aria-hidden="true" className="kn-how-arrow">
+                ↓
+              </span>
             </a>
           </p>
         </div>

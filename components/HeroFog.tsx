@@ -62,6 +62,7 @@ export default function HeroFog() {
   return (
     <div
       ref={ref}
+      data-haze
       aria-hidden="true"
       className="pointer-events-none absolute inset-0 z-10 overflow-hidden"
       style={{ "--haze": 0, "--veil": 0 } as React.CSSProperties}
@@ -82,10 +83,6 @@ export default function HeroFog() {
         className="absolute inset-0 bg-[linear-gradient(to_top,#fff_0%,#f6fafe_46%,rgba(255,255,255,0)_100%)]"
         style={{ opacity: "var(--veil)" }}
       />
-      {/* The hero's foot, resolved to the white of the page. Last of the three, so
-          the seam against <Intro/> stays clean at every point in the scroll — under
-          the fog it would be a band of colour cut off on a hard line. */}
-      <div className="absolute inset-x-0 bottom-0 h-[12%] bg-gradient-to-t from-white to-transparent" />
     </div>
   );
 }

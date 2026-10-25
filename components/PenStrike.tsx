@@ -63,10 +63,10 @@ export default function PenStrike({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <span ref={ref} className="pen-strike">
+    <span ref={ref} className="kn-cross" data-cross>
       {children}
-      <svg className="pen-strike-ink" viewBox="0 0 200 40" preserveAspectRatio="none" aria-hidden="true">
-        <path d="M2 24 C 30 19, 58 24, 88 19 S 145 17, 172 16 S 194 13, 198 12" />
+      <svg className="kn-pen" viewBox="0 0 200 40" preserveAspectRatio="none" aria-hidden="true">
+        <path className="kn-pen-a" d="M2 24 C 30 19, 58 24, 88 19 S 145 17, 172 16 S 194 13, 198 12" />
       </svg>
     </span>
   );
