@@ -230,7 +230,7 @@ export const principles = [
   },
 ];
 
-/** The cohort — fifteen founders a quarter. */
+/** The cohort — fifteen founders a cohort. */
 export const team = [
   { alt: "Person with long blonde hair wearing a white top and hoop earrings, standing outdoors in front of a window", src: `${cdn}/dcb621c0f613969c6d206a3ab4857a5aba9d02b0-400x400.webp` },
   { alt: "Person with short brown hair and a beard, wearing a grey sweatshirt indoors", src: `${cdn}/811759779651a949df88ca8ce197173b0d082693-400x400.webp` },
