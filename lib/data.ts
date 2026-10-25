@@ -150,10 +150,10 @@ export const work: WorkItem[] = [
       "They came for a full build. We refused. A ₹10k roadmap was the honest sell, and we’d rather they came back ready than pay for execution they couldn’t use.",
     timeline: [
       ["Week 1–3", "Diagnosis: not ready to build."],
-      ["Roadmap", "90-day plan handed over."],
-      ["Calls", "Six 1:1s across the quarter."],
+      ["Roadmap", "100-day plan handed over."],
+      ["Calls", "Six 1:1s across the 100 days."],
     ],
-    delivered: ["Personalised 90-day roadmap", "Operating manuals & library", "Six 1:1 guidance calls", "Founder community"],
+    delivered: ["Personalised 100-day roadmap", "Operating manuals & library", "Six 1:1 guidance calls", "Founder community"],
     results: [
       ["Self-run", "they executed it"],
       ["55", "Startup Operating Score"],
