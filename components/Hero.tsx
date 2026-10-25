@@ -27,7 +27,7 @@ export default function Hero() {
       />
       <div className={`${containerClass} relative z-20 flex h-full flex-col items-center pt-[19vh] text-center text-white`}>
         <Wordmark className="text-[clamp(2.25rem,13vw,7.5rem)] leading-none text-sky-soft" />
-        <p className="mt-5 text-[1.75rem] leading-tight sm:text-[2.5rem]">India&apos;s first Startup Execution Studio</p>
+        <p className="mt-5 text-[1.75rem] leading-tight sm:text-[2.5rem]">Startup execution studio · Gurugram</p>
       </div>
       <HeroBackground />
       <HeroFog />
