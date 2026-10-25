@@ -577,8 +577,8 @@ export const testimonials: Testimonial[] = [
  */
 export const pricingFacts: [string, string][] = [
   ["One partner, not five", "Four functions under one roof. No vendor management, no invoices you didn’t expect."],
-  ["We move scope, not price", "If the roadmap changes at day 40, we rebuild the plan, at the same fee."],
-  ["A desk, not a login", "Three months at WeWork, building beside the cohort and the studio team."],
+  ["We move scope, not price", "If the roadmap changes at Day 40, we rebuild the plan, at the same fee."],
+  ["A desk, not a login", "Your own access card to our studio in Gurugram, building beside the cohort and the studio team."],
   ["Fifteen founders, no more", "We take the number we can actually move. That’s the whole reason for the call."],
 ];
 
@@ -590,23 +590,23 @@ export type PaymentStep = {
   when: string;
 };
 
-/** The whole fee, scheduled before the quarter starts. */
+/** The whole fee, scheduled before the 100 days start. */
 export const paymentSteps: PaymentStep[] = [
   {
-    title: "Book your seat",
-    body: "Pay ₹15,000 within 48 hours of the call to book your seat. It counts against the fee, so it isn’t extra, and it is non-refundable once the seat is held.",
-    amount: "₹15,000",
-    when: "Within 48 hrs of the call",
+    title: "Hold your seat",
+    body: "Within 48 hours of your decision call. It counts against the fee, so it isn’t extra, and it’s non-refundable once the seat is held.",
+    amount: "₹15,000 + GST",
+    when: "Within 48 hrs of your decision call",
   },
   {
     title: "Three payments while we build",
-    body: "The balance splits into three across the first 45 days, so you’re paying alongside the work, not ahead of it.",
-    amount: "3 × ₹95,000",
-    when: "Within 45 days",
+    body: "On Day 0, Day 31 and Day 45, so you pay alongside the work, not ahead of it.",
+    amount: "3 × ₹95,000 + GST",
+    when: "Day 0, Day 31 and Day 45",
   },
   {
-    title: "Days 46 to 90",
-    body: "The build keeps running to pitch day. There’s nothing left to pay for it.",
+    title: "Days 46 to 100",
+    body: "The build keeps running to Pitch Day. There’s nothing left to pay.",
     amount: "₹0",
     when: "Nothing further",
   },
@@ -629,10 +629,10 @@ export const pricing = {
   fee: "₹3,00,000",
   gst: "+ GST",
   total: "₹3,00,000 + GST",
-  cohort: "The 90 · Q3 cohort",
+  cohort: "Cohort 01 · starts November",
   seats: 15,
   seatsLeft: 6,
-  fine: "You only pay after the call, and only if we both decide to build.",
+  fine: "You only pay once we’ve both decided to build, after your Selection Session.",
 };
 
 /** Clarity both ways: what the fee buys, and what deliberately stays on your card. */
@@ -644,7 +644,7 @@ export const ledgerIn: string[] = [
   "The full studio team",
   "Vetted partners",
   "Weekly masterclasses",
-  "3 months at WeWork",
+  "Your access card to the studio",
   "The founder cohort",
   "Weekly 1:1s",
 ];
