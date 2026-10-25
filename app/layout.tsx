@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import CookieBanner from "@/components/CookieBanner";
 import MetaPixel from "@/components/MetaPixel";
+import SiteEvents from "@/components/SiteEvents";
 import { consentBootstrap } from "@/lib/consent";
 import { SITE_URL } from "@/lib/site";
 import "./globals.css";
@@ -67,6 +68,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {children}
         <CookieBanner />
         <MetaPixel />
+        <SiteEvents />
       </body>
       {GA_ID && <GoogleAnalytics gaId={GA_ID} />}
     </html>
