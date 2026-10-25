@@ -305,6 +305,7 @@ export default function Journey() {
       lineEl.style.top = `${lineTop}%`;
       lineEl.style.height = `${lineBot - lineTop}%`;
       fillEl.style.top = `${lineTop}%`;
+      fillEl.style.height = `${lineBot - lineTop}%`;
       if (startDot.current) startDot.current.style.top = `${lineTop}%`;
       if (endDot.current) endDot.current.style.top = `${lineBot}%`;
       anchors = journeyPhases.map((phase, i) => {
@@ -327,7 +328,7 @@ export default function Journey() {
     const settle = () => {
       // Reduced motion: show the finished 100 days rather than animating them.
       markerEl.style.top = `${lineBot}%`;
-      fillEl.style.height = `${lineBot - lineTop}%`;
+      fillEl.style.transform = "none";
       setDay(LAST_DAY);
       setActive(journeyPhases.length - 1);
     };
@@ -338,8 +339,10 @@ export default function Journey() {
       const focus = window.innerHeight * 0.42;
       const progress = Math.max(0, Math.min(1, (focus - r.top) / (r.height || 1)));
       const centre = lineTop + progress * (lineBot - lineTop);
-      markerEl.style.top = `${centre}%`;
-      fillEl.style.height = `${Math.max(0, centre - lineTop)}%`;
+      // Both move on transforms, not `top`/`height`: this runs on every scroll frame
+      // over a rail thousands of pixels tall, and a phone shouldn't relayout for it.
+      markerEl.style.transform = `translate3d(0, ${(centre / 100) * r.height}px, 0)`;
+      fillEl.style.transform = `scaleY(${progress})`;
       const today = Math.max(1, Math.min(LAST_DAY, Math.round(dayAt(progress))));
       setDay(today);
       // The live card is the one whose days the counter is in, so the two never disagree.
@@ -386,7 +389,11 @@ export default function Journey() {
         <div className="mt-10 grid grid-cols-[6rem_1fr] gap-x-2.5 md:grid-cols-[11rem_1fr] md:gap-x-4 lg:mt-16 lg:grid-cols-[12rem_1fr] lg:gap-x-6">
           <div ref={rail} className="relative">
             <span ref={line} className="bg-dark/10 absolute left-1/2 w-px -translate-x-1/2 rounded" />
-            <span ref={fill} className="bg-dark absolute left-1/2 w-px -translate-x-1/2 rounded transition-[height] duration-100 ease-linear" />
+            <span
+              ref={fill}
+              className="bg-dark absolute left-1/2 w-px origin-top -translate-x-1/2 rounded transition-transform duration-100 ease-linear"
+              style={{ transform: "scaleY(0)" }}
+            />
             {/* Decade marks: the rail as a ruler, so the travel is measured and not just long. */}
             {decades.map((d, i) => {
               const hidden = d >= day ? d - day < reach[1] : day - d < reach[0];
@@ -415,7 +422,7 @@ export default function Journey() {
 
             <div
               ref={marker}
-              className="absolute top-0 left-1/2 z-10 -translate-x-1/2 -translate-y-1/2 transition-[top] duration-100 ease-linear [--fa-size:118px] md:[--fa-size:clamp(118px,13vw,190px)]"
+              className="absolute top-0 left-1/2 z-10 -translate-x-1/2 -translate-y-1/2 transition-transform duration-100 ease-linear [--fa-size:96px] md:[--fa-size:clamp(118px,13vw,190px)]"
             >
               <p className="sr-only">
                 {phase.days}: {phase.tag}.
@@ -423,7 +430,9 @@ export default function Journey() {
               <FounderAvatar day={day} />
               <div ref={caption} aria-hidden="true" className="absolute top-full left-1/2 mt-3.5 flex -translate-x-1/2 flex-col items-center gap-2">
                 <span className="mono-text border-dark/15 text-dark rounded-full border bg-white px-3 py-1.5 whitespace-nowrap tabular-nums">Day {day}</span>
-                <span className="bg-dark mono-text rounded-full px-3 py-1.5 whitespace-nowrap text-white">{phase.tag}</span>
+                {/* Too wide for the phone rail ("Set up and prove" would run off the screen), and
+                    the live card beside it carries the same tag. */}
+                <span className="bg-dark mono-text rounded-full px-3 py-1.5 whitespace-nowrap text-white max-md:hidden">{phase.tag}</span>
               </div>
             </div>
           </div>
