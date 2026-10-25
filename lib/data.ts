@@ -612,16 +612,16 @@ export const paymentSteps: PaymentStep[] = [
   },
 ];
 
-/** What the fee covers, as `[the thing, what it means]`. */
+/** What the fee covers, as `[the thing, the rest of the line]`; the rest carries its own lead-in. */
 export const feeIncludes: [string, string][] = [
-  ["Ten live planning classes", "your 90-day roadmap, built with you in days 1–10"],
-  ["Website and product development", "real product, with AI inside it"],
-  ["Growth and marketing", "positioning through to demand"],
-  ["Legal and compliance", "from incorporation to data room, whatever the build needs"],
-  ["The full studio team", "plus vetted partners on call"],
-  ["Weekly 1:1s and masterclasses", "an industry expert, live, every week"],
-  ["Three months at WeWork", "and a live dashboard on the build"],
-  ["Pitch day", "you present 90 days of proof to investors and operators"],
+  ["Ten live planning classes", " in Days 1–10"],
+  ["Website and product development", ", with AI inside it"],
+  ["Growth and marketing", ", positioning through to demand"],
+  ["Legal and compliance", ", from incorporation to data room"],
+  ["The full studio team", ", plus vetted partners on call"],
+  ["Weekly 1:1s and masterclasses", " with investors, founders and industry experts"],
+  ["Your access card to the studio", ", and a live dashboard on the build"],
+  ["Pitch Day", " on Day 100"],
 ];
 
 /** The one number on the page, and the cohort it buys a seat in. */

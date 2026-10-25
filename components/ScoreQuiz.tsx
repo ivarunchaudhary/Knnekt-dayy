@@ -816,13 +816,14 @@ function Fee() {
         <p className="text-xl leading-tight font-medium">What the fee covers</p>
         <p className="mono-text mt-2 font-mono text-dark/70">{pricing.cohort}</p>
         <ul className="mt-6 space-y-3 text-sm leading-tight">
-          {feeIncludes.map(([thing, note]) => (
+          {feeIncludes.map(([thing, rest]) => (
             <li key={thing} className="flex gap-3">
               <span aria-hidden="true" className="mt-0.5 flex size-[0.9375rem] shrink-0 items-center justify-center rounded-[4px] bg-sky-deep text-white">
                 {check}
               </span>
               <span className="text-dark/80">
-                <span className="font-medium text-dark">{thing}</span>, {note}
+                <span className="font-medium text-dark">{thing}</span>
+                {rest}
               </span>
             </li>
           ))}

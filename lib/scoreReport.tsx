@@ -457,9 +457,10 @@ function ReportDoc({ r, id }: { r: Result; id: Identity }) {
                 {pricing.cohort}
               </Mono>
               <View style={{ marginTop: 5 }}>
-                {feeIncludes.map(([thing, note]) => (
+                {feeIncludes.map(([thing, rest]) => (
                   <Item key={thing} mark="✓" color={DEEP} textColor={INK_80}>
-                    <Text style={{ fontWeight: 600, color: INK }}>{thing}</Text>, {note}
+                    <Text style={{ fontWeight: 600, color: INK }}>{thing}</Text>
+                    {rest}
                   </Item>
                 ))}
               </View>
