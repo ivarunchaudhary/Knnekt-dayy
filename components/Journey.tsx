@@ -4,23 +4,25 @@ import { useEffect, useRef, useState } from "react";
 import { journeyPhases } from "@/lib/data";
 import Container, { SectionHeading } from "./Container";
 
-/** What the founder is doing on any given day of the quarter — one scene per status. */
-const statuses = ["Start", "Classes", "Roadmap", "Building", "Customers", "Traction", "Pitch"];
-const statusFor = (day: number) => (day <= 3 ? 0 : day <= 10 ? 1 : day <= 16 ? 2 : day <= 45 ? 3 : day <= 82 ? 4 : day <= 89 ? 5 : 6);
+/** Pitch Day: the last day on the spine. */
+const LAST_DAY = 100;
+
+/** Which pose the founder is in on any given day of the 100 — one scene per status. */
+const statusFor = (day: number) => (day <= 3 ? 0 : day <= 10 ? 1 : day <= 30 ? 2 : day <= 55 ? 3 : day <= 85 ? 4 : day < LAST_DAY ? 5 : 6);
 /** Customers only start landing once what we built is in market. */
-const customersFor = (day: number) => Math.max(0, Math.min(100, Math.round(((day - 45) / 37) * 100)));
+const customersFor = (day: number) => Math.max(0, Math.min(100, Math.round(((day - 55) / 30) * 100)));
 
 /** Decade marks on the spine, so the eye has something to measure the travel against. */
-const decades = [10, 20, 30, 40, 50, 60, 70, 80];
+const decades = [10, 20, 30, 40, 50, 60, 70, 80, 90];
 
-/** One pose per status, drawn as the founder lives the quarter. */
+/** One pose per status, drawn as the founder lives the 100 days. */
 const poses = ["01-start", "02-classes", "03-roadmap", "04-building", "05-customers", "06-traction", "07-pitch"].map(
   (name) => `/founder/knnekt-founder-${name}.webp`,
 );
 
-/* The ring round the disc fills over the 90 days; a tick lights as each milestone passes. */
-const ringTicks = [4, 11, 17, 46, 83, 90].map((d) => {
-  const a = ((-90 + ((d - 1) / 89) * 360) * Math.PI) / 180;
+/* The ring round the disc fills over the 100 days; a tick lights as each status begins. */
+const ringTicks = [4, 11, 31, 56, 86, LAST_DAY].map((d) => {
+  const a = ((-90 + ((d - 1) / (LAST_DAY - 1)) * 360) * Math.PI) / 180;
   return { d, cx: (100 + 96 * Math.cos(a)).toFixed(2), cy: (100 + 96 * Math.sin(a)).toFixed(2) };
 });
 
@@ -32,10 +34,10 @@ const seats = Array.from({ length: 20 }, (_, k) => {
 
 /* The four disciplines light up one by one through the build. */
 const pills = [
-  { label: "AI", day: 22, x: 6, y: -2, w: 34, delay: "" },
-  { label: "Tech", day: 29, x: 158, y: -4, w: 44, delay: "d2" },
-  { label: "Legal", day: 36, x: -6, y: 180, w: 48, delay: "d3" },
-  { label: "Growth", day: 43, x: 156, y: 180, w: 56, delay: "d4" },
+  { label: "AI", day: 34, x: 6, y: -2, w: 34, delay: "" },
+  { label: "Tech", day: 40, x: 158, y: -4, w: 44, delay: "d2" },
+  { label: "Legal", day: 46, x: -6, y: 180, w: 48, delay: "d3" },
+  { label: "Growth", day: 52, x: 156, y: 180, w: 56, delay: "d4" },
 ];
 
 /**
@@ -90,7 +92,7 @@ function FounderAvatar({ day }: { day: number }) {
           r="96"
           pathLength={1000}
           transform="rotate(-90 100 100)"
-          style={{ strokeDashoffset: (1000 * (1 - (day - 1) / 89)).toFixed(1) }}
+          style={{ strokeDashoffset: (1000 * (1 - (day - 1) / (LAST_DAY - 1))).toFixed(1) }}
         />
         <g>
           {ringTicks.map((t) => (
@@ -160,11 +162,11 @@ function FounderAvatar({ day }: { day: number }) {
               <circle cx="47" cy="26.8" r="2.1" fill="#fff" />
             </g>
           </g>
-          <g transform="translate(112 176)">
+          <g transform="translate(106 176)">
             <g className="pop d2">
-              <rect className="chip" width="88" height="22" rx="11" />
-              <text className="ct" x="44" y="15">
-                90-day plan
+              <rect className="chip" width="96" height="22" rx="11" />
+              <text className="ct" x="48" y="15">
+                100-day plan
               </text>
             </g>
           </g>
@@ -233,15 +235,15 @@ function FounderAvatar({ day }: { day: number }) {
 }
 
 /**
- * The 90 days as a spine: a ruled rail that fills as you scroll, a founder riding it
- * from Day 1 → Day 90, and the four phases lighting up as it passes them. Position is
+ * The 100 days as a spine: a ruled rail that fills as you scroll, a founder riding it
+ * from Day 1 → Pitch Day on Day 100, and the four phases lighting up as it passes them. Position is
  * written straight to the DOM; only the day and the active phase (which change a few
  * dozen times across the whole section) go through state.
  *
  * The founder is the readout. Rather than a counter, the section shows what the day
  * means — the founder's expression changes scene by scene, from worried on day one
  * to composed on pitch day — with the day and the status hung underneath as two
- * slugs: a hairline one for the day, and the solid ink one for the status.
+ * slugs: a hairline one for the day, and the solid ink one for the phase.
  */
 export default function Journey() {
   const rail = useRef<HTMLDivElement>(null);
@@ -269,9 +271,29 @@ export default function Journey() {
     // The line stops half a marker short of each end, so the marker never hangs off the rail.
     let lineTop = 8;
     let lineBot = 92;
-    // Progress at which the last card (pitch day) arrives — the day counter holds at 90 from there.
-    let pitchStart = 0.85;
+    // Where each card starts along the rail, paired with the day it opens on, so the
+    // counter reads "Day 11" exactly as the "Days 11–30" card arrives. The last anchor is
+    // Pitch Day; the counter holds at 100 from there.
+    let anchors: [number, number][] = journeyPhases.map((phase, i) => [i / journeyPhases.length, phase.from]);
     let raf = 0;
+
+    const dayAt = (progress: number) => {
+      if (progress <= anchors[0][0]) return 1;
+      for (let i = 1; i < anchors.length; i++) {
+        const [p0, d0] = anchors[i - 1];
+        const [p1, d1] = anchors[i];
+        if (progress < p1) return d0 + ((progress - p0) / Math.max(0.0001, p1 - p0)) * (d1 - d0);
+      }
+      return LAST_DAY;
+    };
+    const progressAt = (day: number) => {
+      for (let i = 1; i < anchors.length; i++) {
+        const [p0, d0] = anchors[i - 1];
+        const [p1, d1] = anchors[i];
+        if (day <= d1) return p0 + ((day - d0) / Math.max(1, d1 - d0)) * (p1 - p0);
+      }
+      return anchors[anchors.length - 1][0];
+    };
 
     const place = () => {
       const r = railEl.getBoundingClientRect();
@@ -285,28 +307,28 @@ export default function Journey() {
       fillEl.style.top = `${lineTop}%`;
       if (startDot.current) startDot.current.style.top = `${lineTop}%`;
       if (endDot.current) endDot.current.style.top = `${lineBot}%`;
-      const last = cards.current[cards.current.length - 1];
-      if (last) {
-        const q = last.getBoundingClientRect();
-        pitchStart = Math.max(0.05, Math.min(0.985, (q.top - r.top) / railH));
-      }
-      // Days 1–89 are spread over the run up to pitch day, so each decade mark lands on
-      // exactly the point where the counter reads it. Day 90 is the end dot already.
+      anchors = journeyPhases.map((phase, i) => {
+        const card = cards.current[i];
+        const p = card ? (card.getBoundingClientRect().top - r.top) / railH : i / journeyPhases.length;
+        return [Math.max(0, Math.min(0.985, p)), phase.from];
+      });
+      // Each decade mark sits where the counter reads it. Day 100 is the end dot already.
       const span = lineBot - lineTop;
       decades.forEach((d, i) => {
         const tick = ticks.current[i];
-        if (tick) tick.style.top = `${lineTop + ((d - 1) / 88) * pitchStart * span}%`;
+        if (tick) tick.style.top = `${lineTop + progressAt(d) * span}%`;
       });
-      const daysPerPx = 88 / Math.max(0.0001, (pitchStart * span * railH) / 100);
+      const pitchStart = anchors[anchors.length - 1][0];
+      const daysPerPx = (LAST_DAY - 2) / Math.max(0.0001, (pitchStart * span * railH) / 100);
       const below = halfPx + (caption.current?.offsetHeight ?? 0) + 12;
       setReach([halfPx * daysPerPx + 1, below * daysPerPx + 1]);
     };
 
     const settle = () => {
-      // Reduced motion: show the finished quarter rather than animating one.
+      // Reduced motion: show the finished 100 days rather than animating them.
       markerEl.style.top = `${lineBot}%`;
       fillEl.style.height = `${lineBot - lineTop}%`;
-      setDay(90);
+      setDay(LAST_DAY);
       setActive(journeyPhases.length - 1);
     };
 
@@ -318,21 +340,10 @@ export default function Journey() {
       const centre = lineTop + progress * (lineBot - lineTop);
       markerEl.style.top = `${centre}%`;
       fillEl.style.height = `${Math.max(0, centre - lineTop)}%`;
-      const raw = progress < pitchStart ? 1 + (progress / pitchStart) * 88 : 90;
-      setDay(Math.max(1, Math.min(90, Math.round(raw))));
-
-      let best = 0;
-      let bestDistance = Infinity;
-      cards.current.forEach((card, i) => {
-        if (!card) return;
-        const cr = card.getBoundingClientRect();
-        const distance = Math.abs(cr.top + cr.height / 2 - focus);
-        if (distance < bestDistance) {
-          bestDistance = distance;
-          best = i;
-        }
-      });
-      setActive(best);
+      const today = Math.max(1, Math.min(LAST_DAY, Math.round(dayAt(progress))));
+      setDay(today);
+      // The live card is the one whose days the counter is in, so the two never disagree.
+      setActive(Math.max(0, journeyPhases.findLastIndex((phase) => today >= phase.from)));
     };
 
     place();
@@ -362,14 +373,14 @@ export default function Journey() {
     };
   }, []);
 
-  const status = statuses[statusFor(day)];
-  const customers = customersFor(day);
+  // The slugs under the founder name the movement of the 100 days they're in.
+  const phase = journeyPhases.find((p) => day <= p.to) ?? journeyPhases[journeyPhases.length - 1];
 
   return (
     <section id="journey" className="pt-12 pb-24 md:py-28">
       <Container>
-        <SectionHeading lead="Day 1 to pitch day.">
-          Ten live classes to plan the quarter with you, then eighty days where the studio builds and launches it. Scroll it through and follow the founder from the first class to pitch day.
+        <SectionHeading lead="Day 1 to Pitch Day.">
+          Ten days to plan it with you. Ninety days to build it with you. Then you pitch it, live.
         </SectionHeading>
 
         <div className="mt-10 grid grid-cols-[6rem_1fr] gap-x-2.5 md:grid-cols-[11rem_1fr] md:gap-x-4 lg:mt-16 lg:grid-cols-[12rem_1fr] lg:gap-x-6">
@@ -407,12 +418,12 @@ export default function Journey() {
               className="absolute top-0 left-1/2 z-10 -translate-x-1/2 -translate-y-1/2 transition-[top] duration-100 ease-linear [--fa-size:118px] md:[--fa-size:clamp(118px,13vw,190px)]"
             >
               <p className="sr-only">
-                Day {day} of 90: {status}. {customers} customers.
+                {phase.days}: {phase.tag}.
               </p>
               <FounderAvatar day={day} />
               <div ref={caption} aria-hidden="true" className="absolute top-full left-1/2 mt-3.5 flex -translate-x-1/2 flex-col items-center gap-2">
                 <span className="mono-text border-dark/15 text-dark rounded-full border bg-white px-3 py-1.5 whitespace-nowrap tabular-nums">Day {day}</span>
-                <span className="bg-dark mono-text rounded-full px-3 py-1.5 whitespace-nowrap text-white">{status}</span>
+                <span className="bg-dark mono-text rounded-full px-3 py-1.5 whitespace-nowrap text-white">{phase.tag}</span>
               </div>
             </div>
           </div>

@@ -246,25 +246,24 @@ export const team = [
   { alt: "Person with dark hair tied back, wearing a beige turtleneck sweater and hoop earrings, standing indoors", src: `${cdn}/cfc12095e86efb371285ab2914add93ecdc9bc94-400x400.webp` },
 ];
 
-/** The 90 days, stage by stage — ticker in the facts list. */
+/** The 100 days, stage by stage — ticker in the facts list. */
 export const journey = [
-  "Day 1–10 · Plan it together",
-  "Day 11–90 · Build & launch",
-  "Day 90 · First 100 customers",
-  "Day 90 · Fund-ready",
-  "Day 90 · Pitch day",
+  "Days 1–10 · Roadmap Sprint",
+  "Days 11–30 · Set up and prove",
+  "Days 31–100 · Build",
+  "Day 100 · Pitch Day",
 ];
 
-/** The four movements of the quarter, walked through by the scroll-driven spine. */
+/** The four movements of the 100 days, walked through by the scroll-driven spine. */
 export type JourneyPhase = {
   days: string;
   tag: string;
   title: string;
   body: string;
   /**
-   * The slice of the quarter this movement owns, so the strip and the rows agree on
-   * which one is live. The labels overlap on purpose—"Days 11–90" and "By day 90"
-   * are narrative, not sequential—so the boundaries are stated rather than parsed.
+   * The slice of the 100 days this movement owns, so the strip and the rows agree on
+   * which one is live. "Days 31–100" runs up to Pitch Day rather than through it, so
+   * the boundaries are stated rather than parsed.
    */
   from: number;
   to: number;
@@ -274,59 +273,59 @@ export type JourneyPhase = {
 export const journeyPhases: JourneyPhase[] = [
   {
     days: "Days 1\u201310",
-    tag: "Plan \u00b7 ten live classes",
+    tag: "Roadmap Sprint",
     from: 1,
     to: 10,
     title: "We plan it with you.",
-    body: "Ten live classes. We read your real constraints, then map all 90 days to the goal\u2014together.",
+    body: "Ten live classes: we read your real constraints, map the build, and set one goal together, the goal our Goal Promise is measured against.",
     bars: [
-      ["Read constraints", "Where you actually are."],
-      ["Map 90 days", "Week by week, one plan."],
-      ["Set the goal", "The number we build around."],
+      ["Read constraints", "Where you really are."],
+      ["Map the build", "One plan, ten classes."],
+      ["Set the goal", "What we\u2019re measured against."],
     ],
   },
   {
-    days: "Days 11\u201390",
-    tag: "Build & launch",
+    days: "Days 11\u201330",
+    tag: "Set up and prove",
     from: 11,
-    to: 82,
+    to: 30,
+    title: "We get the foundations right.",
+    body: "We lock your positioning, prove it with real customers, set up legal and scope the product.",
+    bars: [
+      ["Lock positioning", "Who it\u2019s for."],
+      ["Prove demand", "Real buyers, not opinions."],
+      ["Set foundations", "Legal set up, product scoped."],
+    ],
+  },
+  {
+    days: "Days 31\u2013100",
+    tag: "Build",
+    from: 31,
+    to: 99,
     title: "We build. You steer.",
-    body: "The full studio ships across product, growth, AI, legal and compliance while you make the calls.",
+    body: "Product, growth, AI and legal ship together, while you make the calls.",
     bars: [
-      ["Website & MVP", "Real product\u2014with AI inside."],
-      ["Growth engine", "Positioning to demand."],
-      ["Legal & compliance", "Structure, done right."],
+      ["Ship the product", "Website and MVP, AI inside."],
+      ["Grow demand", "Positioning to demand."],
+      ["Run AI and legal", "Operations and clean records."],
     ],
   },
   {
-    days: "By day 90",
-    tag: "The outcome",
-    from: 83,
-    to: 89,
-    title: "100 customers. Fund-ready. Real traction.",
-    body: "At day 90 you have proof\u2014not a pretty deck. Customers using what we built.",
+    days: "Day 100",
+    tag: "Pitch Day",
+    from: 100,
+    to: 100,
+    title: "Then you pitch it, live.",
+    body: "You present what you built to a room of investors and operators.",
     bars: [
-      ["100 customers", "In market, paying attention."],
-      ["Fund-ready", "The metrics and the narrative."],
-      ["Real traction", "Momentum you can point to."],
-    ],
-  },
-  {
-    days: "Day 90",
-    tag: "Pitch day",
-    from: 90,
-    to: 90,
-    title: "Then you pitch it live.",
-    body: "The cohort\u2019s demo day\u2014you present 90 days of proof to a room of investors and operators.",
-    bars: [
-      ["Present live", "You take the stage."],
-      ["The room", "Investors and operators."],
-      ["Warm intros", "The conversations that follow."],
+      ["Pitch live", "To investors and operators."],
+      ["Show the proof", "The four things investors check."],
+      ["Goal Promise", "Missed? 30 more days, free."],
     ],
   },
 ];
 
-/** Pillars light up on the spine as the quarter reaches each one. */
+/** Pillars light up on the spine as the build reaches each one. */
 export const journeyPillars: [string, number][] = [
   ["Growth", 22],
   ["Technology", 29],
