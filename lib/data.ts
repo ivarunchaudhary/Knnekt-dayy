@@ -173,13 +173,15 @@ export const services = [
     title: "Growth & Marketing",
     text: "How you’re found, understood and remembered, turning attention into customers who come back and bring others. Positioning first, then demand: we don’t spend to grow before the story is proven.",
     capabilities: ["Positioning", "Branding", "Marketing", "Content creation", "Demand generation", "Retention"],
+    proof: "A real customer base and measurable traction.",
     bg: `${cdn}/7fa74a1ccdcb8015276c6112898c48b4bdcb3da7-1920x1112.webp`,
   },
   {
     id: "technology",
     title: "Technology",
-    text: "The product and the systems behind it, built properly so they hold weight as you grow, without a rebuild later. Website and MVP inside the quarter, with the ops stack that keeps them running.",
+    text: "The product and the systems behind it, built properly so they hold weight as you grow, without a rebuild later. Website and MVP inside the 100 days, with the ops stack that keeps them running.",
     capabilities: ["Website development", "App development", "Ops stack", "Integrations", "Analytics setup", "Automation"],
+    proof: "A product people actually use.",
     bg: `${cdn}/5972f7b6bc093c048edc54c40149f78a8af834ae-1920x1112.webp`,
   },
   {
@@ -187,6 +189,7 @@ export const services = [
     title: "AI Enablement",
     text: "AI put to work across the business, so the repeatable runs itself and your team spends its time on the rare. Inside the product where it earns its place, and behind it where it saves you hires.",
     capabilities: ["Workflow automation", "Sales & support AI", "Custom AI tools", "Data setup", "Prompt systems", "Agentic workflows"],
+    proof: "Operations that run without you, and data investors can trust.",
     bg: `${cdn}/5c0766161f4835c1f8d9489e22128bfc71aad1ff-1920x1112.webp`,
   },
   {
@@ -194,6 +197,7 @@ export const services = [
     title: "Legal & Compliance",
     text: "The paperwork that decides whether a raise goes smoothly, handled early, before it gets expensive to fix. Incorporation, cap table and contracts done once, properly, and a data room that holds up.",
     capabilities: ["Incorporation", "Cap table", "Contracts", "IP assignment", "Compliance", "Data room"],
+    proof: "Clean records for investors, and eligibility for the schemes and grants built for startups.",
     bg: `${cdn}/84a716626708bc871945e911c39039eb81ec16c1-1920x1112.webp`,
   },
 ];

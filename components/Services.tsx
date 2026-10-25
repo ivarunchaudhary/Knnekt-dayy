@@ -62,7 +62,9 @@ export default function Services() {
         return (
           <div key={s.id} data-panel className={panelClass}>
             <h2 className="text-2xl font-medium text-white lg:sr-only">
-              <span className="block text-white/50">Under one roof, we run</span>
+              <span className="block text-white/50">
+                <span className="text-white">Under one roof,</span> we run
+              </span>
               <span className="block">{s.title}</span>
             </h2>
             <div
@@ -85,7 +87,9 @@ export default function Services() {
           <div className="mx-auto hidden w-full max-w-418 grid-cols-12 px-9 text-3xl font-medium text-white lg:grid">
             <div className="col-span-5 flex h-full flex-col">
               <div className="flex h-1/2 flex-col justify-end">
-                <h2 className="text-white/50">Under one roof, we run</h2>
+                <h2>
+                  <span className="text-white">Under one roof,</span> <span className="text-white/50">we run</span>
+                </h2>
               </div>
               <div className="relative h-1/2">
                 {services.map((s, i) => (
@@ -138,6 +142,16 @@ function ServiceCard({ service: s }: { service: (typeof services)[number] }) {
             </li>
           ))}
         </ul>
+        <div
+          role="group"
+          aria-labelledby={`service-proof-title-${s.id}`}
+          className="mt-6 rounded-lg border border-sky-deep/25 bg-sky-soft/40 px-4 py-3.5 lg:[@media(max-height:910px)]:mt-4"
+        >
+          <p id={`service-proof-title-${s.id}`} className="mono-text font-mono leading-tight text-sky-deep">
+            The proof it creates
+          </p>
+          <p className="mt-1.5 text-sm leading-tight font-medium">{s.proof}</p>
+        </div>
       </div>
     </div>
   );
