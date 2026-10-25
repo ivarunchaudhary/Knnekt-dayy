@@ -27,6 +27,10 @@ export default function Services() {
     const el = root.current;
     if (!el) return;
     const panels = Array.from(el.querySelectorAll<HTMLElement>("[data-panel]"));
+    // The panels only stack from `lg` up, where they are sticky. Below that they
+    // scroll past one another like any other block, and pushing a card back as the
+    // next one approached would fade it out while it is still being read.
+    const stacked = window.matchMedia("(min-width: 64rem)");
     let raf = 0;
     const update = () => {
       raf = 0;
@@ -38,7 +42,8 @@ export default function Services() {
         const next = panels[i + 1];
         const card = cards.current[i];
         if (!card) return;
-        const covered = next ? Math.min(1, Math.max(0, 1 - next.getBoundingClientRect().top / vh)) : 0;
+        const covered =
+          next && stacked.matches ? Math.min(1, Math.max(0, 1 - next.getBoundingClientRect().top / vh)) : 0;
         card.style.opacity = String(Math.max(0, 1 - covered * 1.4));
         card.style.transform = `scale(${1 - covered * 0.06}) translateY(${-covered * 40}px)`;
       });
