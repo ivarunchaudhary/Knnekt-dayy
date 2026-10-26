@@ -89,14 +89,14 @@ var CORE = [
   'Already in place',
   'Hours a week',
   'Capital',
-  'Budget band',
   'Market confidence %',
   'Benchmark model',
   'Benchmark median',
   'Benchmark top third',
   'Benchmark scale ready',
   'Raw total',
-  'Community opt-in',
+  'WhatsApp consent',
+  'Scholarship',
   'Report emailed',
   'Instrument version'
 ];
@@ -207,10 +207,10 @@ function appendSubmission(data) {
   row['Already in place'] = list(data.built_milestones);
   row['Hours a week'] = data.g1_hours;
   row['Capital'] = data.g2_capital;
-  row['Budget band'] = data.g3_band;
   row['Market confidence %'] = data.market_confidence;
   row['Raw total'] = data.raw_total;
-  row['Community opt-in'] = data.community_optin ? 'Yes' : 'No';
+  row['WhatsApp consent'] = data.whatsapp_consent ? 'Yes' : 'No';
+  row['Scholarship'] = data.scholarship_summary;
   row['Report emailed'] = data.emailed ? 'Yes' : 'No';
   row['Instrument version'] = data.instrument_version;
   row[SESSION_COLUMN] = data.session_id || '';
@@ -262,7 +262,8 @@ function savePartial(data) {
   row['Phone'] = data.phone;
   row['Stopped at'] = data.stopped_at;
   row['Questions answered'] = data.answered;
-  row['Community opt-in'] = data.community_optin ? 'Yes' : 'No';
+  row['WhatsApp consent'] = data.whatsapp_consent ? 'Yes' : 'No';
+  row['Scholarship'] = data.scholarship_summary;
   row[SESSION_COLUMN] = session;
 
   var seen = {};

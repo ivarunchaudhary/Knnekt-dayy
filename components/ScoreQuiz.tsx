@@ -1,14 +1,15 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { IconBrandWhatsapp } from "@tabler/icons-react";
 import { createPortal } from "react-dom";
 import { feeIncludes, ledgerIn, paymentSteps, pricing, pricingFacts, scorePillars } from "@/lib/data";
 import {
-  CONFIG,
   SECTIONS,
   answered,
   archetypes,
+  blankScholarship,
   gateCopy,
   grade,
   pageMeta,
@@ -16,11 +17,13 @@ import {
   pillars,
   questions,
   responses,
+  scholarshipTracks,
   touched,
   verdicts,
   type Answers,
   type Identity,
   type Result,
+  type Scholarship,
 } from "@/lib/score";
 import { identify, track, useFormTracking } from "@/lib/pixel";
 import { LADDER, plan as planFor, planCopy, type Month, type Plan } from "@/lib/scorePlan";
@@ -78,11 +81,106 @@ const check = (
   </svg>
 );
 
-type Errors = Partial<Record<"name" | "email" | "phone", string>>;
+type Errors = Partial<Record<"name" | "email" | "phone" | "waConsent" | "schTrack" | "schCity", string>>;
 const looksLikeEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim());
 const looksLikePhone = (v: string) => v.replace(/\D/g, "").length >= 8;
+const checkClass = "flex cursor-pointer items-start gap-3 rounded-lg border px-4 py-3 text-sm leading-tight transition-colors has-[:checked]:border-sky-deep has-[:checked]:bg-gray-100 hover:border-sky-deep";
 
-/** Page one: who we're scoring, where the report goes, and the community box. */
+/** The scholarship ask: one box, then the track, then whatever that track needs. */
+function ScholarshipField({ value, errors, onChange }: { value: Scholarship; errors: Errors; onChange: (sc: Scholarship) => void }) {
+  return (
+    <div>
+      <label className={`${checkClass} border-dark/15`}>
+        <input
+          type="checkbox"
+          className="mt-0.5 size-4 shrink-0 accent-sky-deep"
+          aria-describedby="sch-req-help"
+          checked={value.requested}
+          onChange={(e) => onChange(e.target.checked ? { ...value, requested: true } : blankScholarship())}
+        />
+        <span>
+          <span className="font-medium">Consider me for a scholarship</span>{" "}
+          <span id="sch-req-help" className="text-dark/70">
+            One full scholarship every cohort, and 20–30% off the fee on four tracks. Asking doesn’t affect your selection.
+          </span>
+        </span>
+      </label>
+      {value.requested && (
+        <>
+          <fieldset className="mt-5 min-w-0" aria-describedby={errors.schTrack ? "sch-track-error" : undefined}>
+            <legend className={`${labelClass} mb-2`}>Which track fits you best?</legend>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {scholarshipTracks.map((t) => (
+                <label
+                  key={t.key}
+                  className={`flex cursor-pointer items-start gap-3 rounded-lg border px-4 py-3 text-sm leading-tight transition-colors hover:border-sky-deep has-[:checked]:border-sky-deep has-[:checked]:bg-gray-100 ${errors.schTrack ? "border-[#b3261e]" : "border-dark/15"}`}
+                >
+                  <input
+                    type="radio"
+                    name="sch-track"
+                    value={t.key}
+                    className="mt-px size-4 shrink-0 accent-sky-deep"
+                    checked={value.track === t.key}
+                    aria-describedby={errors.schTrack ? "sch-track-error" : undefined}
+                    onChange={() => onChange({ ...value, track: t.key, city: t.key === "beyond_metros" ? value.city : "", prior: t.key === "second_time" ? value.prior : "" })}
+                  />
+                  <span>
+                    <span className="block font-medium">{t.name}</span>
+                    <span className="mt-1 block text-dark/70">{t.desc}</span>
+                  </span>
+                </label>
+              ))}
+            </div>
+            {errors.schTrack && (
+              <span id="sch-track-error" className={errorClass}>
+                {errors.schTrack}
+              </span>
+            )}
+            <p className="mt-3 text-xs leading-tight text-dark/70">Everyone who asks is also considered for the Full Scholarship (100%).</p>
+          </fieldset>
+          {value.track === "beyond_metros" && (
+            <p className="mt-5">
+              <label className={labelClass} htmlFor="sch-city">
+                Which city are you building from?
+              </label>
+              <input
+                id="sch-city"
+                type="text"
+                maxLength={60}
+                autoComplete="address-level2"
+                aria-required="true"
+                className={fieldClass}
+                placeholder="e.g. Indore"
+                value={value.city}
+                onChange={(e) => onChange({ ...value, city: e.target.value })}
+                aria-invalid={!!errors.schCity}
+                aria-describedby={errors.schCity ? "sch-city-error" : undefined}
+              />
+              {errors.schCity && (
+                <span id="sch-city-error" className={errorClass}>
+                  {errors.schCity}
+                </span>
+              )}
+            </p>
+          )}
+          {value.track === "second_time" && (
+            <p className="mt-5">
+              <label className={labelClass} htmlFor="sch-prior">
+                What did you build before? One line <span className="text-dark/50">(optional)</span>
+              </label>
+              <input id="sch-prior" type="text" maxLength={120} className={fieldClass} placeholder="e.g. A D2C snacks brand, 2021–23" value={value.prior} onChange={(e) => onChange({ ...value, prior: e.target.value })} />
+            </p>
+          )}
+          {value.track === "need_based" && (
+            <p className="mt-5 rounded-lg bg-gray-100 px-4 py-3 text-sm leading-tight text-dark/80">We’ll ask for simple proof of income at your Selection Session. Nothing to upload now.</p>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+/** Page one: who we're scoring, where the report goes, and the scholarship ask. */
 function IdentityForm({ initial, onDraft, onNext }: { initial: Identity; onDraft: (id: Identity) => void; onNext: (id: Identity) => void }) {
   const [id, setId] = useState<Identity>(initial);
   const [errors, setErrors] = useState<Errors>({});
@@ -92,18 +190,27 @@ function IdentityForm({ initial, onDraft, onNext }: { initial: Identity; onDraft
     setId((v) => ({ ...v, [key]: e.target.value }));
     setErrors((prev) => (prev[key] ? { ...prev, [key]: undefined } : prev));
   };
+  const setScholarship = (sc: Scholarship) => {
+    setId((v) => ({ ...v, scholarship: sc }));
+    setErrors((prev) => ({ ...prev, schTrack: sc.track ? undefined : prev.schTrack, schCity: undefined }));
+  };
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     const found: Errors = {};
+    const sc = id.scholarship;
     if (id.name.trim().length < 2) found.name = "Tell us who you are.";
     if (!looksLikeEmail(id.email)) found.email = "That address doesn’t look right, and it’s where the report goes.";
     if (!looksLikePhone(id.phone)) found.phone = "We need a number we can actually call.";
+    if (!id.waConsent) found.waConsent = "Tick this so we can send your report on WhatsApp.";
+    if (sc.requested && !sc.track) found.schTrack = "Pick the track that fits you best.";
+    if (sc.requested && sc.track === "beyond_metros" && sc.city.trim().length < 2) found.schCity = "Tell us which city you’re building from.";
     setErrors(found);
     if (Object.keys(found).length) {
-      document.querySelector<HTMLElement>("[aria-invalid='true']")?.focus();
+      // After the render that marks them, so the first bad field takes focus.
+      window.setTimeout(() => document.querySelector<HTMLElement>("[aria-invalid='true'], [aria-describedby='sch-track-error']")?.focus());
       return;
     }
-    onNext({ ...id, name: id.name.trim(), email: id.email.trim().toLowerCase(), phone: id.phone.trim() });
+    onNext({ ...id, name: id.name.trim(), email: id.email.trim().toLowerCase(), phone: id.phone.trim(), scholarship: { ...sc, city: sc.city.trim(), prior: sc.prior.trim() } });
   };
   return (
     <form noValidate onSubmit={submit} className="flex flex-1 flex-col motion-safe:animate-[score-in_0.5s_var(--ease-out-expo)_both]">
@@ -133,7 +240,7 @@ function IdentityForm({ initial, onDraft, onNext }: { initial: Identity; onDraft
             </span>
           )}
         </p>
-        <p>
+        <div>
           <label className={labelClass} htmlFor="score-phone">
             Contact number
           </label>
@@ -143,14 +250,29 @@ function IdentityForm({ initial, onDraft, onNext }: { initial: Identity; onDraft
               {errors.phone}
             </span>
           )}
-        </p>
-        <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-dark/15 px-4 py-3 text-sm leading-tight transition-colors has-[:checked]:border-sky-deep has-[:checked]:bg-gray-100 hover:border-sky-deep">
-          <input type="checkbox" className="mt-0.5 size-4 shrink-0 accent-sky-deep" checked={id.optin} onChange={(e) => setId((v) => ({ ...v, optin: e.target.checked }))} />
-          <span>
-            <span className="font-medium">Add me to the Knnekt founder WhatsApp community.</span>{" "}
-            <span className="text-dark/70">Insights, what other founders are working through, and what’s changing in the market. Nothing to buy.</span>
-          </span>
-        </label>
+          <label className={`${checkClass} mt-3 ${errors.waConsent ? "border-[#b3261e]" : "border-dark/15"}`}>
+            <input
+              type="checkbox"
+              aria-required="true"
+              className="mt-0.5 size-4 shrink-0 accent-sky-deep"
+              checked={id.waConsent}
+              aria-invalid={!!errors.waConsent}
+              aria-describedby={errors.waConsent ? "score-wa-error" : undefined}
+              onChange={(e) => {
+                const on = e.target.checked;
+                setId((v) => ({ ...v, waConsent: on }));
+                if (on) setErrors((prev) => ({ ...prev, waConsent: undefined }));
+              }}
+            />
+            <span className="font-medium">We’ll send your report and updates on WhatsApp.</span>
+          </label>
+          {errors.waConsent && (
+            <span id="score-wa-error" className={errorClass}>
+              {errors.waConsent}
+            </span>
+          )}
+        </div>
+        <ScholarshipField value={id.scholarship} errors={errors} onChange={setScholarship} />
       </div>
       <p className="mt-6 flex flex-wrap items-center justify-between gap-3">
         <button type="submit" className={primaryBtn}>
@@ -161,8 +283,8 @@ function IdentityForm({ initial, onDraft, onNext }: { initial: Identity; onDraft
         </span>
       </p>
       <p className="mt-6 border-t border-dark/15 pt-5 text-xs leading-tight text-dark/70">
-        Your report lands in this inbox as a PDF the moment you finish. We’ll call you on this number to walk through it, so you don’t book anything. Answer honestly, not optimistically: the score
-        is only as accurate as you are.
+        Your report lands in this inbox as a PDF the moment you finish. We’ll call you on this number within 24 hours to walk through it, so you don’t book anything. Answer honestly, not
+        optimistically: the score is only as accurate as you are.
       </p>
     </form>
   );
@@ -383,9 +505,24 @@ function Page({
         <button type="button" onClick={onBack} className={ghostBtn}>
           ← Back
         </button>
-        <button type="button" onClick={tryNext} className={primaryBtn}>
-          {last ? "See my result →" : "Continue →"}
-        </button>
+        <span className="flex flex-wrap items-center justify-end gap-x-4 gap-y-2">
+          {last && (
+            <span className="max-w-[30ch] text-right text-xs leading-tight text-dark/70">
+              By submitting, you agree to our{" "}
+              <Link className="underline hover:text-dark" href="/en/terms-and-conditions" target="_blank">
+                Terms
+              </Link>{" "}
+              and{" "}
+              <Link className="underline hover:text-dark" href="/en/privacy-policy" target="_blank">
+                Privacy Policy
+              </Link>
+              .
+            </span>
+          )}
+          <button type="button" onClick={tryNext} className={primaryBtn}>
+            {last ? "See my result →" : "Continue →"}
+          </button>
+        </span>
       </div>
       {still.length > 0 && <p className={`${errorClass} text-right`}>{still.length === 1 ? "One question still needs an answer." : `${still.length} questions still need an answer.`}</p>}
     </div>
@@ -404,56 +541,6 @@ function Scoring() {
       <p className="mono-text font-mono text-dark/70">
         Scoring<span className="inline-block w-6 text-left">{dots}</span>
       </p>
-    </div>
-  );
-}
-
-/** The countdown to the WhatsApp community, for founders who ticked the box.
- *  WhatsApp opens in a new tab so the report stays open behind it. */
-function WhatsAppBar({ url }: { url: string }) {
-  const [n, setN] = useState(CONFIG.WA_REDIRECT_SECS);
-  const [stay, setStay] = useState(false);
-  /** The browser refused the timed pop-up, so it waits for a tap on Join now. */
-  const [blocked, setBlocked] = useState(false);
-  useEffect(() => {
-    if (stay || blocked) return;
-    const t = setTimeout(() => {
-      if (n > 1) return setN(n - 1);
-      const w = window.open(url, "_blank");
-      if (w) {
-        w.opener = null;
-        setStay(true);
-      } else setBlocked(true);
-    }, 1000);
-    return () => clearTimeout(t);
-  }, [n, stay, blocked, url]);
-  if (stay) return null;
-  return (
-    <div role="status" className="sticky top-0 z-20 -mx-1 mb-6 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-dark px-4 py-3 text-white shadow-[0_20px_40px_-24px_rgba(22,37,63,0.6)]">
-      <p className="text-sm leading-tight">
-        {blocked ? (
-          "You’re in. Tap Join now to open the founder WhatsApp community."
-        ) : (
-          <>
-            You’re in. Taking you to the founder WhatsApp community in <b className="tabular-nums">{n}</b>s…
-          </>
-        )}
-        <span className="block text-xs text-white/70">Your report is in your inbox and you can come back to this page any time.</span>
-      </p>
-      <span className="flex items-center gap-3">
-        <a
-          href={url}
-          target="_blank"
-          rel="noopener"
-          onClick={() => setStay(true)}
-          className="mono-text rounded-full bg-white px-4 py-2 font-mono text-dark transition-colors hover:bg-sky-soft"
-        >
-          Join now →
-        </a>
-        <button type="button" onClick={() => setStay(true)} className="mono-text font-mono text-white/80 transition-colors hover:text-white">
-          Stay on my report
-        </button>
-      </span>
     </div>
   );
 }
@@ -894,7 +981,6 @@ function Report({ result, identity, answers, delivery, file }: { result: Result;
   return (
     <div data-report className="@container motion-safe:animate-[score-in_0.5s_var(--ease-out-expo)_both]">
       <div className="-mx-1 px-1 pt-1">
-        {identity.optin && WHATSAPP_URL && <WhatsAppBar url={WHATSAPP_URL} />}
         <div className="flex items-center justify-between gap-3 border-b border-dark/15 pb-3">
           <span className="mono-text font-mono whitespace-nowrap text-dark/60">Your report</span>
           <button
@@ -947,9 +1033,7 @@ function Report({ result, identity, answers, delivery, file }: { result: Result;
         <span className="text-xl font-medium text-sky-deep tabular-nums">{result.confidence.pct}%</span>
       </div>
 
-      {result.gates
-        .filter((g): g is Exclude<typeof g, "RESOURCING"> => g !== "RESOURCING")
-        .map((g) => (
+      {result.gates.map((g) => (
           <div key={g} className="mt-3 rounded-lg border border-sky-deep/40 bg-gray-100 px-4 py-3">
             <p className="mono-text font-mono text-sky-deep">{gateCopy[g][0]} · this outweighs your score</p>
             <p className="mt-1.5 text-sm leading-tight text-dark/80">{gateCopy[g][1]}</p>
@@ -1012,7 +1096,7 @@ function Report({ result, identity, answers, delivery, file }: { result: Result;
         </p>
       </div>
 
-      {/* The report's last word, for every founder, not only those who ticked the box. */}
+      {/* The report's last word: the founder community, for everyone. */}
       {WHATSAPP_URL && (
         <div className="mt-8 flex flex-col gap-4 rounded-lg border border-dark/15 bg-white px-5 py-5 @md:flex-row @md:items-center @md:justify-between">
           <div className="flex items-start gap-3">
@@ -1092,14 +1176,13 @@ function usePartialSave(snapshot: () => { identity: Identity; answers: Answers; 
 
 /**
  * The Startup Operating Score. Page one takes the founder's details; then one
- * page per section — company context, each of the six pillars, resourcing —
+ * page per section — company context, each of the six pillars, about fit —
  * and the report once the last page is answered. Finishing submits the
- * answers, which emails the PDF and queues the call; opted-in founders are
- * then taken to the WhatsApp community. `bare` drops the sky band and the
+ * answers, which emails the PDF and queues the call. `bare` drops the sky band and the
  * card's shadow for when it already sits inside a dialog.
  */
 export default function ScoreQuiz({ bare = false }: { bare?: boolean }) {
-  const [identity, setIdentity] = useState<Identity>({ name: "", email: "", phone: "", optin: false });
+  const [identity, setIdentity] = useState<Identity>({ name: "", email: "", phone: "", waConsent: false, scholarship: blankScholarship() });
   const [answers, setAnswers] = useState<Answers>(() => questions.map((q) => (q.kind === "multi" ? [] : null)));
   const [catOther, setCatOther] = useState("");
   const [stage, setStage] = useState<Stage>({ at: "identity" });

@@ -5,7 +5,7 @@
  * and the arithmetic stays in one place.
  *
  * The bank runs in sections: company context, the six pillars (three
- * questions each, one page per pillar) and one resourcing question. Only the
+ * questions each, one page per pillar) and two questions about fit. Only the
  * pillar questions score; the rest shape the readout and the call.
  */
 import { scorePillars } from "./data";
@@ -18,8 +18,6 @@ export const CONFIG = {
   /** The Demand gate reads raw pillar values (0–20), never percentages. */
   DEMAND_GATE_RAW: 6,
   RETAKE_LOCKOUT_DAYS: 60,
-  /** Seconds the result page waits before sending an opted-in founder to WhatsApp. */
-  WA_REDIRECT_SECS: 8,
   /** Each pillar's three questions are worth 8, 6 and 6. */
   PILLAR_MAX: 20,
 };
@@ -39,7 +37,7 @@ const IDX = { clarity: 0, evidence: 1, product: 2, traction: 3, ops: 4, investme
 const NECK_ORDER = [1, 3, 0, 2, 4, 5];
 
 /** Non-scoring questions the readout reads by name. */
-export type Key = "cat" | "venName" | "founders" | "built" | "desc" | "exp" | "g1" | "g2" | "g3";
+export type Key = "cat" | "venName" | "founders" | "built" | "desc" | "exp" | "g1" | "g2" | "q28" | "q30";
 
 type Base = { sec: number; q: string; h?: string; sub?: string };
 export type Question =
@@ -61,11 +59,11 @@ const single = (sec: number, q: string, h: string, options: [string, number][], 
   ...extra,
 });
 
-/** Section labels, indexed by `sec`: 0 context, 1–6 pillars, 7 resourcing. */
-export const SECTIONS = ["Company context", "Pillar 1 of 6", "Pillar 2 of 6", "Pillar 3 of 6", "Pillar 4 of 6", "Pillar 5 of 6", "Pillar 6 of 6", "Resourcing"];
+/** Section labels, indexed by `sec`: 0 context, 1–6 pillars, 7 fit. */
+export const SECTIONS = ["Company context", "Metric 1 of 6", "Metric 2 of 6", "Metric 3 of 6", "Metric 4 of 6", "Metric 5 of 6", "Metric 6 of 6", "About fit"];
 
 export const questions: Question[] = [
-  single(0, "Which best describes what you’re building?", "Your benchmark adapts to this answer.", [
+  single(0, "Which best describes what you’re building?", "Your report adapts to this answer.", [
     ["Consumer brand / physical product (D2C)", 0],
     ["Software product (SaaS or app)", 0],
     ["Marketplace or platform (two-sided)", 0],
@@ -239,16 +237,20 @@ export const questions: Question[] = [
     ["Fully documented and unambiguous.", 6],
   ], { pillar: 5, sub: "Founder Alignment" }),
 
-  // Resourcing
-  single(7, "What level of monthly investment is realistic for a focused three-month engagement?", "There is no wrong answer here. It scopes the conversation, it does not qualify you for it.", [
-    ["Below ₹60,000 per month.", 0],
-    ["₹60,000 to ₹1,00,000 per month.", 1],
-    ["₹1,00,000 to ₹2,00,000 per month.", 2],
-    ["Above ₹2,00,000 per month.", 3],
-  ], { key: "g3" }),
+  // About fit. Keys keep the Growth System numbering (Q28, Q30) the pipeline reads.
+  single(7, "Can you be at our studio in Gurugram for weekly classes?", "", [
+    ["Yes, I’m in Delhi NCR", 0],
+    ["Yes, I’d travel for 100 days", 0],
+    ["No", 0],
+  ], { key: "q28" }),
+  single(7, "If selected, are you ready to invest in a 100-day build? ₹3,00,000 + GST, starting with ₹15,000 + GST and three instalments.", "", [
+    ["Yes", 0],
+    ["Yes, but I’d like to discuss timing", 0],
+    ["Not right now", 0],
+  ], { key: "q30" }),
 ];
 
-/** One page per section: context, each pillar, resourcing. Question indexes per page. */
+/** One page per section: context, each pillar, fit. Question indexes per page. */
 export const pages: { sec: number; qs: number[] }[] = (() => {
   const out: { sec: number; qs: number[] }[] = [];
   questions.forEach((q, i) => {
@@ -261,12 +263,18 @@ export const pages: { sec: number; qs: number[] }[] = (() => {
 
 /** What the page header says for each section. */
 export function pageMeta(sec: number): { eye: string; h: string; hint: string } {
-  if (sec === 0) return { eye: "Company context", h: "First, some context.", hint: "A few quick questions about the company and the team. Your benchmark and report adapt to these." };
-  if (sec === 7) return { eye: "Resourcing", h: "One last question.", hint: "" };
+  if (sec === 0) return { eye: "Company context", h: "First, some context.", hint: "A few quick questions about the company and the team. Your report adapts to these." };
+  if (sec === 7) return { eye: "About fit", h: "Last 2 questions: about fit", hint: "We only invite founders we can genuinely help. These tell us if the next 100 days fit you." };
   return { eye: SECTIONS[sec], h: pillars[sec - 1].name, hint: "Pick the statement that is most true today, not where you hope to be." };
 }
 
 const indexOf = (key: Key) => questions.findIndex((q) => q.key === key);
+
+/** A picked option of a keyed single-choice question, in words. */
+const optionLabel = (key: Key, pick: number | null): string | null => {
+  const q = questions[indexOf(key)];
+  return pick !== null && q.kind === "single" ? (q.options[pick]?.label ?? null) : null;
+};
 
 /** Whether a question has an answer the page will accept. Blank multi = idea stage, allowed. */
 export function answered(i: number, answers: Answers, catOther = ""): boolean {
@@ -319,13 +327,13 @@ export function started(i: number, answers: Answers): boolean {
 export function stepLabel(page: number): string {
   if (page < 0 || page >= pages.length) return "Your details";
   const sec = pages[page].sec;
-  const name = sec === 0 ? "Company context" : sec === 7 ? "Resourcing" : pillars[sec - 1].name;
+  const name = sec === 0 ? "Company context" : sec === 7 ? "About fit" : pillars[sec - 1].name;
   return `${name} (page ${page + 1} of ${pages.length})`;
 }
 
-export type Gate = "COMMITMENT" | "CAPITAL" | "DEMAND" | "RESOURCING";
+export type Gate = "COMMITMENT" | "CAPITAL" | "DEMAND";
 export type Archetype = "Explorer" | "Visionary" | "Builder" | "Operator" | "Architect" | "Scaler";
-export type Route = "STOP" | "B" | "A" | "WAIT";
+export type Route = "STOP" | "B" | "A";
 
 export const archetypes: Record<Archetype, { name: string; sub: string }> = {
   Explorer: { name: "The Explorer", sub: "Idea-rich, evidence-poor. You have a thesis and no proof of anything yet, including that the problem is real." },
@@ -389,15 +397,9 @@ export const verdicts: Record<Route, { band: string; bandSub: string; title: str
     title: "You know what you’re building. You’re short of hands.",
     body: "The problem isn’t clarity. It’s fragmentation: work scattered across freelancers and tools with nobody joining the dots. On the call we’ll pinpoint which capabilities you actually need next, and how we’d operate beside you.",
   },
-  WAIT: {
-    band: "Ready",
-    bandSub: "Timing, not readiness",
-    title: "Ready. Let’s get the timing right.",
-    body: "You’d score well enough to work with us. When we call, we’ll tell you exactly what we’d do in your position and you can set the pace. We won’t push you to spend before it’s sensible.",
-  },
 };
 
-export const gateCopy: Record<Exclude<Gate, "RESOURCING">, [string, string]> = {
+export const gateCopy: Record<Gate, [string, string]> = {
   COMMITMENT: ["Commitment", "At under five hours a week, no amount of help will move the needle. That is why this counts for more than everything else here."],
   CAPITAL: ["Capital position", "You do not have paying customers or funding yet. Getting money in is the biggest thing to sort before spending more, so it counts for more than your score here."],
   DEMAND: ["Demand", "Both Customer Evidence and Commercial Traction are close to empty. That mix is the most common lead-up to an expensive mistake, so it counts for more than the rest of your score."],
@@ -442,7 +444,8 @@ export type Result = {
   route: Route;
   g1: number | null;
   g2: number | null;
-  g3: number | null;
+  q28: number | null;
+  q30: number | null;
   cat: number | null;
   catOther: string;
   exp: number | null;
@@ -476,7 +479,8 @@ export function grade(answers: Answers, catOther = ""): Result {
 
   const g1 = num(answers[indexOf("g1")]);
   const g2 = num(answers[indexOf("g2")]);
-  const g3 = num(answers[indexOf("g3")]);
+  const q28 = num(answers[indexOf("q28")]);
+  const q30 = num(answers[indexOf("q30")]);
   const cat = num(answers[indexOf("cat")]);
   const exp = num(answers[indexOf("exp")]);
   const founders = num(answers[indexOf("founders")]);
@@ -515,10 +519,8 @@ export function grade(answers: Answers, catOther = ""): Result {
   else if (overall < CONFIG.THRESHOLD_STOP) route = "STOP";
   else if (gates.includes("DEMAND")) route = "B";
   else if (gates.includes("CAPITAL")) route = "B";
-  else if (overall >= CONFIG.THRESHOLD_DOOR_A && g3 !== 0) route = "A";
-  else if (overall >= CONFIG.THRESHOLD_DOOR_A) route = "WAIT";
+  else if (overall >= CONFIG.THRESHOLD_DOOR_A) route = "A";
   else route = "B";
-  if (route === "WAIT") gates.push("RESOURCING");
 
   // Benchmark and market confidence.
   const ci = cat === null ? 6 : cat;
@@ -555,7 +557,8 @@ export function grade(answers: Answers, catOther = ""): Result {
     route,
     g1,
     g2,
-    g3,
+    q28,
+    q30,
     cat,
     catOther: catOther.trim(),
     exp,
@@ -571,23 +574,71 @@ export function grade(answers: Answers, catOther = ""): Result {
   };
 }
 
-export type Identity = { name: string; email: string; phone: string; optin: boolean };
+/** The scholarship tracks a founder can ask to be considered for on page one. */
+export const scholarshipTracks = [
+  { key: "women", name: "Women Founders", desc: "You lead the startup as founder or co-founder · 20%" },
+  { key: "beyond_metros", name: "Beyond the Metros", desc: "You’re building from outside India’s big cities · 20%" },
+  { key: "second_time", name: "Second-time Founders", desc: "You’ve built a startup before · 20–30%" },
+  { key: "need_based", name: "Need-based", desc: "The fee is what’s in the way · 20–25%" },
+] as const;
+export type TrackKey = (typeof scholarshipTracks)[number]["key"];
+const trackName = (k: TrackKey | null) => scholarshipTracks.find((t) => t.key === k)?.name ?? null;
+
+/** City only for Beyond the Metros, the prior startup only for Second-time Founders. */
+export type Scholarship = { requested: boolean; track: TrackKey | null; city: string; prior: string };
+export const blankScholarship = (): Scholarship => ({ requested: false, track: null, city: "", prior: "" });
+
+export type Identity = { name: string; email: string; phone: string; waConsent: boolean; scholarship: Scholarship };
+
+/** A scholarship request off the wire, cut to what the form can hold. */
+export function cleanScholarship(raw: unknown): Scholarship {
+  const s = (raw && typeof raw === "object" ? raw : {}) as Record<string, unknown>;
+  const requested = s.requested === true;
+  const track = requested ? (scholarshipTracks.find((t) => t.key === s.track)?.key ?? null) : null;
+  const text = (v: unknown, max: number) => (typeof v === "string" ? v.trim().slice(0, max) : "");
+  return {
+    requested,
+    track,
+    city: track === "beyond_metros" ? text(s.city, 60) : "",
+    prior: track === "second_time" ? text(s.prior, 120) : "",
+  };
+}
+
+/** The scholarship request as the pipeline files it. */
+export function scholarshipData(sc: Scholarship) {
+  const on = sc.requested;
+  const track = on ? sc.track : null;
+  const city = on && track === "beyond_metros" && sc.city.trim() ? sc.city.trim() : null;
+  const prior = on && track === "second_time" && sc.prior.trim() ? sc.prior.trim() : null;
+  const summary = on
+    ? `Scholarship: ${trackName(track) ?? "-"}${city ? ` · ${city}` : ""}${prior ? ` · built before: ${prior}` : ""} (also considered for the Full Scholarship)`
+    : "Scholarship: not requested";
+  return { scholarship_requested: on, scholarship_track: track, scholarship_city: city, scholarship_prior_startup: prior, scholarship_summary: summary };
+}
 
 export type Response = { section: string; question: string; answer: string };
 
 /** The intake step's label, sitting ahead of the bank's own sections. */
 export const INTAKE_SECTION = "Before we start";
 
-/** The four things the opening step asks. They score nothing, but the founder
- *  answered them, so the report has to show them back the same way as the rest. */
+/** What the opening step asks. It scores nothing, but the founder answered it,
+ *  so the report has to show it back the same way as the rest. */
 export function intakeResponses(id: Identity): Response[] {
   const row = (question: string, answer: string): Response => ({ section: INTAKE_SECTION, question, answer: answer.trim() || "-" });
-  return [
+  const sc = id.scholarship;
+  const rows = [
     row("Your name", id.name),
     row("Email", id.email),
     row("Contact number", id.phone),
-    row("Add me to the Knnekt founder WhatsApp community.", id.optin ? "Yes, add me" : "No thanks"),
+    row("We’ll send your report and updates on WhatsApp.", id.waConsent ? "Yes" : "-"),
+    row("Consider me for a scholarship", sc.requested ? "Yes" : "No"),
   ];
+  if (sc.requested) {
+    rows.push(row("Which track fits you best?", trackName(sc.track) ?? ""));
+    if (sc.track === "beyond_metros") rows.push(row("Which city are you building from?", sc.city));
+    if (sc.track === "second_time") rows.push(row("What did you build before? One line", sc.prior));
+  }
+  return rows;
 }
 
 /** Every question with the founder's answer in words, the intake step first when
@@ -637,11 +688,13 @@ export function payload(r: Result, id: Identity, answers: Answers, event: "resul
     primary_bottleneck: pillars[r.primary].key,
     secondary_bottleneck: r.secondary === null ? null : pillars[r.secondary].key,
     gates_fired: r.gates,
-    verdict_auto: { STOP: "STOP", B: "DOOR_B", A: "DOOR_A", WAIT: "WAIT" }[r.route],
+    verdict_auto: { STOP: "STOP", B: "DOOR_B", A: "DOOR_A" }[r.route],
     g1_hours: pick(["<5", "5-20", "20-40", "40+"], r.g1),
     g2_capital: pick(["neither", "funding_only", "revenue_only", "both"], r.g2),
-    g3_band: pick(["below_floor", "60k-1L", "1L-2L", "2L+"], r.g3),
-    community_optin: id.optin,
+    q28: optionLabel("q28", r.q28),
+    q30: optionLabel("q30", r.q30),
+    whatsapp_consent: id.waConsent,
+    ...scholarshipData(id.scholarship),
     benchmark: { model: r.benchName, median: r.bench[0], top_third: r.bench[1], scale_ready: r.bench[2] },
     market_confidence: r.confidence.pct,
     responses: responses(answers, r.catOther, id),

@@ -66,7 +66,6 @@ export function reportEmailHtml(r: Result, id: Identity, pdfName: string): strin
 
 
   const gateCards = r.gates
-    .filter((g): g is Exclude<typeof g, "RESOURCING"> => g !== "RESOURCING")
     .map((g) => {
       const [name, why] = gateCopy[g];
       return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse;margin:0 0 10px;background:${HORIZON};border-radius:10px;">
@@ -209,7 +208,6 @@ export function reportEmailText(r: Result, id: Identity, pdfName: string): strin
     "",
   ];
   for (const g of r.gates) {
-    if (g === "RESOURCING") continue;
     const [name, why] = gateCopy[g];
     lines.push(`${name} - this outweighs your score`, why, "");
   }

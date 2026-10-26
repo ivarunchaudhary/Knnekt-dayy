@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { CONFIG, cleanAnswers, questions, responses, started, stepLabel } from "@/lib/score";
+import { CONFIG, cleanAnswers, cleanScholarship, questions, responses, scholarshipData, started, stepLabel } from "@/lib/score";
 import { forwardToSheet } from "@/lib/scoreWebhook";
 
-type Body = { session?: unknown; identity?: { name?: unknown; email?: unknown; phone?: unknown; optin?: unknown }; answers?: unknown; catOther?: unknown; page?: unknown };
+type Body = { session?: unknown; identity?: { name?: unknown; email?: unknown; phone?: unknown; waConsent?: unknown; scholarship?: unknown }; answers?: unknown; catOther?: unknown; page?: unknown };
 
 const field = (v: unknown, max: number) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 
@@ -47,7 +47,8 @@ export async function POST(request: Request) {
       name,
       email,
       phone,
-      community_optin: Boolean(body.identity?.optin),
+      whatsapp_consent: body.identity?.waConsent === true,
+      ...scholarshipData(cleanScholarship(body.identity?.scholarship)),
       stopped_at: stepLabel(page),
       answered: `${filled.length} of ${questions.length}`,
       responses: filled.map((i) => all[i]),

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { answered, cleanAnswers, grade, payload, type Identity } from "@/lib/score";
+import { answered, cleanAnswers, cleanScholarship, grade, payload, type Identity } from "@/lib/score";
 import { sendMail } from "@/lib/mailer";
 import { reportEmailHtml, reportEmailText, reportSubject } from "@/lib/scoreEmail";
 import { reportFilename, reportPdfBase64 } from "@/lib/scoreReport";
@@ -30,7 +30,8 @@ export async function POST(request: Request) {
     name: String(body.identity?.name ?? "").trim(),
     email: String(body.identity?.email ?? "").trim().toLowerCase(),
     phone: String(body.identity?.phone ?? "").trim(),
-    optin: Boolean(body.identity?.optin),
+    waConsent: body.identity?.waConsent === true,
+    scholarship: cleanScholarship(body.identity?.scholarship),
   };
   if (id.name.length < 2 || !looksLikeEmail(id.email) || !looksLikePhone(id.phone)) {
     return NextResponse.json({ error: "Name, email and phone are required" }, { status: 400 });
