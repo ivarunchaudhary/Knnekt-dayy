@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { CONTACT_PHONE } from "@/lib/contact";
 import { containerClass } from "./Container";
 import Wordmark from "./Wordmark";
 
@@ -18,7 +19,7 @@ export default function Footer() {
               <span className="flex min-h-6 items-center">Studio</span>
               <span className="text-dark-subtle block">Gurugram</span>
               <span className="text-dark-subtle block">India</span>
-              <a className={`text-dark-subtle hover:text-dark ${link}`} href="tel:+919140845927">+91 91408 45927</a>
+              <a className={`text-dark-subtle hover:text-dark ${link}`} href={`tel:${CONTACT_PHONE.tel}`}>{CONTACT_PHONE.display}</a>
             </address>
           </div>
           <nav className="grid grid-cols-2 md:block md:space-y-6">

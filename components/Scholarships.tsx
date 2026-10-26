@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
-import { pricing } from "@/lib/data";
+import { pricing, scholarshipFine, scholarshipTracks } from "@/lib/data";
 import Container, { SectionHeading } from "./Container";
 import ScoreButton from "./ScoreButton";
 
@@ -9,62 +9,35 @@ const facts = [
   ["Within 24 hours", "decided with your seat"],
 ];
 
-const tracks: { name: string; for: string; off: string; amount: string; colour: string; icon: ReactNode }[] = [
-  {
-    name: "Women Founders",
-    for: "For women who lead their startup as founder or co-founder.",
-    off: "20% off the fee",
-    amount: "₹60,000",
-    colour: "#ff7a6b",
-    icon: (
-      <>
-        <circle cx="24" cy="16" r="7" fill="currentColor" />
-        <path d="M10 40c1-9 7-14 14-14s13 5 14 14z" fill="currentColor" />
-        <path d="M33 9l2 4 4 .6-3 2.9.7 4.1L33 18.7l-3.7 1.9.7-4.1-3-2.9 4-.6z" fill="#ffc24b" />
-      </>
-    ),
-  },
-  {
-    name: "Beyond the Metros",
-    for: "For founders building from tier-2 cities, who move to Gurugram for the 100 days.",
-    off: "20% off the fee",
-    amount: "₹60,000",
-    colour: "#34c9a0",
-    icon: (
-      <>
-        <path d="M8 40V22l8-5v23M16 40V14l10-6v32M26 40V20l14 6v14" fill="none" stroke="currentColor" strokeWidth="3" strokeLinejoin="round" />
-        <circle cx="36" cy="12" r="4" fill="#ffc24b" />
-      </>
-    ),
-  },
-  {
-    name: "Second-time Founders",
-    for: "For founders who have built before, whether it worked or not.",
-    off: "20–30% off the fee",
-    amount: "₹60,000–90,000",
-    colour: "#8b7cf6",
-    icon: (
-      <>
-        <path d="M14 30a12 12 0 1 1 4 9" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" />
-        <path d="M10 26l4 5 5-4" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M24 18v8l5 3" fill="none" stroke="#ffc24b" strokeWidth="3.2" strokeLinecap="round" />
-      </>
-    ),
-  },
-  {
-    name: "Need-based",
-    for: "For strong founders for whom the fee is the only thing in the way.",
-    off: "20–25% off the fee",
-    amount: "₹60,000–75,000",
-    colour: "#3b81e3",
-    icon: (
-      <>
-        <path d="M24 40C12 32 7 25 7 18a8.5 8.5 0 0 1 17-2 8.5 8.5 0 0 1 17 2c0 7-5 14-17 22z" fill="currentColor" />
-        <path d="M19 22h10M24 17v10" stroke="#fff" strokeWidth="3" strokeLinecap="round" />
-      </>
-    ),
-  },
-];
+/** Each track's icon; the track copy and colour live in lib/data, shared with the PDF report. */
+const icons: Record<string, ReactNode> = {
+  "Women Founders": (
+    <>
+      <circle cx="24" cy="16" r="7" fill="currentColor" />
+      <path d="M10 40c1-9 7-14 14-14s13 5 14 14z" fill="currentColor" />
+      <path d="M33 9l2 4 4 .6-3 2.9.7 4.1L33 18.7l-3.7 1.9.7-4.1-3-2.9 4-.6z" fill="#ffc24b" />
+    </>
+  ),
+  "Beyond the Metros": (
+    <>
+      <path d="M8 40V22l8-5v23M16 40V14l10-6v32M26 40V20l14 6v14" fill="none" stroke="currentColor" strokeWidth="3" strokeLinejoin="round" />
+      <circle cx="36" cy="12" r="4" fill="#ffc24b" />
+    </>
+  ),
+  "Second-time Founders": (
+    <>
+      <path d="M14 30a12 12 0 1 1 4 9" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" />
+      <path d="M10 26l4 5 5-4" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M24 18v8l5 3" fill="none" stroke="#ffc24b" strokeWidth="3.2" strokeLinecap="round" />
+    </>
+  ),
+  "Need-based": (
+    <>
+      <path d="M24 40C12 32 7 25 7 18a8.5 8.5 0 0 1 17-2 8.5 8.5 0 0 1 17 2c0 7-5 14-17 22z" fill="currentColor" />
+      <path d="M19 22h10M24 17v10" stroke="#fff" strokeWidth="3" strokeLinecap="round" />
+    </>
+  ),
+};
 
 /**
  * Scholarships: one full scholarship a cohort and four tracks off the fee.
@@ -109,11 +82,11 @@ export default function Scholarships() {
           </div>
 
           <ul className="ks-cards" aria-label="Scholarship tracks">
-            {tracks.map((t) => (
+            {scholarshipTracks.map((t) => (
               <li key={t.name} className="ks-card" style={{ "--c": t.colour } as CSSProperties}>
                 <span className="ks-ico">
                   <svg viewBox="0 0 48 48" aria-hidden="true">
-                    {t.icon}
+                    {icons[t.name]}
                   </svg>
                 </span>
                 <p className="ks-name">{t.name}</p>
@@ -140,8 +113,7 @@ export default function Scholarships() {
 
         <div className="ks-foot">
           <p className="ks-fine">
-            Awarded by the selection panel, one scholarship per founder; tracks can’t be combined. The number of scholarships varies by
-            cohort. Our two promises apply as normal.
+            {scholarshipFine}
           </p>
           <p className="ks-cta">
             <ScoreButton className="mono-text group inline-flex w-full items-center justify-center gap-3 rounded-full bg-sky-deep py-2 pr-2 pl-6 text-xs text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.18),0_8px_20px_-8px_rgb(22_37_63/0.55)] outline-offset-2 outline-dark transition-[background-color,transform,box-shadow] duration-200 hover:-translate-y-px hover:bg-dark hover:shadow-[inset_0_1px_0_rgb(255_255_255/0.12),0_12px_24px_-10px_rgb(22_37_63/0.6)] focus-visible:bg-dark active:translate-y-0 active:scale-[0.98] sm:w-auto sm:pl-7 sm:text-sm sm:whitespace-nowrap">

@@ -379,6 +379,9 @@ export type FacultyGroup = {
  * "Designation", a dashed logo slot and a silhouette. Drop a `name`, `role`,
  * `company` or `src` onto a member and that slot fills in.
  */
+/** The execution team, colour-coded by function, in roster order. */
+export const teamColours = ["#ff7a6b", "#3b81e3", "#8b7cf6", "#34c9a0", "#ffc24b", "#ec6aa8"];
+
 export const faculty: FacultyGroup[] = [
   {
     id: "investors",
@@ -611,7 +614,29 @@ export const pricing = {
   seats: 15,
   seatsLeft: 6,
   fine: "You only pay once we’ve both decided to build, after your Selection Session.",
+  /** What the build would cost at market/industry standard rates, set against the fee. */
+  market: "₹5.9 lakh",
 };
+
+/** The two promises about the fee, on the site and in the report. */
+export const promises = [
+  { num: "30", title: "30-Day Promise", body: "If the first 30 days don’t feel right, we refund your instalment." },
+  {
+    num: "+30",
+    title: "Goal Promise",
+    body: "We set your goal together on Day 10. If we don’t reach it by Day 100, we keep building with you for 30 more days, free.",
+  },
+];
+export const promisesNote = "Both promises apply when you attend the weekly classes and do your roadmap tasks. Full terms are in the founder agreement.";
+
+/** The four scholarship tracks, each keyed in its own colour. Each surface draws its own icon. */
+export const scholarshipTracks = [
+  { name: "Women Founders", for: "For women who lead their startup as founder or co-founder.", off: "20% off the fee", amount: "₹60,000", colour: "#ff7a6b" },
+  { name: "Beyond the Metros", for: "For founders building from tier-2 cities, who move to Gurugram for the 100 days.", off: "20% off the fee", amount: "₹60,000", colour: "#34c9a0" },
+  { name: "Second-time Founders", for: "For founders who have built before, whether it worked or not.", off: "20–30% off the fee", amount: "₹60,000–90,000", colour: "#8b7cf6" },
+  { name: "Need-based", for: "For strong founders for whom the fee is the only thing in the way.", off: "20–25% off the fee", amount: "₹60,000–75,000", colour: "#3b81e3" },
+];
+export const scholarshipFine = "Awarded by the selection panel, one scholarship per founder; tracks can’t be combined. The number of scholarships varies by cohort. Our two promises apply as normal.";
 
 /** Clarity both ways: what the fee buys, and what deliberately stays on your card. */
 export const ledgerIn: string[] = [

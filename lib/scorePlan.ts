@@ -5,6 +5,7 @@
  * to investor-ready, and the month-by-month plan. Pure, like `grade`: the
  * result page and the PDF both read from here, so they can't disagree.
  */
+import { journey } from "./data";
 import type { Result } from "./score";
 
 type Model = "d2c" | "saas" | "mkt" | "gen";
@@ -228,6 +229,9 @@ export const LADDER = [
 
 export type Month = { m: string; from: number; to: number; topics: string[]; kn: string[] };
 
+/** One stretch of the 100 days, and the score range it should land in (none for Pitch Day). */
+export type Stretch = { h: string; day: number | null; range: [number, number] | null; topics: string[]; kn: string[] };
+
 export type Plan = {
   /** Where the venture sits on its map, with the model: "Problem Identification · Marketplace". */
   stage: string;
@@ -235,6 +239,8 @@ export type Plan = {
   /** The rung the work starts on, and the rung the founder has already built up to. */
   ladder: { start: number; built: number };
   months: Month[];
+  /** The same work laid on the 100 days as the site has them: the sprint, set up and prove, the build, Pitch Day. */
+  days: Stretch[];
   /** "100-day roadmap", or "30-day" when everything left fits in the first month. */
   roadmapLabel: string;
 };
@@ -329,9 +335,51 @@ export function plan(r: Result): Plan {
     },
   ];
 
+  // The 100 days: the first three weeks of work prove it, the rest is the build.
+  const prove: Work[] = [];
+  const build: Work[] = [];
+  let wk = 0;
+  unfinished.forEach((it) => {
+    wk += it.wk || 2;
+    (wk <= 3 || !prove.length ? prove : build).push(it);
+  });
+  // Checkpoint ranges: estimates, never below where they start.
+  const range = (lo: number, hi: number): [number, number] => [Math.max(r.overall, Math.min(r.overall + lo, 95)), Math.max(r.overall, Math.min(r.overall + hi, 96))];
+  const lead = r.constraints[0]?.name;
+  const days: Stretch[] = [
+    {
+      h: journey[0],
+      day: 10,
+      range: range(3, 8),
+      topics: ["Walk your score and top constraints with us", lead ? `Plan the build around ${lead}` : "Map the build around your constraints", "Set your Day 100 goal together"],
+      kn: ["Ten live planning classes", "Your 100-day roadmap, built with you"],
+    },
+    {
+      h: journey[1],
+      day: 30,
+      range: range(9, 15),
+      topics: pick(prove.map((it) => it.you), 4, ["Lock who it’s for and the offer", "Prove demand with real buyers"]),
+      kn: pick(prove.map((it) => it.kn), 3, ["Pressure-test the plan with you", "Set targets and tracking"]),
+    },
+    {
+      h: journey[2],
+      day: 100,
+      range: range(18, 30),
+      topics: pick(build.map((it) => it.you), 4, ["Make sales repeatable without you", "Tighten CAC, retention and payback", "Get the investor story and docs ready"]),
+      kn: pick(build.map((it) => it.kn), 3, ["Drive growth experiments with you", "Prep and pressure-test the raise"]),
+    },
+    {
+      h: journey[3],
+      day: null,
+      range: null,
+      topics: ["Present what you built to investors and operators", "Show the proof behind your score"],
+      kn: ["Rehearse the pitch with you", "Bring investors and operators into the room"],
+    },
+  ];
+
   const roadmapLabel = startPhase === 2 && !unfinished.length ? "scale plan" : `${box[1].you.length ? 100 : 30}-day roadmap`;
 
-  return { stage, check, ladder: { start: startPhase, built: posPhase }, months, roadmapLabel };
+  return { stage, check, ladder: { start: startPhase, built: posPhase }, months, days, roadmapLabel };
 }
 
 /** Copy the report sections share, on screen and on paper. */
@@ -345,6 +393,11 @@ export const planCopy = {
     h: "Your next 3 months",
     d: "What gets done each month, what we do alongside you, and where your score should land.",
     note: "One path, launch → investor-ready. Checkpoints are estimates from founders on a similar path — yours moves with the work you put in.",
+  },
+  days: {
+    h: "Your 100 days",
+    d: "What gets done in each phase, what we do alongside you, and where your score should land.",
+    note: "Checkpoints are what we build toward, not a promise. Your goal is set together on Day 10.",
   },
   fee: {
     h: "One price.",

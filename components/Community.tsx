@@ -1,13 +1,11 @@
 "use client";
 
 import { type CSSProperties, useEffect, useRef, useState } from "react";
-import { faculty, type FacultyMember } from "@/lib/data";
+import { faculty, teamColours, type FacultyMember } from "@/lib/data";
 import Container, { SectionHeading } from "./Container";
 
 const reduceMotion = () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-/** The execution team, colour-coded by function, in roster order. */
-const TEAM_COLOURS = ["#ff7a6b", "#3b81e3", "#8b7cf6", "#34c9a0", "#ffc24b", "#ec6aa8"];
 
 /** Until someone is signed, their face is a silhouette marked "Photo". */
 function Silhouette() {
@@ -134,7 +132,7 @@ function Team() {
       <div className="tp">
         <ul className="t1-row t1-final" aria-label={studio.kicker}>
           {studio.people.map((person, i) => (
-            <li key={person.seat} className="t1-card" style={{ "--c": TEAM_COLOURS[i % TEAM_COLOURS.length] } as CSSProperties}>
+            <li key={person.seat} className="t1-card" style={{ "--c": teamColours[i % teamColours.length] } as CSSProperties}>
               {person.src ? (
                 <span className="t1-photo">
                   {/* eslint-disable-next-line @next/next/no-img-element */}

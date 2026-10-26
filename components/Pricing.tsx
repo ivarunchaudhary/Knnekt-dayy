@@ -1,4 +1,4 @@
-import { feeIncludes, ledgerIn, ledgerOut, paymentSteps, pricing, pricingFacts } from "@/lib/data";
+import { feeIncludes, ledgerIn, ledgerOut, paymentSteps, pricing, pricingFacts, promises, promisesNote } from "@/lib/data";
 import Container, { SectionHeading } from "./Container";
 import ScoreButton from "./ScoreButton";
 
@@ -9,15 +9,6 @@ import ScoreButton from "./ScoreButton";
  * the way in, with the two promises underneath. The ledger closes it out —
  * what the fee buys, and what deliberately stays on their card.
  */
-
-const promises = [
-  { num: "30", title: "30-Day Promise", body: "If the first 30 days don’t feel right, we refund your instalment." },
-  {
-    num: "+30",
-    title: "Goal Promise",
-    body: "We set your goal together on Day 10. If we don’t reach it by Day 100, we keep building with you for 30 more days, free.",
-  },
-];
 
 const check = (
   <svg aria-hidden="true" viewBox="0 0 16 16" fill="none" className="mt-[0.3rem] size-4 shrink-0">
@@ -90,7 +81,7 @@ export default function Pricing() {
               <div className="kn-compare" role="group" aria-label="Market rate compared with the founding price">
                 <div className="kn-compare-a">
                   <p className="mono-text font-mono">At market/industry standard rates, the build is worth</p>
-                  <p className="kn-compare-num">₹5.9 lakh</p>
+                  <p className="kn-compare-num">{pricing.market}</p>
                 </div>
                 <span className="kn-compare-vs" aria-hidden="true">
                   →
@@ -162,8 +153,7 @@ export default function Pricing() {
                 ))}
               </ul>
               <p className="kn-promises-note">
-                Both promises apply when you attend the weekly classes and do your roadmap tasks. Full terms are in the founder
-                agreement.
+                {promisesNote}
               </p>
             </div>
           </div>
