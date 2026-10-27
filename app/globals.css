@@ -1374,6 +1374,14 @@ header[data-hero] .text-center > span[role="img"] svg{filter:drop-shadow(0 2px 1
   .o2-scroll,.tc-track,.t1-row{scroll-padding-left:0}
   .tc-viewport{margin-left:-1.25rem;margin-right:-1.25rem}
   .tc-track{padding-left:1.25rem;padding-right:1.25rem}
+  /* testimonials: the desktop's two drifting rows, with compact cards so both rows fit the screen */
+  .tc-viewport{margin-top:1.75rem}
+  .tc-track{grid-auto-columns:15rem;gap:.75rem}
+  .tc-img{aspect-ratio:2/1}
+  .tc-body{gap:.25rem;padding:.8rem .95rem 1rem}
+  .tc-name{font-size:1.0625rem}
+  .tc-meta{font-size:.75rem}
+  .tc-quote{margin-top:.35rem;font-size:.875rem;line-height:1.35}
 
   /* Under one roof: compact panels so each card fits the screen and can stack */
   #services [data-panel]{min-height:0!important;padding-top:.4rem;padding-bottom:.4rem}
@@ -1386,10 +1394,7 @@ header[data-hero] .text-center > span[role="img"] svg{filter:drop-shadow(0 2px 1
   #services .kn-proof-ico{width:2.25rem;height:2.25rem}
   #services .kn-proof-text{font-size:.9375rem}
 
-  /* testimonials and masterclass experts: one row you swipe, card by card */
-  .tc-viewport.is-swipe{scroll-snap-type:x mandatory;-webkit-mask:none;mask:none;cursor:auto}
-  .tc-viewport.is-swipe .tc-track{grid-template-rows:auto;grid-auto-columns:84%;gap:.75rem}
-  .tc-viewport.is-swipe .tc-card{scroll-snap-align:start;scroll-margin-left:1.25rem}
+  /* masterclass experts: one row you swipe, card by card */
   .o2-scroll{grid-template-rows:auto!important;grid-auto-columns:88%!important;scroll-snap-type:x mandatory;-webkit-mask:none!important;mask:none!important}
   .o2-scroll > li{scroll-snap-align:start}
   .o2-more{grid-row:auto!important;min-height:14rem}
@@ -1413,9 +1418,9 @@ header[data-hero] .text-center > span[role="img"] svg{filter:drop-shadow(0 2px 1
   .mh,.mh-sheet,.mh-list li,.mh-menu span{transition:none!important}
 }
 
-/* phone and tablet: the "Under one roof" panels stack like desktop (switched on by svc.js only when they fit) */
+/* phone and tablet: the "Under one roof" panels stack like desktop; `--stick` (Services.tsx) lifts a card taller than the room so it sticks by its bottom edge */
 @media (max-width:63.99rem){
-  #services.kn-stack [data-panel]{position:sticky;top:calc(20px + var(--i,0) * 14px)}
+  #services.kn-stack [data-panel]{position:sticky;top:var(--stick,calc(20px + var(--i,0) * 14px))}
   #services [data-service-card]{margin-top:0}
   #services h2.kn-in-card{margin-bottom:.9rem;font-size:1.25rem;line-height:1.2;font-weight:500;color:#16253f}
   #services h2.kn-in-card .block:last-child{font-size:1.375rem;font-weight:600;color:#16253f}
@@ -1425,7 +1430,7 @@ header[data-hero] .text-center > span[role="img"] svg{filter:drop-shadow(0 2px 1
   #services [data-service-card] > div{box-shadow:0 -10px 30px -18px rgb(10 20 40/.55)}
 }
 @media (max-width:47.99rem){
-  #services.kn-stack [data-panel]{top:calc(62px + var(--i,0) * 8px)}
+  #services.kn-stack [data-panel]{top:var(--stick,calc(62px + var(--i,0) * 8px))}
   #services h2.kn-in-card{font-size:1.125rem}
 }
 

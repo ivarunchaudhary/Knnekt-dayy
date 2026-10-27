@@ -26,20 +26,21 @@ const subscribeWide = (cb: () => void) => {
  * The dark, image-backed background is itself sticky and cross-fades per active service.
  *
  * Below `lg` each function's title moves inside its card, and the panels stack the
- * same way (`kn-stack`) only if every one of them fits the screen; otherwise they
- * scroll past one another like any other block.
+ * same way (`kn-stack`). A card taller than the room left under the ones before it
+ * sticks by its bottom edge instead, so it scrolls until all of it has been seen
+ * and then waits there to be covered.
  */
 export default function Services() {
   const root = useRef<HTMLElement>(null);
   const cards = useRef<(HTMLDivElement | null)[]>([]);
   const [active, setActive] = useState(0);
-  const [stacked, setStacked] = useState(false);
   /** The function whose title and photo are up, and whose proof card last popped. */
   const shown = useRef(-1);
   const wide = useSyncExternalStore(subscribeWide, () => window.matchMedia(WIDE).matches, () => true);
+  const stacked = !wide;
 
   // Desktop: size each drawing to the room left in its panel, so the card always clears the bottom nav.
-  // Phone and tablet: stack the panels if each, titled, fits under the ones before it.
+  // Phone and tablet: where each panel sticks, under the ones before it or by its bottom edge.
   useEffect(() => {
     const el = root.current;
     if (!el) return;
@@ -63,13 +64,13 @@ export default function Services() {
     };
     const stackFit = () => {
       if (wide) {
-        setStacked(false);
+        panels.forEach((p) => p.style.removeProperty("--stick"));
         return;
       }
       const phone = window.innerWidth < 768;
       const top = phone ? 62 : 20;
       const step = phone ? 8 : 14;
-      setStacked(panels.every((p, i) => p.offsetHeight <= window.innerHeight - top - i * step - 8));
+      panels.forEach((p, i) => p.style.setProperty("--stick", `${Math.min(top + i * step, window.innerHeight - p.offsetHeight - 8)}px`));
     };
     const layout = () => {
       fit();
@@ -108,7 +109,7 @@ export default function Services() {
         const next = panels[i + 1];
         const card = cards.current[i];
         if (!card) return;
-        const covered = next && (wide || stacked) ? Math.min(1, Math.max(0, 1 - next.getBoundingClientRect().top / vh)) : 0;
+        const covered = next ? Math.min(1, Math.max(0, 1 - next.getBoundingClientRect().top / vh)) : 0;
         if (stacked) {
           // phone and tablet deck: solid cards, the earlier ones shrink a little behind
           card.style.opacity = "1";

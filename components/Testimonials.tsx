@@ -1,18 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useSyncExternalStore } from "react";
+import { useEffect, useRef } from "react";
 import { testimonials, type Testimonial } from "@/lib/data";
 import { containerClass, SectionHeading } from "./Container";
 
 /** px per second */
 const SPEED = 28;
-
-const PHONE = "(max-width: 47.99rem)";
-const onPhoneChange = (cb: () => void) => {
-  const mq = matchMedia(PHONE);
-  mq.addEventListener("change", cb);
-  return () => mq.removeEventListener("change", cb);
-};
 
 function Card({ t, copy }: { t: Testimonial; copy?: boolean }) {
   // "Founder · Athleisure · In market" → heading "Athleisure", "Founder · In market" beneath.
@@ -35,8 +28,8 @@ function Card({ t, copy }: { t: Testimonial; copy?: boolean }) {
 /**
  * Founder quotes, one card per startup, two rows by three columns in view, on
  * a ticker that drifts on its own. It holds on touch and focus; a drag, a
- * sideways swipe or the arrows take over (the arrows step one column). On a
- * phone it is one row you swipe, card by card, with no drift.
+ * sideways swipe or the arrows take over (the arrows step one column). A
+ * phone gets the same two drifting rows, one column in view.
  *
  * Nine cards fill two rows unevenly, so the set is repeated to eighteen (nine
  * even columns), then once more for the seamless wrap.
@@ -44,14 +37,12 @@ function Card({ t, copy }: { t: Testimonial; copy?: boolean }) {
 export default function Testimonials() {
   const viewport = useRef<HTMLDivElement>(null);
   const track = useRef<HTMLUListElement>(null);
-  // Unknown on the server: the plain set renders until the client picks swipe or ticker.
-  const mode = useSyncExternalStore(onPhoneChange, () => (matchMedia(PHONE).matches ? "swipe" : "ticker"), () => null);
   const stepRef = useRef<(dir: 1 | -1) => void>(() => {});
 
   useEffect(() => {
     const vp = viewport.current;
     const list = track.current;
-    if (mode !== "ticker" || !vp || !list) return;
+    if (!vp || !list) return;
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
     let loopW = 0;
     let paused = false;
@@ -160,9 +151,7 @@ export default function Testimonials() {
       removeEventListener("pointerup", onUp);
       removeEventListener("resize", measure);
     };
-  }, [mode]);
-
-  const copies = mode === "ticker" ? [1, 2, 3] : [];
+  }, []);
 
   return (
     <section id="testimonials" className="overflow-hidden py-12 md:py-28">
@@ -182,7 +171,7 @@ export default function Testimonials() {
         </div>
         <div
           ref={viewport}
-          className={`tc-viewport${mode === "swipe" ? " is-swipe" : ""}`}
+          className="tc-viewport"
           tabIndex={0}
           aria-label="What founders say, scrolls on its own; hover or touch to pause"
         >
@@ -190,7 +179,7 @@ export default function Testimonials() {
             {testimonials.map((t) => (
               <Card key={t.attribution} t={t} />
             ))}
-            {copies.map((n) => testimonials.map((t) => <Card key={`${n}-${t.attribution}`} t={t} copy />))}
+            {[1, 2, 3].map((n) => testimonials.map((t) => <Card key={`${n}-${t.attribution}`} t={t} copy />))}
           </ul>
         </div>
       </div>
