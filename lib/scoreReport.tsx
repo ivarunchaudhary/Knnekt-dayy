@@ -4,15 +4,16 @@
  * palette. The answers stay out of it; they live behind "Your answers" on the
  * result screen and in the webhook's payload. The API route attaches this to
  * the founder's email, copies the studio, and forwards it to the webhook, so
- * every copy is the same document. The logo, the footer and the contact line
- * link back to the site, and the studio's number and email are tappable.
+ * every copy is the same document. The logo links back to the site, and the
+ * studio's number and email are tappable. Where the people and stories are
+ * still to be signed, the section says so with a dashed "Placeholder" tag.
  */
 import { join } from "node:path";
 import { Circle, Defs, Document, Font, Image, LinearGradient, Link, Page, Path, Rect, Stop, StyleSheet, Svg, Text, View, renderToBuffer, type Styles } from "@react-pdf/renderer";
 import { LOCKUP_PATH, LOCKUP_RATIO, LOCKUP_VIEWBOX } from "./brand";
 import { CONTACT_EMAIL, CONTACT_PHONE } from "./contact";
-import { faculty, feeIncludes, paymentSteps, pricing, pricingFacts, promises, promisesNote, scholarshipFine, scholarshipTracks, teamColours, testimonials } from "./data";
-import { archetypes, gateCopy, pillars, type Identity, type Result } from "./score";
+import { faculty, feeIncludes, paymentSteps, pricing, pricingFacts, promises, promisesNote, scholarshipFine, scholarshipTracks, teamColours } from "./data";
+import { archetypes, gateCopy, pillars, scholarshipTracks as askTracks, type Identity, type Result } from "./score";
 import { LADDER, plan as planFor, planCopy } from "./scorePlan";
 import { SITE_HOST } from "./site";
 
@@ -77,13 +78,13 @@ const s = StyleSheet.create({
   head: { position: "absolute", top: 22, left: PX, right: PX, flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingBottom: 8, borderBottomWidth: 0.75, borderBottomColor: RULE },
   brand: { flexDirection: "row", alignItems: "flex-end", gap: 1.2 },
   foot: { position: "absolute", top: 808, left: PX, right: PX, flexDirection: "row", justifyContent: "space-between", paddingTop: 8, borderTopWidth: 0.75, borderTopColor: RULE },
-  mono: { fontFamily: "Mono", fontSize: 6.5, letterSpacing: 0.8, textTransform: "uppercase", color: INK_60 },
+  mono: { fontFamily: "Mono", fontSize: 6.5, lineHeight: 1.4, letterSpacing: 0.8, textTransform: "uppercase", color: INK_60 },
   bar: { position: "absolute", top: 0, left: 0, right: 0, height: 4, backgroundColor: DEEP },
   eye: { flexDirection: "row", alignItems: "center" },
   eyeNo: { fontFamily: "Mono", fontSize: 6.5, color: "#ffffff", backgroundColor: DEEP, borderRadius: 3, paddingHorizontal: 4, paddingVertical: 2, marginRight: 7 },
   eyeRule: { flex: 1, height: 0.75, backgroundColor: RULE, marginLeft: 8 },
-  secH: { fontSize: 11.5, fontWeight: 600, marginTop: 13 },
-  secD: { fontSize: 8.5, color: INK_70, marginTop: 1.5, marginBottom: 6 },
+  secH: { fontSize: 12, fontWeight: 600, marginTop: 13 },
+  secD: { fontSize: 8.5, color: INK_70, marginTop: 2.5, marginBottom: 7 },
   box: { borderWidth: 0.75, borderColor: RULE, borderRadius: 6 },
   li: { flexDirection: "row", fontSize: 8.5, marginTop: 2.5 },
   mark: { fontFamily: "Mono", width: 10, fontSize: 8 },
@@ -97,12 +98,14 @@ const Mono = ({ children, color, style }: { children: React.ReactNode; color?: s
 /**
  * A gradient behind a panel's content. react-pdf only paints gradients inside
  * an Svg, so this one stretches to the panel; the panel clips it to its corners.
+ * react-pdf reads an x2 of 0 as unset and runs the gradient corner to corner,
+ * so a vertical one is drawn a hair off zero.
  */
 function Grad({ id, stops, x2 = 0, y2 = 1 }: { id: string; stops: [number, string][]; x2?: number; y2?: number }) {
   return (
     <Svg viewBox="0 0 1 1" preserveAspectRatio="none" style={s.fill}>
       <Defs>
-        <LinearGradient id={id} x1={0} y1={0} x2={x2} y2={y2}>
+        <LinearGradient id={id} x1={0} y1={0} x2={x2 || 0.0001} y2={y2}>
           {stops.map(([at, color]) => (
             <Stop key={at} offset={at} stopColor={color} />
           ))}
@@ -113,7 +116,7 @@ function Grad({ id, stops, x2 = 0, y2 = 1 }: { id: string; stops: [number, strin
   );
 }
 
-/** The page furniture: the rule up top, the lockup back to the site, the name, date and page. */
+/** The page furniture: the rule up top, the lockup back to the site, then the name, date and page underneath. */
 function Chrome({ r, id, date }: { r: Result; id: Identity; date: string }) {
   return (
     <>
@@ -132,19 +135,10 @@ function Chrome({ r, id, date }: { r: Result; id: Identity; date: string }) {
         <Mono>Startup Operating Score™</Mono>
       </View>
       <View style={s.foot} fixed>
-        <View style={{ flex: 1 }}>
-          <Mono>
-            {r.venName} · {id.name} · {date}
-          </Mono>
-        </View>
-        <Link src={SITE} style={{ textDecoration: "none" }}>
-          <Mono color={DEEP} style={{ textTransform: "none" }}>
-            {SITE_HOST} →
-          </Mono>
-        </Link>
-        <View style={{ flex: 1, alignItems: "flex-end" }}>
-          <Text style={s.mono} render={({ pageNumber, totalPages }) => `Page ${pageNumber} of ${totalPages}`} />
-        </View>
+        <Mono>
+          {r.venName} · {id.name} · {date}
+        </Mono>
+        <Text style={s.mono} render={({ pageNumber, totalPages }) => `Page ${pageNumber} of ${totalPages}`} />
       </View>
     </>
   );
@@ -160,11 +154,21 @@ function Eye({ n, children }: { n: string; children: string }) {
   );
 }
 
-function Sec({ h, d, children, style }: { h: string; d?: string; children: React.ReactNode; style?: Styles[string] }) {
+/** A section: heading, line, content. `placeholder` tags one whose content is still to be signed. */
+function Sec({ h, d, children, style, placeholder = false }: { h: string; d?: string; children: React.ReactNode; style?: Styles[string]; placeholder?: boolean }) {
   return (
     <View wrap={false} style={style}>
-      <Text style={s.secH}>{h}</Text>
-      {d ? <Text style={s.secD}>{d}</Text> : <View style={{ height: 7 }} />}
+      <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
+        <View style={{ flex: 1 }}>
+          <Text style={s.secH}>{h}</Text>
+          {d ? <Text style={s.secD}>{d}</Text> : <View style={{ height: 7 }} />}
+        </View>
+        {placeholder ? (
+          <Mono style={{ fontSize: 5.5, marginTop: 17, borderWidth: 0.75, borderColor: INK_40, borderStyle: "dashed", borderRadius: 6, paddingHorizontal: 5, paddingVertical: 2 }}>
+            Placeholder
+          </Mono>
+        ) : null}
+      </View>
       {children}
     </View>
   );
@@ -190,6 +194,14 @@ const Rupees = ({ children }: { children: string }) => (
       ),
     )}
   </>
+);
+
+/** A sum set large in the sans, its ₹ in the mono cut, the only one that has the glyph. */
+const Money = ({ children, size, color = INK }: { children: string; size: number; color?: string }) => (
+  <Text style={{ fontSize: size, fontWeight: 600, color, letterSpacing: -0.2 }}>
+    <Text style={{ fontFamily: "Mono", fontWeight: 400 }}>₹</Text>
+    {children.replace(/^₹/, "")}
+  </Text>
 );
 
 const Phone = () => (
@@ -265,11 +277,18 @@ function ReportDoc({ r, id }: { r: Result; id: Identity }) {
   const scoreTone = toneOf(r.overall, r.bench[0], r.bench[1]);
   const confTone = r.confidence.tone === "high" ? GREEN : r.confidence.tone === "med" ? AMBER : RED;
   const gates = r.gates;
+  // Page one's air goes to the gates: each one that fires takes a third of the extra spacing, so three still fit the page.
+  const air = 1 - gates.length / 3;
+  const sp = (tight: number, roomy: number) => tight + (roomy - tight) * air;
   const pos = plan.ladder.built > plan.ladder.start ? (plan.ladder.start + plan.ladder.built) / 2 : plan.ladder.start;
   const cohort = pricing.cohort.split(" · ")[0];
   const [experts, studio] = faculty;
-  const stories = testimonials.filter((t) => t.result.includes("→")).slice(0, 3);
+  const shownExperts = experts.people.slice(0, 3);
   const chrome = <Chrome r={r} id={id} date={date} />;
+  // The founder's scholarship ask, named back to them on pages 3 and 4.
+  const asked = id.scholarship.requested;
+  const askedTrack = asked ? (askTracks.find((t) => t.key === id.scholarship.track)?.name ?? null) : null;
+  const askedLine = `You asked to be considered for a scholarship${askedTrack ? ` (${askedTrack})` : ""}. We’ll talk about it at your Selection Session.`;
 
   return (
     <Document title={`Startup Operating Score · ${r.venName}`} author="Knnekt Studios" subject="Startup Operating Score report">
@@ -280,19 +299,19 @@ function ReportDoc({ r, id }: { r: Result; id: Identity }) {
         <Mono color={DEEP} style={{ marginTop: 12 }}>
           {r.venName}
         </Mono>
-        <View style={{ flexDirection: "row", alignItems: "flex-end", marginTop: 4 }}>
-          <View style={{ width: 150, flexDirection: "row", alignItems: "flex-end" }}>
-            <Text style={{ fontSize: 62, fontWeight: 600, lineHeight: 0.9, letterSpacing: -2, color: scoreTone.fg }}>{r.overall}</Text>
+        <View style={{ flexDirection: "row", alignItems: "flex-start", marginTop: 4 }}>
+          <View style={{ width: 138, flexDirection: "row", alignItems: "flex-end" }}>
+            <Text style={{ fontSize: 66, fontWeight: 600, lineHeight: 0.9, letterSpacing: -2, color: scoreTone.fg }}>{r.overall}</Text>
             <Mono style={{ marginLeft: 5, marginBottom: 4 }}>/ 100</Mono>
           </View>
-          <View style={{ flex: 1, paddingBottom: 1 }}>
+          <View style={{ flex: 1, paddingTop: 6 }}>
             <Mono>{plan.stage}</Mono>
             <Text style={{ fontSize: 17, fontWeight: 600, lineHeight: 1.2, marginTop: 4 }}>{arch.name}</Text>
             <Text style={{ fontSize: 9.5, color: INK_70, marginTop: 3 }}>{arch.sub}</Text>
           </View>
         </View>
 
-        <View style={[s.box, { flexDirection: "row", marginTop: 14, backgroundColor: "#f8f9fb" }]}>
+        <View style={[s.box, { flexDirection: "row", marginTop: sp(12, 20), backgroundColor: "#f8f9fb" }]}>
           {facts.map(([k, v], i) => (
             <View key={k} style={{ flex: i === 0 ? 1.4 : 1, paddingVertical: 9, paddingHorizontal: 11, borderLeftWidth: i ? 0.75 : 0, borderLeftColor: RULE }}>
               <Mono>{k}</Mono>
@@ -302,22 +321,23 @@ function ReportDoc({ r, id }: { r: Result; id: Identity }) {
         </View>
 
         <View wrap={false} style={{ flexDirection: "row", gap: 8, marginTop: 8 }}>
-          <View style={{ flex: 1, backgroundColor: confTone.bg, borderWidth: 0.75, borderColor: confTone.line, borderRadius: 6, padding: 12 }}>
+          <View style={{ flex: 1, backgroundColor: confTone.bg, borderWidth: 0.75, borderColor: confTone.line, borderRadius: 6, paddingHorizontal: 13, paddingTop: sp(10, 12), paddingBottom: sp(10, 13) }}>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <View style={{ width: 5, height: 5, borderRadius: 3, marginRight: 7, backgroundColor: confTone.solid }} />
-              <Text style={{ flex: 1, fontSize: 10.5, fontWeight: 600 }}>{r.confidence.label}</Text>
-              <Text style={{ fontSize: 15, fontWeight: 600, color: confTone.fg, marginLeft: 8 }}>{r.confidence.pct}%</Text>
+              <Text style={{ flex: 1, fontSize: 11.5, fontWeight: 600 }}>{r.confidence.label}</Text>
+              {/* Its own line height so the figure isn't clipped, pulled in so the row stays the title's height. */}
+              <Text style={{ fontSize: 17, fontWeight: 600, lineHeight: 1.15, marginVertical: -4, color: confTone.fg, marginLeft: 8 }}>{r.confidence.pct}%</Text>
             </View>
             <View style={{ height: 3, borderRadius: 2, backgroundColor: confTone.soft, marginTop: 5 }}>
               <View style={{ width: `${Math.max(r.confidence.pct, 2)}%`, height: 3, borderRadius: 2, backgroundColor: confTone.solid }} />
             </View>
-            <Text style={{ fontSize: 8.5, color: INK_80, marginTop: 7 }}>{r.confidence.body}</Text>
+            <Text style={{ fontSize: 9.5, lineHeight: 1.4, color: INK_80, marginTop: 9 }}>{r.confidence.body}</Text>
           </View>
-          <View style={{ flex: 1, borderRadius: 6, overflow: "hidden", padding: 12 }}>
+          <View style={{ flex: 1, borderRadius: 6, overflow: "hidden", paddingHorizontal: 13, paddingTop: 12, paddingBottom: 13 }}>
             <Grad id="next" stops={[[0, PANEL], [1, "#dbeafb"]]} />
             <Mono color={DEEP}>{cohort} · What happens next</Mono>
-            <Text style={{ fontSize: 12, fontWeight: 600, marginTop: 5 }}>Your report is on its way.</Text>
-            <Text style={{ fontSize: 8.5, color: INK_80, marginTop: 4 }}>
+            <Text style={{ fontSize: 12.5, fontWeight: 600, marginTop: 7 }}>Your report is on its way.</Text>
+            <Text style={{ fontSize: 9.5, lineHeight: 1.4, color: INK_80, marginTop: 5 }}>
               We’ll call you within 24 hours from <Phone />. Save it so you pick up.
             </Text>
           </View>
@@ -326,7 +346,7 @@ function ReportDoc({ r, id }: { r: Result; id: Identity }) {
         {gates.length ? (
           <View wrap={false} style={{ borderWidth: 0.75, borderColor: RED.line, borderLeftWidth: 2.5, borderLeftColor: RED.solid, backgroundColor: RED.bg, borderRadius: 6, paddingHorizontal: 10, paddingVertical: 2, marginTop: 6 }}>
             {gates.map((g, i) => (
-              <View key={g} style={{ flexDirection: "row", paddingVertical: 5, borderTopWidth: i ? 0.75 : 0, borderTopColor: RED.line }}>
+              <View key={g} style={{ flexDirection: "row", paddingVertical: 4.5, borderTopWidth: i ? 0.75 : 0, borderTopColor: RED.line }}>
                 <View style={{ width: 11, height: 11, borderRadius: 6, backgroundColor: RED.solid, alignItems: "center", justifyContent: "center", marginRight: 7, marginTop: 0.5 }}>
                   <Text style={{ fontSize: 7.5, fontWeight: 600, lineHeight: 1, color: "#ffffff" }}>!</Text>
                 </View>
@@ -336,25 +356,27 @@ function ReportDoc({ r, id }: { r: Result; id: Identity }) {
                     Outweighs your score
                   </Mono>
                 </View>
-                <Text style={[s.small, { flex: 1, color: INK_80 }]}>{gateCopy[g][1]}</Text>
+                <Text style={[s.small, { flex: 1, lineHeight: 1.35, color: INK_80 }]}>{gateCopy[g][1]}</Text>
               </View>
             ))}
           </View>
         ) : null}
 
-        <Sec h={planCopy.constraints.h} d={planCopy.constraints.d} style={{ marginTop: 4 }}>
+        <Sec h={planCopy.constraints.h} d={planCopy.constraints.d} style={{ marginTop: sp(0, 10) }}>
           <View style={{ flexDirection: "row", gap: 8 }}>
             {r.constraints.map((c, i) => (
-              <View key={c.name} style={{ flex: 1, backgroundColor: consTone[i].bg, borderLeftWidth: 1.5, borderLeftColor: consTone[i].solid, borderTopRightRadius: 6, borderBottomRightRadius: 6, paddingVertical: 10, paddingHorizontal: 13 }}>
+              <View key={c.name} style={{ flex: 1, backgroundColor: consTone[i].bg, borderLeftWidth: 1.5, borderLeftColor: consTone[i].solid, borderTopRightRadius: 6, borderBottomRightRadius: 6, paddingTop: sp(9, 12), paddingBottom: sp(9, 14), paddingHorizontal: 13 }}>
                 <Mono color={consTone[i].fg}>{c.label} constraint</Mono>
-                <Text style={{ fontSize: 11, fontWeight: 600, marginTop: 6 }}>{c.name}</Text>
-                <Text style={{ fontSize: 8.5, color: INK_70, marginTop: 2 }}>{c.why}</Text>
-                <View style={{ borderTopWidth: 0.75, borderTopColor: consTone[i].line, marginTop: 8, paddingTop: 7 }}>
-                  <Mono style={{ marginBottom: 3 }}>What it’s costing you</Mono>
+                <Text style={{ fontSize: 11.5, fontWeight: 600, marginTop: 8 }}>{c.name}</Text>
+                <Text style={{ fontSize: 9, lineHeight: 1.4, color: INK_70, marginTop: 2 }}>{c.why}</Text>
+                <View style={{ borderTopWidth: 0.75, borderTopColor: consTone[i].line, marginTop: sp(7, 9), paddingTop: sp(7, 9) }}>
+                  <Mono style={{ marginBottom: 4 }}>What it’s costing you</Mono>
                   {c.cost.map((x) => (
-                    <Item key={x} mark="×" color={consTone[i].solid}>
-                      {x}
-                    </Item>
+                    <View key={x} style={{ marginTop: sp(0.5, 2) }}>
+                      <Item mark="×" color={consTone[i].solid}>
+                        {x}
+                      </Item>
+                    </View>
                   ))}
                 </View>
               </View>
@@ -362,13 +384,14 @@ function ReportDoc({ r, id }: { r: Result; id: Identity }) {
           </View>
         </Sec>
 
-        <Sec h={planCopy.pillars.h} d="Each scored 0–100. Red is holding you back, amber is getting there, green is strong." style={{ marginTop: 4 }}>
+        {/* The six pillars read as metrics in the founder's copy. Green starts at 70, where the Scaler does. */}
+        <Sec h="Your six metrics" d="Each scored 0–100. Red is holding you back, amber is getting there, green is strong." style={{ marginTop: sp(0, 10) }}>
           {pillars.map((p, i) => {
             const w = weak.includes(i);
             const v = r.pct[i];
-            const t = toneOf(v, 40, 65);
+            const t = toneOf(v, 40, 70);
             return (
-              <View key={p.key} style={{ flexDirection: "row", alignItems: "center", marginTop: i ? 6 : 2 }}>
+              <View key={p.key} style={{ flexDirection: "row", alignItems: "center", marginTop: i ? sp(4.5, 8.5) : 2 }}>
                 <Text style={{ width: 128, fontSize: 9, color: w ? INK : INK_70, fontWeight: w ? 600 : 400 }}>{p.name}</Text>
                 <View style={{ flex: 1, height: 6, backgroundColor: t.bg, borderRadius: 3 }}>
                   <View style={{ width: `${Math.max(v, 2)}%`, height: 6, borderRadius: 3, backgroundColor: t.solid }} />
@@ -492,11 +515,11 @@ function ReportDoc({ r, id }: { r: Result; id: Identity }) {
       <Page size="A4" style={s.page}>
         {chrome}
         <Eye n="03">The fee and scholarships</Eye>
-        <Text style={{ fontSize: 16, fontWeight: 600, lineHeight: 1.2, marginTop: 7 }}>
+        <Text style={{ maxWidth: 250, fontSize: 14.5, fontWeight: 600, lineHeight: 1.2, marginTop: 6 }}>
           Investors fund proof, <Text style={{ color: INK_40, textDecoration: "line-through", textDecorationColor: RED.solid }}>not pitches</Text>. We build the proof with you.
         </Text>
 
-        <Sec h={planCopy.fee.h} d={planCopy.fee.d} style={{ marginTop: -4 }}>
+        <Sec h={planCopy.fee.h} d={planCopy.fee.d} style={{ marginTop: -6 }}>
           <View style={{ flexDirection: "row", gap: 5 }}>
             {["Application-only", `${pricing.seats} seats per cohort`, pricing.cohort].map((chip) => (
               <Chip key={chip}>{chip}</Chip>
@@ -504,16 +527,16 @@ function ReportDoc({ r, id }: { r: Result; id: Identity }) {
           </View>
           <View style={{ flexDirection: "row", borderTopWidth: 0.75, borderTopColor: RULE, borderBottomWidth: 0.75, borderBottomColor: RULE, marginTop: 8 }}>
             {pricingFacts.map(([title, body], i) => (
-              <View key={title} style={{ flex: 1, paddingVertical: 5, paddingLeft: i ? 9 : 0, paddingRight: 9, borderLeftWidth: i ? 0.75 : 0, borderLeftColor: RULE }}>
+              <View key={title} style={{ flex: 1, paddingVertical: 3.5, paddingLeft: i ? 9 : 0, paddingRight: 9, borderLeftWidth: i ? 0.75 : 0, borderLeftColor: RULE }}>
                 <Text style={{ fontSize: 8.5, fontWeight: 600 }}>{title}</Text>
-                <Text style={{ fontSize: 7, color: INK_70, marginTop: 1.5 }}>{body}</Text>
+                <Text style={{ fontSize: 6.5, lineHeight: 1.35, color: INK_70, marginTop: 1.5 }}>{body}</Text>
               </View>
             ))}
           </View>
         </Sec>
 
-        <View wrap={false} style={{ flexDirection: "row", gap: 8, marginTop: 8 }}>
-          <View style={{ flex: 0.95 }}>
+        <View wrap={false} style={{ flexDirection: "row", gap: 8, marginTop: 7 }}>
+          <View style={{ flex: 1.06 }}>
             <View style={{ backgroundColor: BLUE_BG, borderWidth: 0.75, borderColor: BLUE_LINE, borderRadius: 6, paddingHorizontal: 11, paddingTop: 9, paddingBottom: 8 }}>
               <Mono color={DEEP}>How you pay it</Mono>
               <View style={{ marginTop: 2 }}>
@@ -529,7 +552,7 @@ function ReportDoc({ r, id }: { r: Result; id: Identity }) {
                           <Text style={{ flex: 1, fontSize: 9.5, fontWeight: 600, marginRight: 6 }}>{step.title}</Text>
                           <Text style={{ fontFamily: "Mono", fontSize: 8.5, color: last ? GREEN.fg : DEEP }}>{step.amount}</Text>
                         </View>
-                        <Text style={{ fontSize: 7.5, color: INK_70, marginTop: 2 }}>
+                        <Text style={{ fontSize: 7, lineHeight: 1.35, color: INK_70, marginTop: 1.5 }}>
                           <Rupees>{step.body}</Rupees>
                         </Text>
                       </View>
@@ -537,7 +560,7 @@ function ReportDoc({ r, id }: { r: Result; id: Identity }) {
                   );
                 })}
               </View>
-              <Text style={{ fontSize: 7.5, color: INK_70, marginTop: 6 }}>
+              <Text style={{ fontSize: 7, lineHeight: 1.35, color: INK_70, marginTop: 6 }}>
                 Total <Text style={{ fontFamily: "Mono", color: DEEP }}>{pricing.total}</Text>. Every rupee is scheduled before you start: no milestone invoices, no change orders, no surprise line at Day
                 70.
               </Text>
@@ -545,104 +568,133 @@ function ReportDoc({ r, id }: { r: Result; id: Identity }) {
 
             {/* The market rate, highlighted, against the founding price. */}
             <View style={{ flexDirection: "row", alignItems: "center", backgroundColor: BLUE_BG, borderWidth: 0.75, borderColor: GRAY_200, borderRadius: 6, padding: 7, marginTop: 8 }}>
-              <View style={{ width: 116, borderRadius: 5, overflow: "hidden", paddingVertical: 8, paddingHorizontal: 9 }}>
+              <View style={{ width: 122, borderRadius: 5, overflow: "hidden", paddingTop: 8, paddingBottom: 9, paddingHorizontal: 9 }}>
                 <Grad id="market" stops={[[0, "#1a2547"], [1, "#2c4785"]]} x2={1} y2={0} />
                 <Mono color="#c9d3ea" style={{ fontSize: 5.5 }}>
                   At market/industry standard rates, the build is worth
                 </Mono>
-                <Text style={{ fontFamily: "Mono", fontSize: 15, color: "#ffffff", marginTop: 4 }}>{pricing.market}</Text>
+                <View style={{ marginTop: 4 }}>
+                  <Money size={16} color="#ffffff">
+                    {pricing.market}
+                  </Money>
+                </View>
               </View>
-              <Text style={{ fontFamily: "Mono", fontSize: 10, color: DEEP, marginHorizontal: 8 }}>→</Text>
+              <Text style={{ fontFamily: "Mono", fontSize: 10, color: DEEP, marginHorizontal: 9 }}>→</Text>
               <View style={{ flex: 1 }}>
                 <Mono style={{ fontSize: 5.5 }}>Founding price for {cohort}</Mono>
-                <Text style={{ fontFamily: "Mono", fontSize: 11, marginTop: 4 }}>
-                  {pricing.fee} <Text style={[s.mono, { fontSize: 5.5, letterSpacing: 0.3 }]}>{pricing.gst}</Text>
-                </Text>
+                <View style={{ flexDirection: "row", alignItems: "flex-end", marginTop: 4 }}>
+                  <Money size={11}>{pricing.fee}</Money>
+                  <Text style={[s.mono, { fontSize: 5.5, letterSpacing: 0.3, marginLeft: 3, marginBottom: 1.5 }]}>{pricing.gst}</Text>
+                </View>
               </View>
             </View>
           </View>
 
-          <View style={{ flex: 1.05 }}>
-            <View style={{ backgroundColor: PANEL, borderRadius: 6, paddingHorizontal: 11, paddingTop: 9, paddingBottom: 9 }}>
-              <Text style={{ fontSize: 11.5, fontWeight: 600 }}>What the fee covers</Text>
-              <Mono color={INK_70} style={{ marginTop: 3, fontSize: 5.5 }}>
+          <View style={{ flex: 1 }}>
+            <View style={{ backgroundColor: PANEL, borderRadius: 6, paddingHorizontal: 11, paddingTop: 8, paddingBottom: 8 }}>
+              <Text style={{ fontSize: 11, fontWeight: 600 }}>What the fee covers</Text>
+              <Mono color={INK_70} style={{ marginTop: 2, fontSize: 5.5 }}>
                 {pricing.cohort} · {pricing.seats} seats
               </Mono>
               <View style={{ marginTop: 5 }}>
                 {feeIncludes.map(([thing, rest]) => (
-                  <View key={thing} style={{ flexDirection: "row", marginTop: 2.4 }}>
+                  <View key={thing} style={{ flexDirection: "row", marginTop: 1.6 }}>
                     <Tick />
-                    <Text style={{ flex: 1, fontSize: 7.5, color: INK_80 }}>
+                    <Text style={{ flex: 1, fontSize: 7, lineHeight: 1.35, color: INK_80 }}>
                       <Text style={{ fontWeight: 600, color: INK }}>{thing}</Text>
                       {rest}
                     </Text>
                   </View>
                 ))}
               </View>
-              <Text style={{ fontSize: 7, color: INK_80, marginTop: 6 }}>{pricing.fine}</Text>
+              <Text style={{ fontSize: 7, lineHeight: 1.35, color: INK_80, marginTop: 5 }}>{pricing.fine}</Text>
             </View>
 
-            <View style={{ borderRadius: 6, overflow: "hidden", paddingHorizontal: 9, paddingTop: 8, paddingBottom: 7, marginTop: 8 }}>
-              <Grad id="promises" stops={[[0, NAVY], [1, NAVY_2]]} x2={1} y2={1} />
+            {/* Navy at the top, warming to a soft pink at the foot, where the fine print sits in ink. */}
+            <View style={{ borderRadius: 6, overflow: "hidden", paddingHorizontal: 9, paddingTop: 7, paddingBottom: 7, marginTop: 7 }}>
+              <Grad id="promises" stops={[[0, NAVY], [0.4, NAVY_2], [0.66, "#a9b3e6"], [1, "#f4c9de"]]} />
               <Text style={{ fontSize: 11, fontWeight: 600, color: "#ffffff" }}>Two promises.</Text>
               <View style={{ flexDirection: "row", gap: 6, marginTop: 5 }}>
                 {promises.map((p) => (
-                  <View key={p.title} style={{ flex: 1, backgroundColor: "#f4f7fd", borderRadius: 5, paddingHorizontal: 6, paddingVertical: 5 }}>
-                    <View style={{ flexDirection: "row", alignItems: "center" }}>
-                      <Text style={{ fontFamily: "Mono", fontSize: 5.5, color: "#ffffff", backgroundColor: DEEP, borderRadius: 5, paddingHorizontal: 4, paddingVertical: 1.5, marginRight: 5 }}>{p.num}</Text>
-                      <Text style={{ fontSize: 9, fontWeight: 600 }}>{p.title}</Text>
+                  <View key={p.title} style={{ flex: 1, backgroundColor: "#f4f7fd", borderRadius: 5, paddingHorizontal: 7, paddingTop: 6, paddingBottom: 6 }}>
+                    <View style={{ flexDirection: "row" }}>
+                      <Text style={{ fontFamily: "Mono", fontSize: 5.5, color: "#ffffff", backgroundColor: DEEP, borderRadius: 5, paddingHorizontal: 4, paddingVertical: 1.5 }}>{p.num}</Text>
                     </View>
-                    <Text style={{ fontSize: 6.8, color: INK_70, marginTop: 2 }}>{p.body}</Text>
+                    <Text style={{ fontSize: 9.5, fontWeight: 600, marginTop: 3.5 }}>{p.title}</Text>
+                    <Text style={{ fontSize: 6.5, lineHeight: 1.35, color: INK_70, marginTop: 1.5 }}>{p.body}</Text>
                   </View>
                 ))}
               </View>
-              <Text style={{ fontSize: 6.3, color: "#c9d3ea", marginTop: 5 }}>{promisesNote}</Text>
+              <Text style={{ fontSize: 6.3, lineHeight: 1.35, color: INK_80, marginTop: 5 }}>{promisesNote}</Text>
             </View>
           </View>
         </View>
 
-        <View wrap={false} style={{ borderTopWidth: 0.75, borderTopColor: RULE, marginTop: 8 }}>
-          <Text style={[s.secH, { marginTop: 6 }]}>Scholarships.</Text>
-          <Text style={s.secD}>One full scholarship every cohort, and 20–30% off the fee on four tracks. There’s no separate application: we decide at your Selection Session.</Text>
+        <View wrap={false} style={{ borderTopWidth: 0.75, borderTopColor: RULE, marginTop: 7 }}>
+          <Text style={[s.secH, { marginTop: 5 }]}>Scholarships.</Text>
+          <Text style={[s.secD, { maxWidth: 330 }]}>One full scholarship every cohort, and 20–30% off the fee on four tracks. There’s no separate application: tell us in the Score, and we decide at your Selection Session.</Text>
+          {asked ? (
+            <View style={{ flexDirection: "row", alignItems: "center", backgroundColor: GREEN.bg, borderWidth: 0.75, borderColor: GREEN.line, borderRadius: 6, paddingVertical: 4.5, paddingHorizontal: 8, marginBottom: 5 }}>
+              <Tick color={GREEN.solid} />
+              <Text style={{ flex: 1, fontSize: 8, color: INK_80 }}>{askedLine}</Text>
+            </View>
+          ) : null}
           <View style={{ borderRadius: 7, overflow: "hidden", padding: 8 }}>
             <Grad id="scholarships" stops={[[0, NAVY], [0.6, NAVY_2], [1, "#8eabea"]]} />
-            <View style={{ flexDirection: "row", alignItems: "center", backgroundColor: "#fff9ea", borderWidth: 1, borderColor: "#e7b94c", borderRadius: 6, paddingVertical: 6, paddingHorizontal: 10 }}>
+            <View style={{ flexDirection: "row", alignItems: "center", backgroundColor: "#fff9ea", borderWidth: 1, borderColor: "#e7b94c", borderRadius: 6, paddingVertical: 4, paddingHorizontal: 10 }}>
               <View style={{ width: 18, height: 18, borderRadius: 4, backgroundColor: "#fdecc0", alignItems: "center", justifyContent: "center", marginRight: 9 }}>
                 <Svg viewBox="0 0 48 48" style={{ width: 11, height: 11 }}>
                   <Path d="M24 6l5.2 10.6 11.7 1.7-8.5 8.2 2 11.6L24 32.6l-10.4 5.5 2-11.6-8.5-8.2 11.7-1.7z" fill="#e3a21a" />
                 </Svg>
               </View>
               <View style={{ flex: 1 }}>
-                <Mono color="#a8740c" style={{ fontSize: 5.5 }}>
-                  Once per cohort
-                </Mono>
-                <Text style={{ fontSize: 10, fontWeight: 600, marginTop: 2 }}>The Full Scholarship: 100% of the fee</Text>
-                <Text style={{ fontSize: 7.5, color: INK_70, marginTop: 1 }}>For one founder each cohort, chosen by the panel from everyone who asks to be considered, on any track.</Text>
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <Mono color="#a8740c" style={{ fontSize: 5.5 }}>
+                    Once per cohort
+                  </Mono>
+                  {asked ? (
+                    <Chip color="#8a5d06" bg="#fbe3a4" style={{ fontSize: 5, paddingHorizontal: 4, paddingVertical: 1.5, marginLeft: 5 }}>
+                      You’re considered
+                    </Chip>
+                  ) : null}
+                </View>
+                <Text style={{ fontSize: 10.5, fontWeight: 600, marginTop: 2 }}>The Full Scholarship: 100% of the fee</Text>
+                <Text style={{ fontSize: 7.5, lineHeight: 1.35, color: INK_70, marginTop: 1 }}>For one founder each cohort, chosen by the panel from everyone who asks to be considered, on any track.</Text>
               </View>
               <View style={{ alignItems: "flex-end", marginLeft: 10 }}>
-                <Text style={{ fontFamily: "Mono", fontSize: 12 }}>{pricing.fee}</Text>
+                <Money size={13}>{pricing.fee}</Money>
                 <Text style={{ fontSize: 6.5, color: INK_60, marginTop: 3 }}>the whole fee</Text>
               </View>
             </View>
             <View style={{ flexDirection: "row", gap: 6, marginTop: 6 }}>
-              {scholarshipTracks.map((t) => (
-                <View key={t.name} style={{ flex: 1, backgroundColor: "#f6f8fd", borderRadius: 6, padding: 6.5 }}>
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <View style={{ width: 15, height: 15, borderRadius: 4, backgroundColor: tint(t.colour, 0.16), alignItems: "center", justifyContent: "center", marginRight: 5 }}>
-                      <Svg viewBox="0 0 48 48" style={{ width: 9.5, height: 9.5 }}>
-                        {TRACK_ICONS[t.name]?.(t.colour)}
-                      </Svg>
+              {scholarshipTracks.map((t) => {
+                const mine = t.name === askedTrack;
+                return (
+                  <View key={t.name} style={{ flex: 1, backgroundColor: "#f6f8fd", borderWidth: mine ? 1.25 : 0, borderColor: t.colour, borderRadius: 6, padding: mine ? 5.75 : 7 }}>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" }}>
+                      <View style={{ width: 14, height: 14, borderRadius: 4, backgroundColor: tint(t.colour, 0.16), alignItems: "center", justifyContent: "center" }}>
+                        <Svg viewBox="0 0 48 48" style={{ width: 9, height: 9 }}>
+                          {TRACK_ICONS[t.name]?.(t.colour)}
+                        </Svg>
+                      </View>
+                      {mine ? (
+                        <Chip color="#ffffff" bg={t.colour} style={{ fontSize: 5, paddingHorizontal: 5, paddingVertical: 1.5 }}>
+                          Your track
+                        </Chip>
+                      ) : null}
                     </View>
-                    <Text style={{ fontSize: 9, fontWeight: 600 }}>{t.name}</Text>
+                    <Text style={{ fontSize: 9.5, fontWeight: 600, marginTop: 4 }}>{t.name}</Text>
+                    <Text style={{ flexGrow: 1, fontSize: 6.5, lineHeight: 1.35, color: INK_70, marginTop: 2 }}>{t.for}</Text>
+                    <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-end", columnGap: 3, marginTop: 5 }}>
+                      <Text style={{ fontSize: 7, fontWeight: 600 }}>{t.off}</Text>
+                      <Text style={{ fontFamily: "Mono", fontSize: 5, color: INK_60, marginBottom: 0.5 }}>{t.amount}</Text>
+                    </View>
                   </View>
-                  <Text style={{ flexGrow: 1, fontSize: 7, color: INK_70, marginTop: 4 }}>{t.for}</Text>
-                  <Text style={{ fontSize: 7.5, fontWeight: 600, marginTop: 4 }}>{t.off}</Text>
-                  <Text style={{ fontFamily: "Mono", fontSize: 6, color: INK_60, marginTop: 1 }}>{t.amount}</Text>
-                </View>
-              ))}
+                );
+              })}
             </View>
           </View>
-          <Text style={{ fontSize: 7, color: INK_60, marginTop: 5 }}>{scholarshipFine}</Text>
+          <Text style={{ maxWidth: 280, fontSize: 7, lineHeight: 1.35, color: INK_60, marginTop: 4 }}>{scholarshipFine}</Text>
         </View>
       </Page>
 
@@ -663,26 +715,31 @@ function ReportDoc({ r, id }: { r: Result; id: Identity }) {
             { h: "Selection Session at our studio in Gurugram.", d: "A group session with founders like you, then a one-on-one on your score and your first 10 days." },
             { h: "A decision within 24 hours.", d: "If you’re selected, ₹15,000 + GST within 48 hours holds your seat." },
           ].map((step, i) => (
-            <View key={i} style={{ flex: 1, backgroundColor: GRAY_100, borderLeftWidth: 1.5, borderLeftColor: DEEP, borderTopRightRadius: 6, borderBottomRightRadius: 6, padding: 10 }}>
+            <View key={i} style={{ flex: 1, backgroundColor: GRAY_100, borderLeftWidth: 1.5, borderLeftColor: DEEP, borderTopRightRadius: 6, borderBottomRightRadius: 6, paddingHorizontal: 10, paddingTop: 9, paddingBottom: 10 }}>
               <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: DEEP, alignItems: "center", justifyContent: "center", marginRight: 6 }}>
                   <Text style={{ fontFamily: "Mono", fontSize: 6, color: "#ffffff" }}>{i + 1}</Text>
                 </View>
                 <Mono color={DEEP}>Step {i + 1}</Mono>
               </View>
-              <Text style={{ fontSize: 10, fontWeight: 600, marginTop: 7 }}>{step.h}</Text>
-              <Text style={{ fontSize: 8, color: INK_70, marginTop: 3 }}>
+              <Text style={{ fontSize: 9.5, fontWeight: 600, lineHeight: 1.25, marginTop: 6 }}>{step.h}</Text>
+              <Text style={{ fontSize: 7, lineHeight: 1.35, color: INK_70, marginTop: 2.5 }}>
                 <Rupees>{step.d}</Rupees>
               </Text>
             </View>
           ))}
         </View>
+        {asked ? (
+          <View style={{ backgroundColor: GRAY_100, borderWidth: 0.75, borderColor: BLUE_LINE, borderRadius: 6, paddingVertical: 6.5, paddingHorizontal: 11, marginTop: 6 }}>
+            <Text style={{ fontSize: 7.5, color: INK_80 }}>{askedLine}</Text>
+          </View>
+        ) : null}
 
-        <Sec h="Industry experts" d="Weekly masterclasses with investors, founders and industry experts, working on your numbers." style={{ marginTop: 2 }}>
+        <Sec h="Industry experts" d="Weekly masterclasses with investors, founders and industry experts, working on your numbers." style={{ marginTop: -1 }} placeholder={shownExperts.some((p) => !p.name)}>
           <View style={{ borderRadius: 7, overflow: "hidden", padding: 9 }}>
             <Grad id="experts" stops={[[0, NAVY], [1, NAVY_2]]} x2={1} y2={1} />
             <View style={{ flexDirection: "row", gap: 6 }}>
-              {experts.people.slice(0, 3).map((p) => {
+              {shownExperts.map((p) => {
                 const [first, ...rest] = (p.name ?? "Expert name").split(" ");
                 return (
                   <View key={p.seat} style={{ flex: 1, flexDirection: "row", borderWidth: 0.75, borderColor: "#34467a", backgroundColor: "#16285a", borderRadius: 6, overflow: "hidden" }}>
@@ -691,21 +748,20 @@ function ReportDoc({ r, id }: { r: Result; id: Identity }) {
                         <Text style={{ fontWeight: 600 }}>{first}</Text> {rest.join(" ")}
                       </Text>
                       <View style={{ height: 0.75, backgroundColor: "#5a6a99", marginTop: 4, width: 70 }} />
-                      <View style={{ marginTop: 5, transform: "skewX(-10deg)" }}>
-                        <Text style={{ fontSize: 8.5, color: "#e3e8f5" }}>{p.role ?? "Designation"}</Text>
-                      </View>
-                      <Text style={{ fontSize: 6.5, color: "#9aa5c4", marginTop: 2 }}>at</Text>
+                      {/* The designation alone is set in a serif italic, PDF's own Times, as a title would be. */}
+                      <Text style={{ fontFamily: "Times-Roman", fontStyle: "italic", fontSize: 10, color: "#e3e8f5", marginTop: 5 }}>{p.role ?? "Designation"}</Text>
+                      <Text style={{ fontSize: 6.5, lineHeight: 1.35, color: "#9aa5c4", marginTop: 2 }}>at</Text>
                       <View style={{ flexDirection: "row", marginTop: 3 }}>
                         <Mono color="#9aa5c4" style={{ fontSize: 4.5, borderWidth: 0.75, borderColor: "#7381ab", borderStyle: "dashed", borderRadius: 3, paddingHorizontal: 5, paddingVertical: 4 }}>
                           {p.company?.name ?? "Company logo"}
                         </Mono>
                       </View>
-                      <Text style={{ fontSize: 6.5, color: "#c9d1e8", marginTop: 5 }}>Qualification</Text>
+                      <Text style={{ fontSize: 6.5, lineHeight: 1.35, color: "#c9d1e8", marginTop: 5 }}>Qualification</Text>
                       <View style={{ flexDirection: "row", marginTop: 2 }}>
                         <Text style={{ fontSize: 6, color: "#ffffff", backgroundColor: "#3a7be0", borderRadius: 3, paddingHorizontal: 4, paddingVertical: 2 }}>{p.seat}</Text>
                       </View>
                     </View>
-                    <Silhouette from="#1f3a78" to="#18295c" w={48} dark />
+                    <Silhouette from="#2a4a8f" to="#18295c" w={56} dark />
                   </View>
                 );
               })}
@@ -714,7 +770,7 @@ function ReportDoc({ r, id }: { r: Result; id: Identity }) {
           </View>
         </Sec>
 
-        <Sec h="Building beside you" d="The same team builds with you for all 100 days.">
+        <Sec h="Building beside you" d="The same team builds with you for all 100 days." style={{ marginTop: -3 }} placeholder={studio.people.some((p) => !p.name)}>
           <View style={{ borderWidth: 0.75, borderColor: GRAY_200, borderRadius: 7, overflow: "hidden", padding: 7 }}>
             <Grad id="studio" stops={[[0, "#f3f7fd"], [1, "#dce9f8"]]} />
             <View style={{ flexDirection: "row", gap: 4 }}>
@@ -723,13 +779,13 @@ function ReportDoc({ r, id }: { r: Result; id: Identity }) {
                 return (
                   <View key={p.seat} style={{ flex: 1 }}>
                     <View style={{ borderWidth: 1, borderColor: c, borderRadius: 6, padding: 1.5 }}>
-                      <Silhouette from={tint(c, 0.14)} to={tint(c, 0.32)} w={(W - 14 - 20) / 6 - 5} h={52} />
+                      <Silhouette from={tint(c, 0.14)} to={tint(c, 0.32)} w={(W - 14 - 20) / 6 - 5} h={62} />
                     </View>
                     <Mono color={c} style={{ fontSize: 4.8, marginTop: 5, letterSpacing: 0.5 }}>
                       {p.fn}
                     </Mono>
                     <Text style={{ fontSize: 8, fontWeight: 600, marginTop: 2 }}>{p.seat}</Text>
-                    <Text style={{ fontSize: 6.5, color: INK_70, marginTop: 1 }}>{p.teaches}</Text>
+                    <Text style={{ fontSize: 6.5, lineHeight: 1.35, color: INK_70, marginTop: 1 }}>{p.teaches}</Text>
                   </View>
                 );
               })}
@@ -740,38 +796,35 @@ function ReportDoc({ r, id }: { r: Result; id: Identity }) {
           </View>
         </Sec>
 
-        <Sec h="Founders’ stories" d="What founders say after building with us.">
+        {/* Held as placeholders until founders from the cohort sign off on their stories. */}
+        <Sec h="Founders’ stories" d="What founders say after building with us." style={{ marginTop: -3 }} placeholder>
           <View style={{ flexDirection: "row", gap: 6 }}>
-            {stories.map((t) => {
-              const [before, after] = t.result.replace(" score", "").split(" → ");
-              return (
-                <View key={t.quote} style={{ flex: 1, borderWidth: 0.75, borderColor: GRAY_200, borderRadius: 7, overflow: "hidden" }}>
-                  <View style={{ height: 42, paddingHorizontal: 10, justifyContent: "center" }}>
-                    <Grad id={`story-${before}`} stops={[[0, "#eef4fc"], [1, "#d3e3f6"]]} x2={1} y2={1} />
-                    <Mono>Score</Mono>
-                    <Text style={{ fontFamily: "Mono", fontSize: 14, marginTop: 2 }}>
-                      <Text style={{ color: INK_60 }}>{before}</Text> <Text style={{ color: DEEP }}>→</Text> <Text style={{ color: GREEN.fg }}>{after}</Text>
-                    </Text>
-                  </View>
-                  <View style={{ paddingHorizontal: 10, paddingVertical: 8 }}>
-                    <Text style={{ fontSize: 8, color: INK_70 }}>{t.attribution}</Text>
-                    <Text style={{ fontSize: 8.5, marginTop: 4 }}>
-                      “<Rupees>{t.quote}</Rupees>”
-                    </Text>
-                  </View>
+            {[0, 1, 2].map((i) => (
+              <View key={i} style={{ flex: 1, borderWidth: 0.75, borderColor: GRAY_200, borderRadius: 7, overflow: "hidden" }}>
+                <View style={{ height: 62, justifyContent: "flex-end", paddingHorizontal: 7, paddingBottom: 5 }}>
+                  <Grad id={`story-${i}`} stops={[[0, "#f1f6fd"], [1, "#d3e3f6"]]} x2={1} y2={1} />
+                  <Mono color={INK_40} style={{ fontSize: 4.5 }}>
+                    Photo
+                  </Mono>
                 </View>
-              );
-            })}
+                <View style={{ paddingHorizontal: 10, paddingTop: 8, paddingBottom: 9 }}>
+                  <Text style={{ fontSize: 10, fontWeight: 600 }}>Startup name</Text>
+                  <View style={{ flexDirection: "row", alignItems: "center", marginTop: 4 }}>
+                    <Text style={{ fontSize: 7.5, color: INK_70, marginRight: 5 }}>Founder · Stage</Text>
+                    <Chip color={DEEP} bg={GRAY_100} style={{ fontSize: 5, paddingHorizontal: 5, paddingVertical: 1.5 }}>
+                      Score before → after
+                    </Chip>
+                  </View>
+                  <Text style={{ fontSize: 8.5, marginTop: 6 }}>“Founder quote to come.”</Text>
+                </View>
+              </View>
+            ))}
           </View>
         </Sec>
 
-        <View wrap={false} style={[s.box, { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: 9, paddingHorizontal: 12, marginTop: 10 }]}>
+        <View wrap={false} style={[s.box, { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: 9, paddingHorizontal: 12, marginTop: 8 }]}>
           <Mono>Contact</Mono>
           <Text style={{ fontSize: 8.5, fontWeight: 600 }}>
-            <Link src={SITE} style={{ color: DEEP, textDecoration: "none" }}>
-              {SITE_HOST}
-            </Link>
-            {"  ·  "}
             <Link src={`tel:${CONTACT_PHONE.tel}`} style={{ color: INK, textDecoration: "none" }}>
               {CONTACT_PHONE.display}
             </Link>
