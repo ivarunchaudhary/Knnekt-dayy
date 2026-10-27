@@ -1406,8 +1406,8 @@ header[data-hero] .text-center > span[role="img"] svg{filter:drop-shadow(0 2px 1
   .t1-row{scroll-snap-type:x mandatory}
   .t1-row > li{scroll-snap-align:start}
 
-  /* the contact block no longer needs room for a bottom nav */
-  footer{padding-bottom:1.5rem}
+  /* the picture closes the page, so nothing sits below it but the home-indicator inset */
+  footer{padding-bottom:env(safe-area-inset-bottom,0)}
 }
 @media (max-width:47.99rem) and (prefers-reduced-motion:reduce){
   .mh,.mh-sheet,.mh-list li,.mh-menu span{transition:none!important}
