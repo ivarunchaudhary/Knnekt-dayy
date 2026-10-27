@@ -14,6 +14,10 @@ export type Mail = {
   html: string;
   text: string;
   attachment?: { filename: string; base64: string };
+  /** Defaults to the studio inbox. */
+  replyTo?: string;
+  /** Defaults to SCORE_BCC, else the studio inbox; [] sends no copy. */
+  bcc?: string[];
 };
 
 export type MailResult = { sent: true; id: string | null } | { sent: false; reason: "unconfigured" | "failed"; error?: string };
@@ -24,10 +28,12 @@ export async function sendMail(mail: Mail): Promise<MailResult> {
   if (!key) return { sent: false, reason: "unconfigured" };
 
   // The studio's copy of every report. Without SCORE_BCC it goes to the reply-to inbox.
-  const bcc = (process.env.SCORE_BCC || REPLY_TO)
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
+  const bcc =
+    mail.bcc ??
+    (process.env.SCORE_BCC || REPLY_TO)
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
 
   try {
     const res = await fetch("https://api.resend.com/emails", {
@@ -37,7 +43,7 @@ export async function sendMail(mail: Mail): Promise<MailResult> {
         from: FROM,
         to: [mail.to],
         ...(bcc.length ? { bcc } : {}),
-        reply_to: REPLY_TO,
+        reply_to: mail.replyTo || REPLY_TO,
         subject: mail.subject,
         html: mail.html,
         text: mail.text,

@@ -7,3 +7,6 @@ export const CONTACT_EMAIL = "hello@knnekt.studio";
 
 /** The studio's number: the one we call founders from, so they know to pick up. */
 export const CONTACT_PHONE = { display: "+91 91408 45927", tel: "+919140845927" };
+
+/** The form's Stage choices. The enquiry route checks against the same list, so anything else falls back to the first. */
+export const CONTACT_STAGES: readonly string[] = ["Idea, nothing built yet", "Building, pre-launch", "In market, early customers", "Raising, or about to"];

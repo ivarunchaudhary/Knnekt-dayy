@@ -1,10 +1,9 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
-import { CONTACT_EMAIL } from "@/lib/contact";
+import { CONTACT_EMAIL, CONTACT_STAGES as stages } from "@/lib/contact";
 import { identify, track, useFormTracking } from "@/lib/pixel";
 
-const stages = ["Idea, nothing built yet", "Building, pre-launch", "In market, early customers", "Raising, or about to"];
 type Fields = { name: string; email: string; startup: string; stage: string; message: string };
 type Errors = Partial<Record<keyof Fields, string>>;
 
