@@ -13,7 +13,7 @@ type Body = { identity?: Partial<Identity>; answers?: unknown; catOther?: unknow
 /**
  * A finished score. Re-graded here from the raw answers so the number the
  * founder saw and the number we send can't drift apart, then emailed to them
- * from hello@knnekt.studio — the short readout in the body, the full report as
+ * from hello@knnekt.studio — a short letter in the body, the full report as
  * the attached PDF, with the studio copied — and forwarded to the webhook that
  * files the lead. The PDF comes back in the response too, so the result screen
  * can offer it for download. The studio calls from there; nothing is booked.
@@ -57,8 +57,8 @@ export async function POST(request: Request) {
   const mail = await sendMail({
     to: id.email,
     subject: reportSubject(result),
-    html: reportEmailHtml(result, id, filename),
-    text: reportEmailText(result, id, filename),
+    html: reportEmailHtml(result, id),
+    text: reportEmailText(result, id),
     ...(pdf ? { attachment: { filename, base64: pdf } } : {}),
   });
   if (!mail.sent) {

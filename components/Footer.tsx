@@ -9,12 +9,15 @@ const link = "inline-flex min-h-6 items-center outline-offset-2 outline-dark hov
 export default function Footer() {
   return (
     <footer className="mono-text relative flex flex-col overflow-hidden font-mono">
-      <div className={`${containerClass} relative z-10 flex flex-col justify-between gap-x-20 gap-y-10 pt-16 pb-14 md:pb-12`}>
-        <div className="grid gap-x-1.5 gap-y-10 md:grid-cols-4">
+      <div className={`${containerClass} relative z-10 flex flex-col justify-between gap-x-20 gap-y-10 pt-8 pb-8 md:pt-16 md:pb-12`}>
+        {/* On a phone the wordmark and the studio share the first row and the
+            two link lists share the next, so the footer is three short rows
+            rather than five tall ones. */}
+        <div className="grid grid-cols-2 gap-x-4 gap-y-6 md:grid-cols-4 md:gap-x-1.5 md:gap-y-10">
           <div>
             <Wordmark mark className="text-dark text-[2rem]" />
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:block md:space-y-6">
+          <div className="md:space-y-6">
             <address className="not-italic">
               <span className="flex min-h-6 items-center">Studio</span>
               <span className="text-dark-subtle block">Gurugram</span>
@@ -22,7 +25,7 @@ export default function Footer() {
               <a className={`text-dark-subtle hover:text-dark ${link}`} href={`tel:${CONTACT_PHONE.tel}`}>{CONTACT_PHONE.display}</a>
             </address>
           </div>
-          <nav className="grid grid-cols-2 md:block md:space-y-6">
+          <nav className="col-span-2 grid grid-cols-2 gap-x-4 md:col-span-1 md:block md:space-y-6">
             <ul>
               <li>
                 <a className={link} href="https://www.instagram.com/knnektstudios/" target="_blank" rel="noopener noreferrer">Instagram</a>
@@ -49,13 +52,14 @@ export default function Footer() {
               </li>
             </ul>
           </nav>
-          <div>
+          <div className="col-span-2 md:col-span-1">
             <p>
               <a className={link} href="mailto:hello@knnekt.studio">hello@knnekt.studio</a>
             </p>
             <p>Knnekt Studios</p>
             <p>Startup Operating Score</p>
             <p className="text-dark-subtle">©{new Date().getFullYear()} All rights reserved</p>
+            <p className="text-dark-subtle">Knnekt Studios is operated by Qolorr Retail Pvt Ltd.</p>
           </div>
         </div>
       </div>
@@ -70,7 +74,7 @@ export default function Footer() {
           percent of clear white to sit on. The tree reaches the picture's top
           edge, so the line stays above it rather than being nudged down into
           the sky. */}
-      <div className={`${containerClass} @container relative z-10 pb-10 md:pb-[15%]`}>
+      <div className={`${containerClass} @container relative z-10 pb-4 md:pb-[15%]`}>
         <p className="text-dark text-center font-sans text-[min(4.6cqi,4rem)] leading-none font-medium tracking-tight whitespace-nowrap normal-case">
           Every Startup Needs One Friend
         </p>
