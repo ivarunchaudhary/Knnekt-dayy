@@ -28,7 +28,7 @@ export default function Footer() {
           <nav className="col-span-2 grid grid-cols-2 gap-x-4 md:col-span-1 md:block md:space-y-6">
             <ul>
               <li>
-                <a className={link} href="https://www.instagram.com/knnektstudios/" target="_blank" rel="noopener noreferrer">Instagram</a>
+                <a className={link} href="https://www.instagram.com/knnekt.studios/" target="_blank" rel="noopener noreferrer">Instagram</a>
               </li>
               <li>
                 <a className={link} href="https://x.com/knnektstudios" target="_blank" rel="noopener noreferrer">Twitter / X</a>

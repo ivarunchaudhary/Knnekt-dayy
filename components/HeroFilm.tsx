@@ -53,9 +53,9 @@ export default function HeroFilm() {
           aria-hidden="true"
           tabIndex={-1}
           disablePictureInPicture
-          poster="/images/hero--film-poster.jpg"
+          poster="/images/hero--film-poster-v2.jpg"
         >
-          <source src="/videos/hero--film.mp4" type="video/mp4" />
+          <source src="/videos/hero--film-v2.mp4" type="video/mp4" />
         </video>
       </div>
     </div>
