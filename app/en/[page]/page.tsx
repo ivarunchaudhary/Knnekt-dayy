@@ -83,19 +83,6 @@ function LegalDocument({ doc, title }: { doc: LegalDoc; title: string }) {
       <p className="text-dark-subtle mt-3 text-sm">Knnekt Studios, a brand of Qolorr Retail Private Limited</p>
       <p className="text-dark-subtle mt-1 text-sm">Effective {doc.effective}</p>
 
-      <nav aria-label="Contents" className="mt-10 max-w-[40rem] border-t border-black/15 pt-6">
-        <p className="text-dark mb-3 text-sm font-semibold">Contents</p>
-        <ol className="text-dark-subtle grid list-decimal gap-x-10 gap-y-1 pl-5 text-sm md:grid-cols-2">
-          {doc.sections.map((s, i) => (
-            <li key={s.title}>
-              <a className="hover:text-dark" href={`#section-${i + 1}`}>
-                {s.title}
-              </a>
-            </li>
-          ))}
-        </ol>
-      </nav>
-
       {doc.sections.map((s, i) => (
         <section key={s.title} id={`section-${i + 1}`} className="mt-14 scroll-mt-24">
           <h2 className="text-dark text-xl font-semibold">
