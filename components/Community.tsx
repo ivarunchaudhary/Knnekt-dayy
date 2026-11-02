@@ -20,6 +20,16 @@ function Silhouette() {
   );
 }
 
+/** A former employer's logo, beneath the company. */
+function ExLogo({ ex }: { ex: NonNullable<FacultyMember["ex"]> }) {
+  return (
+    <p className="o2-ex">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img className={ex.large ? "o2-ex-logo o2-ex-logo-lg" : "o2-ex-logo"} alt={ex.name} src={ex.logo} />
+    </p>
+  );
+}
+
 /** One masterclass expert: who they are on the left, their portrait on the right, their seat as the badge. */
 function ExpertCard({ person }: { person: FacultyMember }) {
   const [first, ...rest] = (person.name ?? "Expert name").split(" ");
@@ -30,21 +40,34 @@ function ExpertCard({ person }: { person: FacultyMember }) {
           <span>{first}</span> {rest.join(" ")}
         </p>
         <span className="o2-rule" />
-        <p className="o2-role">{person.role ?? "Designation"}</p>
-        <p className="o2-at">at</p>
+        {/* A signed expert with no title goes straight to the company, without "Designation · at". */}
+        {(person.role || !person.name) && (
+          <>
+            <p className="o2-role">{person.role ?? "Designation"}</p>
+            <p className="o2-at">at</p>
+          </>
+        )}
         {person.company ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img className="h-9 w-auto max-w-32 object-contain" alt={person.company.name} src={person.company.logo} />
+          person.company.logo ? (
+            <span className="o2-co">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img className="cm-logo-img" alt={person.company.name} src={person.company.logo} />
+            </span>
+          ) : (
+            <span className="o2-co o2-co-text">{person.company.name}</span>
+          )
         ) : (
           <span className="cm-logo mono-text font-mono">Company logo</span>
         )}
-        <p className="o2-qual">Qualification</p>
+        {person.ex?.first && <ExLogo ex={person.ex} />}
+        {(person.qual || !person.name) && <p className="o2-qual">{person.qual ?? "Qualification"}</p>}
+        {person.ex && !person.ex.first && <ExLogo ex={person.ex} />}
         <span className="o2-badge">{person.seat}</span>
       </div>
       <span className="o2-photo">
         {person.src ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img className="absolute inset-0 size-full object-cover" alt={person.alt ?? ""} loading="lazy" decoding="async" src={person.src} />
+          <img className="o2-img" alt={person.alt ?? ""} loading="lazy" decoding="async" draggable={false} src={person.src} />
         ) : (
           <Silhouette />
         )}
@@ -101,7 +124,7 @@ function Masterclasses() {
         </div>
       </div>
       {/* The row scrolls, so it takes focus for the keyboard. */}
-      <ul ref={row} className="o2-scroll" aria-label="Masterclass experts" tabIndex={0}>
+      <ul ref={row} className={investors.people.length % 2 ? "o2-scroll o2-odd" : "o2-scroll"} aria-label="Masterclass experts" tabIndex={0}>
         {investors.people.map((person) => (
           <ExpertCard key={person.seat} person={person} />
         ))}

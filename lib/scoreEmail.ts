@@ -5,11 +5,8 @@
  * italic sign-off line, and survives any client.
  */
 import { CONTACT_PHONE } from "./contact";
+import { letterHtml, letterText, SIGN_OFF } from "./letter";
 import { archetypes, type Identity, type Result } from "./score";
-
-const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-
-const FONT = "'Helvetica Neue',Helvetica,Arial,sans-serif";
 
 export const reportSubject = (r: Result) => `Your Startup Operating Score: ${r.overall}/100`;
 
@@ -23,31 +20,15 @@ function letter(r: Result, id: Identity): string[][] {
     [
       `Our team reviews every report personally. We will call you within 24 hours from ${CONTACT_PHONE.display} to walk you through your results, discuss the first thing worth fixing, and explore whether working together would be the right step for you.`,
     ],
-    ["Warm regards,", "Team Knnekt Studios"],
-    ["Investors fund proof, not pitches. We build the proof with you."],
+    ...SIGN_OFF,
   ];
 }
 
 export function reportEmailHtml(r: Result, id: Identity): string {
-  const paras = letter(r, id);
-  const body = paras
-    .map((lines, i) => {
-      const italic = i === paras.length - 1 ? "font-style:italic;" : "";
-      return `<p style="margin:0 0 14px;font:400 15px/1.55 ${FONT};color:#16253f;${italic}">${lines.map(esc).join("<br>")}</p>`;
-    })
-    .join("\n");
-  return `<!doctype html>
-<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(reportSubject(r))}</title></head>
-<body style="margin:0;padding:24px 16px;background:#ffffff;">
-<div style="max-width:600px;">
-${body}
-</div>
-</body></html>`;
+  return letterHtml(reportSubject(r), letter(r, id));
 }
 
 /** The same thing as plain text, for clients that won't render HTML. */
 export function reportEmailText(r: Result, id: Identity): string {
-  return letter(r, id)
-    .map((lines) => lines.join("\n"))
-    .join("\n\n");
+  return letterText(letter(r, id));
 }

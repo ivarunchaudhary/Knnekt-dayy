@@ -8,16 +8,14 @@ import { containerClass, SectionHeading } from "./Container";
 const SPEED = 28;
 
 function Card({ t, copy }: { t: Testimonial; copy?: boolean }) {
-  // "Founder · Athleisure · In market" → heading "Athleisure", "Founder · In market" beneath.
-  const [role, sector, stage] = t.attribution.split(" · ");
   return (
     <li className="tc-card" aria-hidden={copy || undefined} tabIndex={copy ? -1 : undefined}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img className="tc-img" alt={copy ? "" : t.image.alt} src={t.image.src} loading="lazy" draggable={false} />
       <div className="tc-body">
-        <p className="tc-name">{sector}</p>
+        <p className="tc-name">{t.name}</p>
         <p className="tc-meta">
-          {role} · {stage} <span className="tc-proof mono-text font-mono">{t.result}</span>
+          {t.meta} <span className="tc-proof mono-text font-mono">{t.result}</span>
         </p>
         <blockquote className="tc-quote">“{t.quote}”</blockquote>
       </div>
@@ -177,9 +175,9 @@ export default function Testimonials() {
         >
           <ul ref={track} className="tc-track">
             {testimonials.map((t) => (
-              <Card key={t.attribution} t={t} />
+              <Card key={t.name} t={t} />
             ))}
-            {[1, 2, 3].map((n) => testimonials.map((t) => <Card key={`${n}-${t.attribution}`} t={t} copy />))}
+            {[1, 2, 3].map((n) => testimonials.map((t) => <Card key={`${n}-${t.name}`} t={t} copy />))}
           </ul>
         </div>
       </div>

@@ -1171,6 +1171,21 @@ header[data-hero] .text-center > span[role="img"] svg{filter:drop-shadow(0 2px 1
 @media (min-width:80rem){.o2-scroll{grid-auto-columns:calc((100% - 2rem) / 3.12);-webkit-mask:linear-gradient(90deg,#000 calc(100% - 2.5rem),transparent);mask:linear-gradient(90deg,#000 calc(100% - 2.5rem),transparent)}}
 .o2-more{grid-row:span 2;min-height:auto}
 
+/* real expert photos and company logos */
+.o2-photo{overflow:hidden}
+.o2-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 20%}
+.o2-co{display:block;margin-top:.15rem}
+.o2-final .o2-text{padding-right:.9rem}
+.o2-ex{display:flex;align-items:center;gap:.6rem;margin-top:.7rem}
+.o2-ex-logo{display:block;height:1.9rem;width:auto;max-width:7rem;object-fit:contain}
+.o2-ex + .o2-qual{margin-top:.35rem}
+.o2-ex-logo-lg{height:2.6rem}
+.o2-ex:has(+ .o2-badge){margin-bottom:.9rem}
+.cm-logo-img{display:block;height:2.25rem;width:auto;max-width:9.5rem;object-fit:contain;object-position:left center}
+.o2-co-text{font-size:1rem;font-weight:500;line-height:1.25;color:#fff}
+/* an odd number of experts: "…and more" takes the empty slot instead of a whole column */
+.o2-scroll.o2-odd .o2-more{grid-row:auto;min-height:14rem}
+
 /* execution team: photo placeholders, like the masterclass cards */
 .t1-ph{display:grid;place-items:end center;background:linear-gradient(160deg,color-mix(in srgb,var(--c) 18%,#fff),color-mix(in srgb,var(--c) 34%,#eef5fd))}
 .t1-ph .cm-sil{width:68%;color:rgb(255 255 255/.85)}

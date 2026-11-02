@@ -355,7 +355,12 @@ export type FacultyMember = {
   note?: string;
   /** For the masterclasses: their title, and the company it's at (a logo, once we have it). */
   role?: string;
-  company?: { name: string; logo: string };
+  /** Where they are now: a logo when we have one, otherwise the name set as text. */
+  company?: { name: string; logo?: string };
+  /** One line of credentials beneath the company. */
+  qual?: string;
+  /** A former employer's logo; `large` for a wordmark that needs the extra height, `first` to set it above the qualification. */
+  ex?: { name: string; logo: string; large?: boolean; first?: boolean };
   /** A real photo, once the person is signed. Absent → the card shows a silhouette marked "Photo". */
   src?: string;
   alt?: string;
@@ -390,44 +395,54 @@ export const faculty: FacultyGroup[] = [
     more: "…and more",
     people: [
       {
-        seat: "Seed investor · Consumer",
-        teaches: "What a seed round actually buys",
-        note: "Why most decks answer a question nobody asked.",
+        name: "Dipesh Vaishnav",
+        seat: "Grants & Loan Expert",
+        teaches: "Grants and loans",
+        role: "Director",
+        company: { name: "ConsultUp India", logo: "/images/logo--consultup-india-white.webp" },
+        src: "/images/expert--dipesh-vaishnav.webp",
+        alt: "Dipesh Vaishnav",
       },
       {
-        seat: "Early-stage VC · B2B SaaS",
-        teaches: "The metrics that survive diligence",
-        note: "Which numbers hold up under a data room, and which quietly don’t.",
+        name: "Sourabh Sinha",
+        seat: "Corporate compliance",
+        teaches: "Corporate compliance",
+        role: "Proprietor",
+        company: { name: "S Sinha & Associates" },
+        qual: "Company Secretary",
+        ex: { name: "Blue Planet Environmental Solutions", logo: "/images/logo--blue-planet-white.webp", large: true },
+        src: "/images/expert--sourabh-sinha.webp",
+        alt: "Sourabh Sinha",
       },
       {
-        seat: "Angel · 30+ cheques",
-        teaches: "Writing the first cheque",
-        note: "What makes an angel say yes in the first ten minutes.",
+        name: "Vikas Gangwal",
+        seat: "Finance Expert",
+        teaches: "Finance",
+        company: { name: "PNC Infratech", logo: "/images/logo--pnc-infratech.webp" },
+        qual: "Ex‑Vice President, EY Ventures",
+        ex: { name: "EY", logo: "/images/logo--ey-white.webp", first: true },
+        src: "/images/expert--vikas-gangwal.webp",
+        alt: "Vikas Gangwal",
       },
       {
-        seat: "Growth-stage investor",
-        teaches: "From traction to a Series A story",
-        note: "The narrative that turns 100 customers into a round.",
+        name: "Dr. Kirtika Chetia",
+        seat: "Marketing Consultant",
+        teaches: "Marketing",
+        role: "Founder",
+        company: { name: "Nitkala" },
+        qual: "Ex‑EDII · NID · MICA",
+        src: "/images/expert--kirtika-chetia.webp",
+        alt: "Dr. Kirtika Chetia",
       },
       {
-        seat: "Family office · India",
-        teaches: "Capital that isn’t venture",
-        note: "Revenue-based, strategic and patient money, and when it beats a VC.",
-      },
-      {
-        seat: "Founder-turned-investor",
-        teaches: "Both sides of the table",
-        note: "What they wish someone had told them before their own raise.",
-      },
-      {
-        seat: "Legal partner · Corporate law",
-        teaches: "Term sheets without surprises",
-        note: "The clauses that cost founders the most, read before they sign.",
-      },
-      {
-        seat: "Distribution leader · FMCG",
-        teaches: "Getting onto the shelf",
-        note: "How distribution really works in India, from the people who run it.",
+        name: "Prof. Bharat Oswal",
+        seat: "B2B & B2G Matchmaker",
+        teaches: "B2B and B2G matchmaking",
+        role: "Vice Chairman",
+        company: { name: "JITO Incubation & Innovation Foundation", logo: "/images/logo--jito-jiif-white.webp" },
+        qual: "Angel Investor · CII Young Indians Pune, YUVA Chair",
+        src: "/images/expert--bharat-oswal.webp",
+        alt: "Prof. Bharat Oswal",
       },
     ],
   },
@@ -478,14 +493,14 @@ export const faculty: FacultyGroup[] = [
 
 export type Testimonial = {
   quote: string;
-  /** Attributed by role, the same way the case studies are, until founders consent to be named. */
-  attribution: string;
+  /** The startup and its sector, as the card's heading. */
+  name: string;
+  /** The founder and where the startup stands now. */
+  meta: string;
   /** The one figure that backs the quote up. */
   result: string;
   /**
-   * The card in the photo stack. The four case-study quotes carry their own
-   * case frame; the rest carry a studio photo, never a face that would read as
-   * the founder's own.
+   * The card's picture: the startup's own product shot, poster or logo.
    */
   image: { src: string; alt: string };
 };
@@ -493,58 +508,67 @@ export type Testimonial = {
 /** One at a time, on a stack of photos that shuffles forward with each quote. */
 export const testimonials: Testimonial[] = [
   {
-    quote: "Knnekt gave me a clear vision to launch. Within two months I shipped my product and gained the traction that helped me understand my customers.",
-    attribution: "Founder · Athleisure · In market",
+    quote: "Knnekt Studio helped us with our GTM and improved the customer acquisition funnel we were already working on.",
+    name: "isaymove · Athleisure",
+    meta: "Ishika · Selling, running new campaigns",
     result: "45 → 71 score",
-    image: { src: `${cdn}/630edbc02eae351ece1f45cce3e1ede17718cca4-1200x1249.webp`, alt: "Coach reviewing data on a laptop while athletes train on an indoor track" },
+    image: { src: "/images/project--isaymove.webp", alt: "Three women in isaymove athleisure doing yoga poses in a sunlit studio" },
   },
   {
-    quote: "The platform was never the question. Knnekt made us answer who it’s really for.",
-    attribution: "Founder · Equity-firm SaaS · In market",
-    result: "2 pilots live",
-    image: { src: `${cdn}/39491c8a82d60f80a16f404d543c829d3123d7d7-1200x1249.webp`, alt: "Person holding a tablet displaying an AI assistant interface" },
-  },
-  {
-    quote: "They cut half my roadmap and I launched twice as fast. The no’s were the value.",
-    attribution: "Founder · Luxury commerce · Launched",
-    result: "52 → 79 score",
-    image: { src: `${own}/qolorr-mobile.webp`, alt: "The Qolorr wordmark, white on black" },
-  },
-  {
-    quote: "They talked me out of spending ₹50k I didn’t need to. I ran the roadmap myself and it worked.",
-    attribution: "Founder · D2C beverage · Roadmap",
+    quote: "The score was brutal and showed me where I was lagging. Knnekt Studio helped me with the initial marketing, customer acquisition and product manufacturing.",
+    name: "Khoj · Archival Indian food",
+    meta: "Mehtab Hundal · Manufacturing, sold out at Gurugram exhibitions",
     result: "38 → 55 score",
-    image: { src: `${own}/khoj-mobile.webp`, alt: "A woman in Punjabi jewellery drinking from a brass glass, in front of a shelf of spice jars" },
+    image: { src: "/images/project--khoj.webp", alt: "A jar of Khoj on a stone slab beside a brass bowl of black pepper" },
   },
   {
-    quote: "I’d been quoted four vendors and three months just to get to a kickoff. Here it was one plan and one invoice.",
-    attribution: "Founder · Logistics SaaS · Building",
-    result: "One fixed price",
-    image: { src: `${cdn}/485eab86632782a606942f1209ba6c34d2668eda-1200x1601.webp`, alt: "A long, bright open-plan office with people working at shared desks" },
+    quote: "Knnekt Studio helped us connect with industry experts and built a funnel to close equity firms as our test partners and first clients.",
+    name: "Klypp · AI CRM for private equity",
+    meta: "Sourav Dhiman · 2 pilots live with equity firms",
+    result: "27 → 63 score",
+    image: { src: "/images/project--klypp.webp", alt: "The Klypp wordmark in white on a dark background" },
   },
   {
-    quote: "The score was brutal and it was the most useful hour of my year. I knew exactly what was broken before I spent a rupee.",
-    attribution: "Founder · Healthtech · Pre-launch",
-    result: "Free report, kept",
-    image: { src: `${cdn}/131a923cb1ee419e62639e344a4d1a0ce6913048-1200x1601.webp`, alt: "Person with a hand to their face, reading something on a desktop computer" },
+    quote: "Knnekt Studio helped me go for ₹50–60L in grants when I was only expecting ₹30L, and they’ve been with me throughout the journey.",
+    name: "Camarin AI · AI fashion-tech systems",
+    meta: "Vaibhav Sonkhla · 4–5 B2B clients, ₹5L+ average deal",
+    result: "52 → 71 score",
+    image: { src: "/images/project--camarin-ai.webp", alt: "The Camarin AI logo in white on black, beside a red gradient circle" },
   },
   {
-    quote: "The weekly 1:1 is the part I’d pay for on its own. Someone senior, every week, who’d actually read my numbers.",
-    attribution: "Founder · Fintech · Building",
-    result: "12 weekly 1:1s",
-    image: { src: `${cdn}/25d452de1b87378bd8baa6e3860b17d5b656edaf-1200x1560.webp`, alt: "Person in a grey sweater reading a message on their phone" },
+    quote: "The score found our biggest constraint first: inventory logic. We had too few units in each style and too many different SKUs, and that held back our customer acquisition, retention, ads and brand building.",
+    name: "Precious Me · Women’s workwear footwear",
+    meta: "Akshi Kataria · Selling online and at exhibitions, early traction",
+    result: "21 → 43 score",
+    image: { src: "/images/project--precious-me.webp", alt: "The Precious Me logo in black" },
   },
   {
-    quote: "We shipped the MVP in week seven and had paying users in week nine. Nothing about that was normal for us.",
-    attribution: "Founder · Vertical SaaS · In market",
-    result: "MVP by week 7",
-    image: { src: `${cdn}/4ba968d2595fbd0923b413c381b2d5b7577d3215-1200x1599.webp`, alt: "Person at a workbench with a 3D printer and tools on a pegboard wall" },
+    quote: "Knnekt Studio showed me the constraints I’d hit going straight into trading, and set me on the right path: start with an education platform. That brought traction, an early revenue stream and an industry network, and made me compliance-ready for a carbon credit licence.",
+    name: "CarboraX · Carbon credit trading",
+    meta: "Adithyan · Running sustainability projects and carbon-credit education",
+    result: "18 → 34 score",
+    image: { src: "/images/project--carborax.webp", alt: "The CarboraX logo: a green leaf mark beside the CarboraX wordmark" },
   },
   {
-    quote: "Legal was the thing I kept putting off. It got handled in the first month, before it got expensive.",
-    attribution: "Founder · Consumer app · In market",
-    result: "Clean data room",
-    image: { src: `${cdn}/a7836cfbeb7410fcc0226cd2f630461ff0199920-1200x1601.webp`, alt: "Person working at a counter beside a large plant, in a sunlit room" },
+    quote: "Knnekt Studio used footfall data to help us finalise our locations, and guided us on the menu, ambience and economics the café needs to run profitably.",
+    name: "Puff and Blow · Café",
+    meta: "Saarthak Kapoor · Opening 4 outlets across Gurugram",
+    result: "31 → 67 score",
+    image: { src: "/images/project--puff-and-blow.webp", alt: "The Puff and Blow café poster, a neon-pink illustration of a woman in a sari" },
+  },
+  {
+    quote: "Knnekt Studio helped us land 2 pilots and build a pipeline that brings in new clients every month.",
+    name: "axelr8.ai · AI education platform",
+    meta: "Sourav · 2 pilots done, new clients every month",
+    result: "42 → 78 score",
+    image: { src: "/images/project--axlr8-ai.webp", alt: "The axelr8.ai logo" },
+  },
+  {
+    quote: "Knnekt Studio helped us with marketing, positioning and pricing, and with nailing the cultural impact of Korean cuisine.",
+    name: "Seoul Cha · Korean QSR",
+    meta: "Sohini Mondal · Serving in GK-II, New Delhi",
+    result: "24 → 72 score",
+    image: { src: "/images/project--seoul-cha.webp", alt: "The Seoul Cha logo: a tiger cub sipping bubble tea, with the name Seoul Cha" },
   },
 ];
 

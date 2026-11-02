@@ -7,7 +7,15 @@ const looksLikeEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
 const field = (v: unknown, max: number) => (typeof v === "string" ? v.trim().slice(0, max) : "");
 const escape = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 
-type Body = { name?: unknown; email?: unknown; startup?: unknown; stage?: unknown; message?: unknown; website?: unknown };
+type Body = {
+  name?: unknown;
+  email?: unknown;
+  startup?: unknown;
+  stage?: unknown;
+  message?: unknown;
+  website?: unknown;
+  whatsappConsent?: unknown;
+};
 
 /**
  * An enquiry from the contact form. Filed in the Sheet's "Enquiries" tab and
@@ -36,12 +44,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Name, email, startup and a message are required" }, { status: 400 });
   }
 
+  // Consent is opt-in only: anything other than a literal `true` counts as no.
+  // The timestamp is the proof of consent, so it is set only when consent is given.
   const submittedAt = new Date().toISOString();
+  const whatsappConsent = body.whatsappConsent === true;
+  const consentAt = whatsappConsent ? submittedAt : "";
   const lines: [string, string][] = [
     ["Name", name],
     ["Email", email],
     ["Startup", startup],
     ["Stage", stage],
+    ["WhatsApp updates", whatsappConsent ? `yes (consented ${consentAt})` : "no"],
   ];
 
   const [mail, filed] = await Promise.all([
@@ -55,7 +68,10 @@ export async function POST(request: Request) {
         .map(([k, v]) => `<tr><td style="padding-right:16px;color:#666">${k}</td><td>${escape(v)}</td></tr>`)
         .join("")}</table><p style="font:14px/1.5 sans-serif;white-space:pre-wrap">${escape(message)}</p>`,
     }),
-    forwardToSheet({ event: "contact", submitted_at: submittedAt, name, email, startup, stage, message }, "contact"),
+    forwardToSheet(
+      { event: "contact", submitted_at: submittedAt, name, email, startup, stage, message, whatsapp_consent: whatsappConsent, whatsapp_consent_at: consentAt },
+      "contact",
+    ),
   ]);
 
   if (!mail.sent) {

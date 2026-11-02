@@ -4,10 +4,10 @@ import { useMemo, useRef, useState } from "react";
 import { CONTACT_EMAIL, CONTACT_STAGES as stages } from "@/lib/contact";
 import { identify, track, useFormTracking } from "@/lib/pixel";
 
-type Fields = { name: string; email: string; startup: string; stage: string; message: string };
+type Fields = { name: string; email: string; startup: string; stage: string; message: string; whatsappConsent: boolean };
 type Errors = Partial<Record<keyof Fields, string>>;
 
-const empty: Fields = { name: "", email: "", startup: "", stage: stages[0], message: "" };
+const empty: Fields = { name: "", email: "", startup: "", stage: stages[0], message: "", whatsappConsent: false };
 
 /** Deliberately loose: enough to catch a typo, never enough to reject a real address. */
 const looksLikeEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
@@ -48,6 +48,7 @@ export default function ContactForm() {
       `Email: ${fields.email.trim()}`,
       `Startup: ${fields.startup.trim()}`,
       `Stage: ${fields.stage}`,
+      `WhatsApp updates: ${fields.whatsappConsent ? "yes" : "no"}`,
       "",
       fields.message.trim(),
     ].join("\n");
@@ -58,6 +59,10 @@ export default function ContactForm() {
     funnel.start();
     setFields((f) => ({ ...f, [key]: e.target.value }));
     setErrors((prev) => (prev[key] ? { ...prev, [key]: undefined } : prev));
+  };
+
+  const toggleConsent = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFields((f) => ({ ...f, whatsappConsent: e.target.checked }));
   };
 
   const onSubmit = (e: React.FormEvent) => {
@@ -216,6 +221,17 @@ export default function ContactForm() {
           )}
         </p>
       </div>
+
+      <label className="text-dark-subtle mt-6 flex items-start gap-3 text-sm leading-tight">
+        <input
+          type="checkbox"
+          name="whatsappConsent"
+          checked={fields.whatsappConsent}
+          onChange={toggleConsent}
+          className="mt-0.5 h-4 w-4 shrink-0 accent-sky-deep"
+        />
+        <span>Send me updates about Knnekt on WhatsApp. Optional. You can opt out any time by replying STOP.</span>
+      </label>
 
       <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3">
         <button
