@@ -879,7 +879,7 @@ function ReportDoc({ r, id }: { r: Result; id: Identity }) {
           </View>
         </Sec>
 
-        <View wrap={false} style={[s.box, { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: 9, paddingHorizontal: 12, marginTop: 8 }]}>
+        <View wrap={false} style={[s.box, { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: 7, paddingHorizontal: 12, marginTop: 6 }]}>
           <Mono>Contact</Mono>
           <Text style={{ fontSize: 8.5, fontWeight: 600 }}>
             <Link src={`tel:${CONTACT_PHONE.tel}`} style={{ color: INK, textDecoration: "none" }}>
