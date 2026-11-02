@@ -3,6 +3,7 @@
 import { type CSSProperties, useEffect, useRef, useState } from "react";
 import { faculty, teamColours, type FacultyMember } from "@/lib/data";
 import Container, { SectionHeading } from "./Container";
+import RoleArt from "./RoleArt";
 
 const reduceMotion = () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -144,6 +145,26 @@ function Masterclasses() {
 function Team() {
   const [, studio] = faculty;
   const partners = studio.more.replace(/^…and more /, "");
+  // The role illustrations draw themselves in once the panel scrolls into view.
+  // Until JS runs (or with reduced motion) they simply sit there, fully drawn.
+  const panel = useRef<HTMLDivElement>(null);
+  const [reveal, setReveal] = useState<"wait" | "go" | undefined>();
+  useEffect(() => {
+    const el = panel.current;
+    if (!el || reduceMotion() || !("IntersectionObserver" in window)) return;
+    if (el.getBoundingClientRect().top < window.innerHeight * 0.85) return;
+    setReveal("wait");
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        setReveal("go");
+        io.disconnect();
+      },
+      { threshold: 0.35 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
   return (
     <div className="tm">
       <div className="tm-head">
@@ -152,7 +173,7 @@ function Team() {
           <h3 className="mt-6 text-3xl font-medium md:text-4xl">{studio.title}</h3>
         </div>
       </div>
-      <div className="tp">
+      <div ref={panel} className="tp" data-reveal={reveal}>
         <ul className="t1-row t1-final" aria-label={studio.kicker}>
           {studio.people.map((person, i) => (
             <li key={person.seat} className="t1-card" style={{ "--c": teamColours[i % teamColours.length] } as CSSProperties}>
@@ -160,6 +181,10 @@ function Team() {
                 <span className="t1-photo">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img alt={person.alt ?? ""} loading="lazy" decoding="async" width={400} height={400} src={person.src} />
+                </span>
+              ) : person.art ? (
+                <span className="t1-photo t1-art">
+                  <RoleArt kind={person.art} />
                 </span>
               ) : (
                 <span className="t1-photo t1-ph" role="img" aria-label={`Photo to come: ${person.seat.toLowerCase()}`}>

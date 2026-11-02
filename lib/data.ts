@@ -342,6 +342,9 @@ export const scoreVimeoAspect = 1280 / 536;
  * Faculty — who actually takes the classes                                   *
  * ------------------------------------------------------------------------- */
 
+/** The illustration an unnamed team member's card shows in place of a portrait. */
+export type RoleArtKind = "growth" | "technology" | "ai" | "legal" | "design" | "partner";
+
 export type FacultyMember = {
   /** Real name, once the person is signed. Absent → the card shows "Expert name" (or the seat, for the team). */
   name?: string;
@@ -361,7 +364,9 @@ export type FacultyMember = {
   qual?: string;
   /** A former employer's logo; `large` for a wordmark that needs the extra height, `first` to set it above the qualification. */
   ex?: { name: string; logo: string; large?: boolean; first?: boolean };
-  /** A real photo, once the person is signed. Absent → the card shows a silhouette marked "Photo". */
+  /** For the execution team: the illustration shown until there is a photo. */
+  art?: RoleArtKind;
+  /** A real photo, once the person is signed. Absent → the team card shows its `art`, or else a silhouette marked "Photo". */
   src?: string;
   alt?: string;
 };
@@ -456,31 +461,37 @@ export const faculty: FacultyGroup[] = [
       {
         seat: "Growth lead",
         fn: "Growth & Marketing",
+        art: "growth",
         teaches: "Positioning before spend",
       },
       {
         seat: "Technology lead",
         fn: "Technology",
+        art: "technology",
         teaches: "Shipping an MVP you don’t rebuild",
       },
       {
         seat: "AI lead",
         fn: "AI Enablement",
+        art: "ai",
         teaches: "Where AI earns its place",
       },
       {
         seat: "Legal & compliance counsel",
         fn: "Legal & Compliance",
+        art: "legal",
         teaches: "Cap table, contracts, clean data room",
       },
       {
         seat: "Design lead",
         fn: "Design",
+        art: "design",
         teaches: "Brand that survives contact with customers",
       },
       {
         seat: "Studio partner",
         fn: "Your 1:1",
+        art: "partner",
         teaches: "The weekly 1:1",
       },
     ],
