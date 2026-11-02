@@ -8,6 +8,7 @@
  * studio's number and email are tappable. Where the people and stories are
  * still to be signed, the section says so with a dashed "Placeholder" tag.
  */
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { Circle, Defs, Document, Font, Image, LinearGradient, Link, Page, Path, Rect, Stop, StyleSheet, Svg, Text, View, renderToBuffer, type Styles } from "@react-pdf/renderer";
 import { LOCKUP_PATH, LOCKUP_RATIO, LOCKUP_VIEWBOX } from "./brand";
@@ -18,6 +19,33 @@ import { LADDER, plan as planFor, planCopy } from "./scorePlan";
 import { SITE_HOST } from "./site";
 
 const asset = (f: string) => join(process.cwd(), "assets", f);
+
+/**
+ * The PDF's copy of a site image. react-pdf reads no WebP, so assets/report
+ * holds a JPG (photos) or PNG (logos, for their transparency) of each
+ * /images/*.webp under the same name. Null when there isn't one yet, so a new
+ * face or logo on the site falls back to the silhouette or the name in type.
+ */
+function pdfImage(src?: string): string | null {
+  if (!src) return null;
+  const base = src.split("/").pop()!.replace(/\.webp$/, "");
+  for (const ext of [".jpg", ".png"]) {
+    const path = asset(`report/${base}${ext}`);
+    if (existsSync(path)) return path;
+  }
+  return null;
+}
+
+/** A logo `h` points tall at its own proportions, no wider than `maxW`, read off the PNG's header. */
+function Logo({ src, h, maxW, style }: { src?: string; h: number; maxW: number; style?: Styles[string] }) {
+  const path = pdfImage(src);
+  if (!path?.endsWith(".png")) return null;
+  const png = readFileSync(path);
+  const ratio = png.readUInt32BE(16) / png.readUInt32BE(20);
+  const w = Math.min(h * ratio, maxW);
+  // eslint-disable-next-line jsx-a11y/alt-text -- react-pdf's Image takes no alt
+  return <Image src={path} style={{ width: w, height: w / ratio, ...style }} />;
+}
 Font.register({
   family: "Blank",
   fonts: [
@@ -748,20 +776,40 @@ function ReportDoc({ r, id }: { r: Result; id: Identity }) {
                         <Text style={{ fontWeight: 600 }}>{first}</Text> {rest.join(" ")}
                       </Text>
                       <View style={{ height: 0.75, backgroundColor: "#5a6a99", marginTop: 4, width: 70 }} />
-                      {/* The designation alone is set in a serif italic, PDF's own Times, as a title would be. */}
-                      <Text style={{ fontFamily: "Times-Roman", fontStyle: "italic", fontSize: 10, color: "#e3e8f5", marginTop: 5 }}>{p.role ?? "Designation"}</Text>
-                      <Text style={{ fontSize: 6.5, lineHeight: 1.35, color: "#9aa5c4", marginTop: 2 }}>at</Text>
-                      <View style={{ flexDirection: "row", marginTop: 3 }}>
-                        <Mono color="#9aa5c4" style={{ fontSize: 4.5, borderWidth: 0.75, borderColor: "#7381ab", borderStyle: "dashed", borderRadius: 3, paddingHorizontal: 5, paddingVertical: 4 }}>
-                          {p.company?.name ?? "Company logo"}
-                        </Mono>
-                      </View>
-                      <Text style={{ fontSize: 6.5, lineHeight: 1.35, color: "#c9d1e8", marginTop: 5 }}>Qualification</Text>
-                      <View style={{ flexDirection: "row", marginTop: 2 }}>
+                      {/* As on the site, a signed expert with no title goes straight to the company, without "Designation · at". */}
+                      {p.role || !p.name ? (
+                        <>
+                          {/* The designation alone is set in a serif italic, PDF's own Times, as a title would be. */}
+                          <Text style={{ fontFamily: "Times-Roman", fontStyle: "italic", fontSize: 10, color: "#e3e8f5", marginTop: 5 }}>{p.role ?? "Designation"}</Text>
+                          <Text style={{ fontSize: 6.5, lineHeight: 1.35, color: "#9aa5c4", marginTop: 2 }}>at</Text>
+                        </>
+                      ) : null}
+                      {p.company && pdfImage(p.company.logo) ? (
+                        <Logo src={p.company.logo} h={14} maxW={84} style={{ marginTop: 4 }} />
+                      ) : p.company ? (
+                        <Text style={{ fontSize: 8, lineHeight: 1.25, color: "#ffffff", marginTop: 4 }}>{p.company.name}</Text>
+                      ) : (
+                        <View style={{ flexDirection: "row", marginTop: 3 }}>
+                          <Mono color="#9aa5c4" style={{ fontSize: 4.5, borderWidth: 0.75, borderColor: "#7381ab", borderStyle: "dashed", borderRadius: 3, paddingHorizontal: 5, paddingVertical: 4 }}>
+                            Company logo
+                          </Mono>
+                        </View>
+                      )}
+                      {p.ex?.first ? <Logo src={p.ex.logo} h={p.ex.large ? 13 : 10} maxW={60} style={{ marginTop: 5 }} /> : null}
+                      {p.qual || !p.name ? <Text style={{ fontSize: 6.5, lineHeight: 1.35, color: "#c9d1e8", marginTop: 5 }}>{p.qual ?? "Qualification"}</Text> : null}
+                      {p.ex && !p.ex.first ? <Logo src={p.ex.logo} h={p.ex.large ? 13 : 10} maxW={60} style={{ marginTop: 5 }} /> : null}
+                      <View style={{ flexDirection: "row", marginTop: 5 }}>
                         <Text style={{ fontSize: 6, color: "#ffffff", backgroundColor: "#3a7be0", borderRadius: 3, paddingHorizontal: 4, paddingVertical: 2 }}>{p.seat}</Text>
                       </View>
                     </View>
-                    <Silhouette from="#2a4a8f" to="#18295c" w={56} dark />
+                    {pdfImage(p.src) ? (
+                      <View style={{ width: 56, alignSelf: "stretch", position: "relative" }}>
+                        {/* eslint-disable-next-line jsx-a11y/alt-text -- react-pdf's Image takes no alt */}
+                        <Image src={pdfImage(p.src)!} style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "50% 20%" }} />
+                      </View>
+                    ) : (
+                      <Silhouette from="#2a4a8f" to="#18295c" w={56} dark />
+                    )}
                   </View>
                 );
               })}
