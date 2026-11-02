@@ -13,7 +13,7 @@ import { join } from "node:path";
 import { Circle, Defs, Document, Font, Image, LinearGradient, Link, Page, Path, Rect, Stop, StyleSheet, Svg, Text, View, renderToBuffer, type Styles } from "@react-pdf/renderer";
 import { LOCKUP_PATH, LOCKUP_RATIO, LOCKUP_VIEWBOX } from "./brand";
 import { CONTACT_EMAIL, CONTACT_PHONE } from "./contact";
-import { faculty, feeIncludes, paymentSteps, pricing, pricingFacts, promises, promisesNote, scholarshipFine, scholarshipTracks, teamColours } from "./data";
+import { faculty, feeIncludes, paymentSteps, pricing, pricingFacts, promises, promisesNote, scholarshipFine, scholarshipTracks, teamColours, testimonials } from "./data";
 import { archetypes, gateCopy, pillars, scholarshipTracks as askTracks, type Identity, type Result } from "./score";
 import { LADDER, plan as planFor, planCopy } from "./scorePlan";
 import { SITE_HOST } from "./site";
@@ -315,6 +315,7 @@ function ReportDoc({ r, id }: { r: Result; id: Identity }) {
   const cohort = pricing.cohort.split(" · ")[0];
   const [experts, studio] = faculty;
   const shownExperts = experts.people.slice(0, 3);
+  const shownStories = testimonials.slice(0, 3);
   const chrome = <Chrome r={r} id={id} date={date} />;
   // The founder's scholarship ask, named back to them on pages 3 and 4.
   const asked = id.scholarship.requested;
@@ -847,29 +848,34 @@ function ReportDoc({ r, id }: { r: Result; id: Identity }) {
           </View>
         </Sec>
 
-        {/* Held as placeholders until founders from the cohort sign off on their stories. */}
-        <Sec h="Founders’ stories" d="What founders say after building with us." style={{ marginTop: -3 }} placeholder>
+        {/* The first three of the site's founder stories, with the picture each card carries there. */}
+        <Sec h="Founders’ stories" d="What founders say after building with us." style={{ marginTop: -3 }}>
           <View style={{ flexDirection: "row", gap: 6 }}>
-            {[0, 1, 2].map((i) => (
-              <View key={i} style={{ flex: 1, borderWidth: 0.75, borderColor: GRAY_200, borderRadius: 7, overflow: "hidden" }}>
-                <View style={{ height: 62, justifyContent: "flex-end", paddingHorizontal: 7, paddingBottom: 5 }}>
-                  <Grad id={`story-${i}`} stops={[[0, "#f1f6fd"], [1, "#d3e3f6"]]} x2={1} y2={1} />
-                  <Mono color={INK_40} style={{ fontSize: 4.5 }}>
-                    Photo
-                  </Mono>
-                </View>
-                <View style={{ paddingHorizontal: 10, paddingTop: 8, paddingBottom: 9 }}>
-                  <Text style={{ fontSize: 10, fontWeight: 600 }}>Startup name</Text>
-                  <View style={{ flexDirection: "row", alignItems: "center", marginTop: 4 }}>
-                    <Text style={{ fontSize: 7.5, color: INK_70, marginRight: 5 }}>Founder · Stage</Text>
-                    <Chip color={DEEP} bg={GRAY_100} style={{ fontSize: 5, paddingHorizontal: 5, paddingVertical: 1.5 }}>
-                      Score before → after
-                    </Chip>
+            {shownStories.map((t) => {
+              const pic = pdfImage(t.image.src);
+              return (
+                <View key={t.name} style={{ flex: 1, borderWidth: 0.75, borderColor: GRAY_200, borderRadius: 7, overflow: "hidden" }}>
+                  {pic ? (
+                    // eslint-disable-next-line jsx-a11y/alt-text -- react-pdf's Image takes no alt
+                    <Image src={pic} style={{ width: "100%", height: 46, objectFit: "cover" }} />
+                  ) : (
+                    <View style={{ height: 46 }}>
+                      <Grad id={`story-${t.name}`} stops={[[0, "#f1f6fd"], [1, "#d3e3f6"]]} x2={1} y2={1} />
+                    </View>
+                  )}
+                  <View style={{ paddingHorizontal: 9, paddingTop: 6, paddingBottom: 7 }}>
+                    <Text style={{ fontSize: 9.5, fontWeight: 600 }}>{t.name}</Text>
+                    <Text style={{ fontSize: 7, lineHeight: 1.3, color: INK_70, marginTop: 2 }}>{pdfText(t.meta)}</Text>
+                    <View style={{ flexDirection: "row", marginTop: 4 }}>
+                      <Chip color={DEEP} bg={GRAY_100} style={{ fontSize: 5, paddingHorizontal: 5, paddingVertical: 1.5 }}>
+                        {t.result}
+                      </Chip>
+                    </View>
+                    <Text style={{ fontSize: 7.2, lineHeight: 1.3, marginTop: 4 }}>“{pdfText(t.quote)}”</Text>
                   </View>
-                  <Text style={{ fontSize: 8.5, marginTop: 6 }}>“Founder quote to come.”</Text>
                 </View>
-              </View>
-            ))}
+              );
+            })}
           </View>
         </Sec>
 
