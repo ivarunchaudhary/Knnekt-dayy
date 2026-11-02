@@ -36,6 +36,9 @@ function pdfImage(src?: string): string | null {
   return null;
 }
 
+/** The site's non-breaking hyphen (U+2011) isn't in the PDF's cuts, so it sets as a plain one. */
+const pdfText = (t: string) => t.replace(/\u2011/g, "-");
+
 /** A logo `h` points tall at its own proportions, no wider than `maxW`, read off the PNG's header. */
 function Logo({ src, h, maxW, style }: { src?: string; h: number; maxW: number; style?: Styles[string] }) {
   const path = pdfImage(src);
@@ -796,7 +799,7 @@ function ReportDoc({ r, id }: { r: Result; id: Identity }) {
                         </View>
                       )}
                       {p.ex?.first ? <Logo src={p.ex.logo} h={p.ex.large ? 13 : 10} maxW={60} style={{ marginTop: 5 }} /> : null}
-                      {p.qual || !p.name ? <Text style={{ fontSize: 6.5, lineHeight: 1.35, color: "#c9d1e8", marginTop: 5 }}>{p.qual ?? "Qualification"}</Text> : null}
+                      {p.qual || !p.name ? <Text style={{ fontSize: 6.5, lineHeight: 1.35, color: "#c9d1e8", marginTop: 5 }}>{pdfText(p.qual ?? "Qualification")}</Text> : null}
                       {p.ex && !p.ex.first ? <Logo src={p.ex.logo} h={p.ex.large ? 13 : 10} maxW={60} style={{ marginTop: 5 }} /> : null}
                       <View style={{ flexDirection: "row", marginTop: 5 }}>
                         <Text style={{ fontSize: 6, color: "#ffffff", backgroundColor: "#3a7be0", borderRadius: 3, paddingHorizontal: 4, paddingVertical: 2 }}>{p.seat}</Text>
