@@ -10,10 +10,10 @@
  */
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { Circle, Defs, Document, Font, Image, LinearGradient, Link, Page, Path, Rect, Stop, StyleSheet, Svg, Text, View, renderToBuffer, type Styles } from "@react-pdf/renderer";
+import { Circle, Defs, Document, Font, Image, Line, LinearGradient, Link, Page, Path, RadialGradient, Rect, Stop, StyleSheet, Svg, Text, View, renderToBuffer, type Styles } from "@react-pdf/renderer";
 import { LOCKUP_PATH, LOCKUP_RATIO, LOCKUP_VIEWBOX } from "./brand";
 import { CONTACT_EMAIL, CONTACT_PHONE } from "./contact";
-import { faculty, feeIncludes, paymentSteps, pricing, pricingFacts, promises, promisesNote, scholarshipFine, scholarshipTracks, teamColours, testimonials } from "./data";
+import { faculty, feeIncludes, paymentSteps, pricing, pricingFacts, promises, promisesNote, scholarshipFine, scholarshipTracks, teamColours, testimonials, work, type RoleArtKind } from "./data";
 import { archetypes, gateCopy, pillars, scholarshipTracks as askTracks, type Identity, type Result } from "./score";
 import { LADDER, plan as planFor, planCopy } from "./scorePlan";
 import { SITE_HOST } from "./site";
@@ -290,6 +290,150 @@ const TRACK_ICONS: Record<string, (c: string) => React.ReactNode> = {
   ),
 };
 
+/**
+ * Each team role's illustration, after the site's (components/RoleArt.tsx), on
+ * its 120 × 120 grid: drawn in white and ink, accented in the role's colour,
+ * fully drawn as the site's are once they've animated in. The site's soft drop
+ * shadow under the white shapes is a faint ink copy a few units lower.
+ */
+const ROLE_ART: Record<RoleArtKind, (c: string) => React.ReactNode> = {
+  growth: (c) => (
+    <>
+      <Line x1={14} y1={96.5} x2={106} y2={96.5} stroke={INK} strokeWidth={1.5} strokeLinecap="round" strokeOpacity={0.25} />
+      {[22, 34, 48].map((h, n) => (
+        <Rect key={`s${n}`} x={22 + n * 20} y={100 - h} width={14} height={h - 4} rx={3} fill={INK} fillOpacity={0.06} />
+      ))}
+      {[22, 34, 48, 66].map((h, n) => (
+        <Rect key={n} x={22 + n * 20} y={96 - h} width={14} height={h} rx={3} fill={n === 3 ? c : "#ffffff"} />
+      ))}
+      <Path d="M24 66 L49 54 L69 40 L92 20" fill="none" stroke={INK} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+      <Path d="M83 19 L93 19 L93 29" fill="none" stroke={INK} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+    </>
+  ),
+  technology: (c) => (
+    <>
+      <Rect x={14} y={28} width={92} height={70} rx={9} fill={INK} fillOpacity={0.06} />
+      <Rect x={14} y={24} width={92} height={70} rx={9} fill="#ffffff" />
+      <Path d="M14 33a9 9 0 0 1 9-9h74a9 9 0 0 1 9 9v4H14z" fill={c} />
+      {[24, 31, 38].map((cx) => (
+        <Circle key={cx} cx={cx} cy={30.5} r={2.2} fill="#ffffff" />
+      ))}
+      <Rect x={24} y={47} width={10} height={4.5} rx={2.25} fill={c} />
+      <Rect x={38} y={47} width={32} height={4.5} rx={2.25} fill={INK} fillOpacity={0.14} />
+      <Rect x={32} y={57} width={20} height={4.5} rx={2.25} fill={INK} fillOpacity={0.14} />
+      <Rect x={56} y={57} width={18} height={4.5} rx={2.25} fill={c} fillOpacity={0.6} />
+      <Rect x={32} y={67} width={36} height={4.5} rx={2.25} fill={INK} fillOpacity={0.14} />
+      <Rect x={24} y={77} width={8} height={4.5} rx={2.25} fill={c} />
+      <Rect x={36} y={75} width={2.5} height={8.5} rx={1} fill={INK} />
+    </>
+  ),
+  ai: (c) => {
+    const layers = [
+      [40, 60, 80],
+      [30, 50, 70, 90],
+      [48, 72],
+    ];
+    const xs = [24, 60, 96];
+    return (
+      <>
+        {layers.slice(0, -1).flatMap((ys, l) =>
+          ys.flatMap((y1) => layers[l + 1].map((y2) => <Line key={`${l}-${y1}-${y2}`} x1={xs[l]} y1={y1} x2={xs[l + 1]} y2={y2} stroke={INK} strokeWidth={1.25} strokeOpacity={0.22} />)),
+        )}
+        {layers.flatMap((ys, l) => ys.map((y) => <Circle key={`${l}-${y}`} cx={xs[l]} cy={y} r={l === 2 ? 6.5 : 5} fill={l === 2 ? c : "#ffffff"} stroke={l === 2 ? "none" : c} strokeWidth={2} />))}
+        <Path d="M100 14 Q101.6 21.4 109 23 Q101.6 24.6 100 32 Q98.4 24.6 91 23 Q98.4 21.4 100 14z" fill={INK} />
+      </>
+    );
+  },
+  legal: (c) => (
+    <>
+      <Path d="M30 20h42l18 18v68a4 4 0 0 1-4 4H30a4 4 0 0 1-4-4V24a4 4 0 0 1 4-4z" fill={INK} fillOpacity={0.06} />
+      <Path d="M30 16h42l18 18v68a4 4 0 0 1-4 4H30a4 4 0 0 1-4-4V20a4 4 0 0 1 4-4z" fill="#ffffff" />
+      <Path d="M72 16v14a4 4 0 0 0 4 4h14z" fill={c} fillOpacity={0.3} />
+      {[
+        [40, 40],
+        [50, 46],
+        [60, 34],
+        [70, 24],
+      ].map(([y, w]) => (
+        <Rect key={y} x={36} y={y} width={w} height={4.5} rx={2.25} fill={INK} fillOpacity={0.14} />
+      ))}
+      <Path d="M36 90c4-8 7-8 8-2s4 6 7-2 5-5 6 0 3 4 7 1" fill="none" stroke={INK} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+      <Circle cx={86} cy={86} r={14} fill={c} />
+      <Circle cx={86} cy={86} r={10.5} fill="none" stroke="#ffffff" strokeWidth={1} strokeDasharray="2 2" strokeOpacity={0.8} />
+      <Path d="M80 86.5l4 4 8-9" fill="none" stroke="#ffffff" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+    </>
+  ),
+  design: (c) => (
+    <>
+      <Line x1={16} y1={76} x2={32} y2={24} stroke={c} strokeWidth={1.5} strokeOpacity={0.9} />
+      <Line x1={104} y1={70} x2={82} y2={22} stroke={c} strokeWidth={1.5} strokeOpacity={0.9} />
+      <Path d="M16 76C32 24 82 22 104 70" fill="none" stroke={INK} strokeWidth={3} strokeLinecap="round" />
+      <Circle cx={32} cy={24} r={3.5} fill={c} />
+      <Circle cx={82} cy={22} r={3.5} fill={c} />
+      <Rect x={12} y={72} width={8} height={8} rx={1.5} fill="#ffffff" stroke={c} strokeWidth={2} />
+      <Rect x={100} y={66} width={8} height={8} rx={1.5} fill="#ffffff" stroke={c} strokeWidth={2} />
+      <Circle cx={52} cy={104} r={8} fill={INK} fillOpacity={0.06} />
+      <Circle cx={34} cy={100} r={8} fill={c} />
+      <Circle cx={52} cy={100} r={8} fill="#ffffff" />
+      <Circle cx={70} cy={100} r={8} fill={INK} />
+    </>
+  ),
+  partner: (c) => (
+    <>
+      <Rect x={16} y={26} width={88} height={84} rx={10} fill={INK} fillOpacity={0.06} />
+      <Rect x={16} y={22} width={88} height={84} rx={10} fill="#ffffff" />
+      <Path d="M16 32a10 10 0 0 1 10-10h68a10 10 0 0 1 10 10v8H16z" fill={c} />
+      <Rect x={36} y={15} width={4.5} height={13} rx={2.25} fill={INK} />
+      <Rect x={79.5} y={15} width={4.5} height={13} rx={2.25} fill={INK} />
+      {[56, 69, 82, 95].flatMap((y) =>
+        [30, 45, 60, 75, 90].map((x, col) =>
+          col === 3 ? <Circle key={`${x}-${y}`} cx={x} cy={y} r={5.5} fill={c} /> : <Rect key={`${x}-${y}`} x={x - 3} y={y - 3} width={6} height={6} rx={1.5} fill={INK} fillOpacity={0.14} />,
+        ),
+      )}
+    </>
+  ),
+};
+
+/** `hex` mixed with `base`, `t` of the way toward `hex`: CSS's color-mix(in srgb, hex t, base). */
+const mix = (hex: string, t: number, base: string) =>
+  "#" +
+  [1, 3, 5]
+    .map((i) => Math.round(parseInt(base.slice(i, i + 2), 16) * (1 - t) + parseInt(hex.slice(i, i + 2), 16) * t))
+    .map((v) => v.toString(16).padStart(2, "0"))
+    .join("");
+
+/** A team tile as the site draws it (.t1-art): the role's colour washed toward white, a dot grid, a soft glow, the illustration on top. */
+function RoleTile({ kind, c, w, h }: { kind: RoleArtKind; c: string; w: number; h: number }) {
+  const id = `role-${kind}`;
+  const art = Math.min(w, h) * 0.84;
+  const dots: [number, number][] = [];
+  for (let y = 3.5; y < h; y += 7) for (let x = 3.5; x < w; x += 7) dots.push([x, y]);
+  return (
+    <View style={{ width: w, height: h, borderRadius: 5, overflow: "hidden", alignItems: "center", justifyContent: "center" }}>
+      <Svg viewBox={`0 0 ${w} ${h}`} style={s.fill}>
+        <Defs>
+          <LinearGradient id={`${id}-bg`} x1={0.33} y1={0} x2={0.67} y2={1}>
+            <Stop offset={0} stopColor={mix(c, 0.16, "#ffffff")} />
+            <Stop offset={1} stopColor={mix(c, 0.36, "#eef5fd")} />
+          </LinearGradient>
+          <RadialGradient id={`${id}-glow`} cx={0.5} cy={0.45} r={0.5}>
+            <Stop offset={0} stopColor="#ffffff" stopOpacity={0.55} />
+            <Stop offset={1} stopColor="#ffffff" stopOpacity={0} />
+          </RadialGradient>
+        </Defs>
+        <Rect x={0} y={0} width={w} height={h} fill={`url(#${id}-bg)`} />
+        <Rect x={0} y={0} width={w} height={h} fill={`url(#${id}-glow)`} />
+        {dots.map(([x, y]) => (
+          <Circle key={`${x}-${y}`} cx={x} cy={y} r={0.45} fill="#ffffff" fillOpacity={0.6} />
+        ))}
+      </Svg>
+      <Svg viewBox="0 0 120 120" style={{ width: art, height: art }}>
+        {ROLE_ART[kind](c)}
+      </Svg>
+    </View>
+  );
+}
+
 /** A mono pill, for chips and badges. */
 const Chip = ({ children, color = INK_70, bg = GRAY_200, style }: { children: React.ReactNode; color?: string; bg?: string; style?: Styles[string] }) => (
   <Mono color={color} style={{ backgroundColor: bg, borderRadius: 8, paddingHorizontal: 7, paddingVertical: 3, ...style }}>
@@ -307,7 +451,8 @@ function ReportDoc({ r, id }: { r: Result; id: Identity }) {
   const consTone = [RED, ORANGE, AMBER];
   const scoreTone = toneOf(r.overall, r.bench[0], r.bench[1]);
   const confTone = r.confidence.tone === "high" ? GREEN : r.confidence.tone === "med" ? AMBER : RED;
-  const gates = r.gates;
+  // The capital gate stays out of the PDF: almost every early founder answers "neither", so it read as noise on every report.
+  const gates = r.gates.filter((g) => g !== "CAPITAL");
   // Page one's air goes to the gates: each one that fires takes a third of the extra spacing, so three still fit the page.
   const air = 1 - gates.length / 3;
   const sp = (tight: number, roomy: number) => tight + (roomy - tight) * air;
@@ -316,8 +461,14 @@ function ReportDoc({ r, id }: { r: Result; id: Identity }) {
   const [experts, studio] = faculty;
   const shownExperts = experts.people.slice(0, 3);
   const shownStories = testimonials.slice(0, 3);
+  // Every brand the site shows, its founder stories then any case study not among them, each with its picture.
+  const key = (n: string) => n.toLowerCase().replace(/[^a-z0-9]/g, "");
+  const brands = [
+    ...testimonials.map((t) => ({ name: t.name.split(" · ")[0], pic: pdfImage(t.image.src) })),
+    ...work.map((w) => ({ name: w.client, pic: pdfImage(w.mobile?.src) })),
+  ].filter((b, i, all) => all.findIndex((o) => key(o.name) === key(b.name)) === i);
   const chrome = <Chrome r={r} id={id} date={date} />;
-  // The founder's scholarship ask, named back to them on pages 3 and 4.
+  // The founder's scholarship ask, named back to them on page 3, and on page 4 inside the Selection Session step, where it's discussed.
   const asked = id.scholarship.requested;
   const askedTrack = asked ? (askTracks.find((t) => t.key === id.scholarship.track)?.name ?? null) : null;
   const askedLine = `You asked to be considered for a scholarship${askedTrack ? ` (${askedTrack})` : ""}. We’ll talk about it at your Selection Session.`;
@@ -744,10 +895,15 @@ function ReportDoc({ r, id }: { r: Result; id: Identity }) {
               ),
               d: "Save it so you pick up.",
             },
-            { h: "Selection Session at our studio in Gurugram.", d: "A group session with founders like you, then a one-on-one on your score and your first 10 days." },
+            {
+              h: "Selection Session at our studio in Gurugram.",
+              d: "A group session with founders like you, then a one-on-one on your score and your first 10 days.",
+              // Page 3 already names the track; here a line is all the page has room for.
+              note: asked ? "Plus your scholarship ask." : null,
+            },
             { h: "A decision within 24 hours.", d: "If you’re selected, ₹15,000 + GST within 48 hours holds your seat." },
-          ].map((step, i) => (
-            <View key={i} style={{ flex: 1, backgroundColor: GRAY_100, borderLeftWidth: 1.5, borderLeftColor: DEEP, borderTopRightRadius: 6, borderBottomRightRadius: 6, paddingHorizontal: 10, paddingTop: 9, paddingBottom: 10 }}>
+          ].map((step: { h: React.ReactNode; d: string; note?: string | null }, i) => (
+            <View key={i} style={{ flex: 1, backgroundColor: GRAY_100, borderLeftWidth: 1.5, borderLeftColor: DEEP, borderTopRightRadius: 6, borderBottomRightRadius: 6, paddingHorizontal: 10, paddingTop: 8, paddingBottom: 8 }}>
               <View style={{ flexDirection: "row", alignItems: "center" }}>
                 <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: DEEP, alignItems: "center", justifyContent: "center", marginRight: 6 }}>
                   <Text style={{ fontFamily: "Mono", fontSize: 6, color: "#ffffff" }}>{i + 1}</Text>
@@ -757,15 +913,11 @@ function ReportDoc({ r, id }: { r: Result; id: Identity }) {
               <Text style={{ fontSize: 9.5, fontWeight: 600, lineHeight: 1.25, marginTop: 6 }}>{step.h}</Text>
               <Text style={{ fontSize: 7, lineHeight: 1.35, color: INK_70, marginTop: 2.5 }}>
                 <Rupees>{step.d}</Rupees>
+                {step.note ? <Text style={{ color: DEEP, fontWeight: 600 }}> {step.note}</Text> : null}
               </Text>
             </View>
           ))}
         </View>
-        {asked ? (
-          <View style={{ backgroundColor: GRAY_100, borderWidth: 0.75, borderColor: BLUE_LINE, borderRadius: 6, paddingVertical: 6.5, paddingHorizontal: 11, marginTop: 6 }}>
-            <Text style={{ fontSize: 7.5, color: INK_80 }}>{askedLine}</Text>
-          </View>
-        ) : null}
 
         <Sec h="Industry experts" d="Weekly masterclasses with investors, founders and industry experts, working on your numbers." style={{ marginTop: -1 }} placeholder={shownExperts.some((p) => !p.name)}>
           <View style={{ borderRadius: 7, overflow: "hidden", padding: 9 }}>
@@ -822,16 +974,27 @@ function ReportDoc({ r, id }: { r: Result; id: Identity }) {
           </View>
         </Sec>
 
-        <Sec h="Building beside you" d="The same team builds with you for all 100 days." style={{ marginTop: -3 }} placeholder={studio.people.some((p) => !p.name)}>
+        {/* As on the site, a team member without a photo shows their role's illustration; only one with neither is still to come. */}
+        <Sec h="Building beside you" d="The same team builds with you for all 100 days." style={{ marginTop: -3 }} placeholder={studio.people.some((p) => !pdfImage(p.src) && !p.art)}>
           <View style={{ borderWidth: 0.75, borderColor: GRAY_200, borderRadius: 7, overflow: "hidden", padding: 7 }}>
             <Grad id="studio" stops={[[0, "#f3f7fd"], [1, "#dce9f8"]]} />
             <View style={{ flexDirection: "row", gap: 4 }}>
               {studio.people.map((p, i) => {
                 const c = teamColours[i % teamColours.length];
+                const tw = (W - 14 - 20) / 6 - 5;
+                const photo = pdfImage(p.src);
                 return (
                   <View key={p.seat} style={{ flex: 1 }}>
-                    <View style={{ borderWidth: 1, borderColor: c, borderRadius: 6, padding: 1.5 }}>
-                      <Silhouette from={tint(c, 0.14)} to={tint(c, 0.32)} w={(W - 14 - 20) / 6 - 5} h={62} />
+                    {/* The site's ring: a white gap, then the role's colour. */}
+                    <View style={{ borderWidth: 1, borderColor: c, borderRadius: 6, padding: 1.5, backgroundColor: "#ffffff" }}>
+                      {photo ? (
+                        // eslint-disable-next-line jsx-a11y/alt-text -- react-pdf's Image takes no alt
+                        <Image src={photo} style={{ width: tw, height: 50, borderRadius: 5, objectFit: "cover" }} />
+                      ) : p.art ? (
+                        <RoleTile kind={p.art} c={c} w={tw} h={50} />
+                      ) : (
+                        <Silhouette from={tint(c, 0.14)} to={tint(c, 0.32)} w={tw} h={50} />
+                      )}
                     </View>
                     <Mono color={c} style={{ fontSize: 4.8, marginTop: 5, letterSpacing: 0.5 }}>
                       {p.fn}
@@ -857,9 +1020,9 @@ function ReportDoc({ r, id }: { r: Result; id: Identity }) {
                 <View key={t.name} style={{ flex: 1, borderWidth: 0.75, borderColor: GRAY_200, borderRadius: 7, overflow: "hidden" }}>
                   {pic ? (
                     // eslint-disable-next-line jsx-a11y/alt-text -- react-pdf's Image takes no alt
-                    <Image src={pic} style={{ width: "100%", height: 46, objectFit: "cover" }} />
+                    <Image src={pic} style={{ width: "100%", height: 40, objectFit: "cover" }} />
                   ) : (
-                    <View style={{ height: 46 }}>
+                    <View style={{ height: 40 }}>
                       <Grad id={`story-${t.name}`} stops={[[0, "#f1f6fd"], [1, "#d3e3f6"]]} x2={1} y2={1} />
                     </View>
                   )}
@@ -877,9 +1040,23 @@ function ReportDoc({ r, id }: { r: Result; id: Identity }) {
               );
             })}
           </View>
+          <View style={{ flexDirection: "row", alignItems: "center", marginTop: 6 }}>
+            <Mono style={{ fontSize: 5, marginRight: 5 }}>Built with</Mono>
+            <View style={{ flex: 1, flexDirection: "row", justifyContent: "space-between" }}>
+              {brands.map((b) => (
+                <View key={b.name} style={{ flexDirection: "row", alignItems: "center", backgroundColor: "#ffffff", borderWidth: 0.75, borderColor: GRAY_200, borderRadius: 6, paddingLeft: b.pic ? 1.5 : 4.5, paddingRight: 4.5, paddingVertical: 1.5 }}>
+                  {b.pic ? (
+                    // eslint-disable-next-line jsx-a11y/alt-text -- react-pdf's Image takes no alt
+                    <Image src={b.pic} style={{ width: 8.5, height: 8.5, borderRadius: 4.25, objectFit: "cover", marginRight: 2.5 }} />
+                  ) : null}
+                  <Text style={{ fontSize: 5.8, fontWeight: 600, lineHeight: 1 }}>{b.name}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
         </Sec>
 
-        <View wrap={false} style={[s.box, { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: 7, paddingHorizontal: 12, marginTop: 6 }]}>
+        <View wrap={false} style={[s.box, { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: 6, paddingHorizontal: 12, marginTop: 5 }]}>
           <Mono>Contact</Mono>
           <Text style={{ fontSize: 8.5, fontWeight: 600 }}>
             <Link src={`tel:${CONTACT_PHONE.tel}`} style={{ color: INK, textDecoration: "none" }}>
