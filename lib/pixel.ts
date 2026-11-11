@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, type RefObject } from "react";
 import { sendGAEvent } from "@next/third-parties/google";
 import { allowed } from "./consent";
-import { PIXEL_ID, STANDARD_EVENTS, type ServerEvent } from "./metaEvents";
+import { metaIds } from "./attribution";
+import { PIXEL_ID, STANDARD_EVENTS, type MetaEvent, type RelayedEvent } from "./metaEvents";
 
 export { PIXEL_ID };
 
@@ -13,10 +14,20 @@ declare global {
 
 type Params = Record<string, string | number>;
 /** What the visitor has told us this visit; it rides along on every server event. */
-let user: { email?: string; phone?: string; name?: string } = {};
+let user: { email?: string; phone?: string; name?: string; city?: string; appId?: string } = {};
 export const identify = (details: typeof user) => {
   user = { ...user, ...details };
 };
+
+/**
+ * Only the live site reports to Meta. Localhost and Vercel previews used to
+ * land in the same dataset as real visitors and skew every count; set
+ * NEXT_PUBLIC_META_ANY_HOST=1 to test the pixel somewhere else on purpose.
+ */
+const liveHost = () => /(^|\.)knnekt\.studio$/.test(location.hostname) || process.env.NEXT_PUBLIC_META_ANY_HOST === "1";
+
+/** Whether Meta may hear about this visit at all: the visitor allowed it, and this is the live site. */
+export const metaAllowed = () => typeof window !== "undefined" && liveHost() && allowed("ads");
 
 /**
  * Meta's base code, run once and only once advertising is allowed. Consent is
@@ -24,7 +35,7 @@ export const identify = (details: typeof user) => {
  * calls are no-ops: the snippet returns early once fbq exists.
  */
 export function loadPixel() {
-  if (window.fbq) return;
+  if (window.fbq || !liveHost()) return;
   /* eslint-disable */
   // @ts-expect-error Meta's snippet, verbatim
   !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
@@ -37,24 +48,32 @@ export function loadPixel() {
 
 export const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
 
-const eventId = () =>
+const uuid = () =>
   typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}.${Math.random().toString(36).slice(2)}`;
+
+/** The pixel half of an event, on its own. For events whose server copy some other route sends. */
+export function pixel(event: MetaEvent, params: Params, id: string) {
+  if (!metaAllowed()) return;
+  window.fbq?.(STANDARD_EVENTS.includes(event) ? "track" : "trackCustom", event, params, { eventID: id });
+}
 
 /**
  * One Meta event, sent twice under one ID: through the pixel in the browser
  * and through /api/meta to the Conversions API, so Meta keeps whichever
  * arrives and counts it once. keepalive lets the server copy finish even when
  * it's sent as the page is closing. Nothing goes until advertising is allowed.
+ * `id` names the event where the event map gives it a fixed one (ld_<application_id>);
+ * otherwise each call gets a fresh one with the event's prefix.
  */
-export function meta(event: ServerEvent, params?: Params) {
-  if (!allowed("ads")) return;
-  const id = eventId();
-  window.fbq?.(STANDARD_EVENTS.includes(event) ? "track" : "trackCustom", event, params ?? {}, { eventID: id });
+export function meta(event: RelayedEvent, params?: Params, id?: string) {
+  if (!metaAllowed()) return;
+  const eventId = id ?? (event === "PageView" ? `pv_${uuid()}` : uuid());
+  pixel(event, params ?? {}, eventId);
   fetch("/api/meta", {
     method: "POST",
     keepalive: true,
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ event, id, url: location.href, params, user }),
+    body: JSON.stringify({ event, id: eventId, url: location.href, params, user, ...metaIds() }),
   }).catch(() => {});
 }
 
@@ -66,13 +85,13 @@ export function meta(event: ServerEvent, params?: Params) {
  * mode themselves, Meta is held back by meta() above. Never pass anything
  * personal: the parameters reach GA4 and Clarity as they are.
  */
-export function track(name: string, params: Params = {}, metaEvent?: { event: ServerEvent; params?: Params }) {
+export function track(name: string, params: Params = {}, metaEvent?: { event: RelayedEvent; params?: Params; id?: string }) {
   if (GA_ID) sendGAEvent("event", name, params);
   if (window.clarity) {
     window.clarity("event", name);
     for (const [k, v] of Object.entries(params)) window.clarity("set", k, String(v));
   }
-  if (metaEvent) meta(metaEvent.event, metaEvent.params ?? params);
+  if (metaEvent) meta(metaEvent.event, metaEvent.params ?? params, metaEvent.id);
 }
 
 /**
@@ -91,7 +110,8 @@ const FUNNELS: Record<string, { start: string; step: string; tag: string }> = {
  * covers every form on the site. The submit itself is a standard event the
  * caller sends, since that's the one ads optimise for. A form listed in
  * FUNNELS also reports its start and each new step to GA4, and tags Clarity
- * with the step the visitor is on.
+ * with the step the visitor is on. `start` takes extra parameters and a fixed
+ * event ID, for the score's FormStart (content_name, fs_<application_id>).
  */
 export function useFormTracking(form: string, ref: RefObject<HTMLElement | null>, firstStep = "form") {
   const funnel = FUNNELS[form];
@@ -130,11 +150,11 @@ export function useFormTracking(form: string, ref: RefObject<HTMLElement | null>
 
   return useMemo(
     () => ({
-      start() {
+      start(extra?: { params?: Params; id?: string }) {
         const s = state.current;
         if (s.started) return;
         s.started = true;
-        meta("FormStart", { form });
+        meta("FormStart", { form, ...extra?.params }, extra?.id);
         if (funnel) {
           track(funnel.start);
           window.clarity?.("set", funnel.tag, String(s.step));

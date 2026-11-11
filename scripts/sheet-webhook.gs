@@ -214,6 +214,7 @@ function appendSubmission(data) {
   row['Report emailed'] = data.emailed ? 'Yes' : 'No';
   row['Instrument version'] = data.instrument_version;
   row[SESSION_COLUMN] = data.session_id || '';
+  addTracking(row, data);
 
   if (data.benchmark) {
     row['Benchmark model'] = data.benchmark.model;
@@ -265,6 +266,7 @@ function savePartial(data) {
   row['WhatsApp consent'] = data.whatsapp_consent ? 'Yes' : 'No';
   row['Scholarship'] = data.scholarship_summary;
   row[SESSION_COLUMN] = session;
+  addTracking(row, data);
 
   var seen = {};
   (data.responses || []).forEach(function (r) {
@@ -277,6 +279,34 @@ function savePartial(data) {
 
   var sheet = getPartialSheet();
   writeRow(sheet, row, findRow(sheet, session));
+}
+
+/**
+ * Where the founder came from, and what Meta needs to match the events the
+ * pipeline sends later (QualifiedLead, Schedule, Purchase through the site's
+ * /api/meta/server). The Session column is the application_id those calls
+ * name. Make reads these columns off the row and passes them along as they are.
+ */
+var TRACKING = [
+  ['utm_source', 'utm_source'],
+  ['utm_medium', 'utm_medium'],
+  ['utm_campaign', 'utm_campaign'],
+  ['utm_term', 'utm_term (ad set)'],
+  ['utm_content', 'utm_content (ad)'],
+  ['fbclid', 'fbclid'],
+  ['landing_url', 'Landing page'],
+  ['landing_at', 'Landed at'],
+  ['fbp', 'fbp'],
+  ['fbc', 'fbc'],
+  ['client_ip', 'IP'],
+  ['user_agent', 'User agent']
+];
+
+function addTracking(row, data) {
+  TRACKING.forEach(function (pair) {
+    if (data[pair[0]] !== undefined) row[pair[1]] = data[pair[0]];
+  });
+  if (data.ads_consent !== undefined) row['Ads consent'] = data.ads_consent ? 'Yes' : 'No';
 }
 
 /** They finished: their half-filled row has served its purpose. */

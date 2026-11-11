@@ -4,11 +4,15 @@ import { sendMail } from "@/lib/mailer";
 import { reportEmailHtml, reportEmailText, reportSubject } from "@/lib/scoreEmail";
 import { reportFilename, reportPdfBase64 } from "@/lib/scoreReport";
 import { forwardToSheet } from "@/lib/scoreWebhook";
+import { parseConsent } from "@/lib/consent";
+import { cookieValue, liveHost, requestClient, sendCapi } from "@/lib/capi";
+import { SCORE_CONTENT, scoreRoute, startupType } from "@/lib/metaEvents";
+import { leadRecordExtras } from "@/lib/leadRecord";
 
 const looksLikeEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
 const looksLikePhone = (v: string) => v.replace(/\D/g, "").length >= 8;
 
-type Body = { identity?: Partial<Identity>; answers?: unknown; catOther?: unknown; session?: unknown };
+type Body = { identity?: Partial<Identity>; answers?: unknown; catOther?: unknown; session?: unknown; attribution?: unknown };
 
 /**
  * A finished score. Re-graded here from the raw answers so the number the
@@ -17,6 +21,11 @@ type Body = { identity?: Partial<Identity>; answers?: unknown; catOther?: unknow
  * the attached PDF, with the studio copied — and forwarded to the webhook that
  * files the lead. The PDF comes back in the response too, so the result screen
  * can offer it for download. The studio calls from there; nothing is booked.
+ *
+ * Once the score is filed this is also where SubmitApplication — the event the
+ * ads optimise for — leaves for Meta's Conversions API, as sa_<application_id>.
+ * The session ID the quiz sends is the application_id. The browser fires its
+ * pixel copy under the same ID only after this answers, so Meta keeps one.
  */
 export async function POST(request: Request) {
   let body: Body;
@@ -68,9 +77,42 @@ export async function POST(request: Request) {
 
   // The lead, filed in the Sheet. The session lets the Sheet clear this
   // founder's row from the half-filled tab now that they've finished.
-  const session = typeof body.session === "string" ? body.session.slice(0, 64) : "";
-  const data = { ...payload(result, id, clean, "result"), session_id: session, report_pdf_filename: filename, report_pdf_base64: pdf, emailed: mail.sent };
+  const session = typeof body.session === "string" && /^[a-z0-9][a-z0-9-]{7,63}$/i.test(body.session) ? body.session : "";
+  const cookies = request.headers.get("cookie") ?? "";
+  const adsConsent = parseConsent(cookies)?.ads === true;
+  const extras = leadRecordExtras(request, body.attribution, adsConsent);
+  const base = payload(result, id, clean, "result");
+  const data = { ...base, session_id: session, application_id: session, ...extras, report_pdf_filename: filename, report_pdf_base64: pdf, emailed: mail.sent };
   const forwarded = await forwardToSheet(data, "score");
 
-  return NextResponse.json({ ok: true, emailed: mail.sent, forwarded, pdf: pdf ? { filename, base64: pdf } : null });
+  // The score is saved (and the founder emailed): now it counts as an application.
+  const route = scoreRoute(result.route);
+  const type = startupType(base.venture_category);
+  const eventId = session ? `sa_${session}` : "";
+  if (eventId && adsConsent && liveHost(request.headers.get("host"))) {
+    await sendCapi({
+      event: "SubmitApplication",
+      id: eventId,
+      url: request.headers.get("referer") ?? undefined,
+      custom: { content_name: SCORE_CONTENT, startup_type: type, route },
+      user: {
+        ...requestClient(request),
+        email: id.email,
+        phone: id.phone,
+        name: id.name,
+        city: id.scholarship.city,
+        externalId: session,
+        fbp: cookieValue(cookies, "_fbp") || extras.fbp,
+        fbc: cookieValue(cookies, "_fbc") || extras.fbc,
+      },
+    });
+  }
+
+  return NextResponse.json({
+    ok: true,
+    emailed: mail.sent,
+    forwarded,
+    pdf: pdf ? { filename, base64: pdf } : null,
+    meta: eventId ? { id: eventId, startup_type: type, route } : null,
+  });
 }

@@ -25,7 +25,9 @@ import {
   type Result,
   type Scholarship,
 } from "@/lib/score";
-import { identify, track, useFormTracking } from "@/lib/pixel";
+import { identify, meta, pixel, track, useFormTracking } from "@/lib/pixel";
+import { applicationId, closeApplication, firstTime, leadAttribution } from "@/lib/attribution";
+import { SCORE_CONTENT } from "@/lib/metaEvents";
 import { LADDER, plan as planFor, planCopy, type Month, type Plan } from "@/lib/scorePlan";
 import GradientBackground from "./GradientBackground";
 
@@ -1125,9 +1127,6 @@ const scoreBand = (n: number) => (n < 40 ? "0–39" : n < 60 ? "40–59" : n < 8
 
 type Stage = { at: "identity" } | { at: "page"; page: number } | { at: "scoring" } | { at: "report"; result: Result };
 
-const newSession = () =>
-  typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
-
 /**
  * Keeps the Sheet's "Half filled" tab current for a founder who hasn't finished:
  * whatever they've entered so far is sent each time they reach a new page and
@@ -1136,8 +1135,7 @@ const newSession = () =>
  * sent before they've typed or picked anything, nor after they finish (the
  * finished score clears their half-filled row instead).
  */
-function usePartialSave(snapshot: () => { identity: Identity; answers: Answers; catOther: string; page: number; done: boolean }) {
-  const session = useRef("");
+function usePartialSave(session: { current: string }, snapshot: () => { identity: Identity; answers: Answers; catOther: string; page: number; done: boolean }) {
   const last = useRef("");
   const read = useRef(snapshot);
   // Declared before the caller's own effects, so it has the latest state by the time they save.
@@ -1151,13 +1149,13 @@ function usePartialSave(snapshot: () => { identity: Identity; answers: Answers; 
     const typed = s.identity.name.trim() || s.identity.email.trim() || s.identity.phone.trim();
     const picked = s.answers.some((a) => (Array.isArray(a) ? a.length > 0 : typeof a === "string" ? a.trim() !== "" : a !== null));
     if (!typed && !picked) return;
-    session.current ||= newSession();
-    const body = JSON.stringify({ session: session.current, identity: s.identity, answers: s.answers, catOther: s.catOther, page: s.page });
+    session.current ||= applicationId();
+    const body = JSON.stringify({ session: session.current, identity: s.identity, answers: s.answers, catOther: s.catOther, page: s.page, attribution: leadAttribution() });
     if (body === last.current) return;
     last.current = body;
     if (leaving && typeof navigator !== "undefined" && navigator.sendBeacon?.("/api/score/partial", new Blob([body], { type: "application/json" }))) return;
     fetch("/api/score/partial", { method: "POST", headers: { "Content-Type": "application/json" }, body, keepalive: true }).catch(() => {});
-  }, []);
+  }, [session]);
 
   useEffect(() => {
     const leave = () => save(true);
@@ -1171,7 +1169,7 @@ function usePartialSave(snapshot: () => { identity: Identity; answers: Answers; 
     };
   }, [save]);
 
-  return { save, session: () => (session.current ||= newSession()) };
+  return { save };
 }
 
 /**
@@ -1190,12 +1188,19 @@ export default function ScoreQuiz({ bare = false }: { bare?: boolean }) {
   const [file, setFile] = useState<ReportFile | null>(null);
   const top = useRef<HTMLDivElement>(null);
   const funnel = useFormTracking("score", top, "Your details");
+  // The application_id, made as the score opens and kept for the visit: the
+  // Sheet's Session column, and the root of every Meta event ID for this application.
+  const appId = useRef("");
+  useEffect(() => {
+    appId.current ||= applicationId();
+    identify({ appId: appId.current });
+  }, []);
   const draft = useRef(identity);
   const done = useRef(false);
   const onDraft = useCallback((id: Identity) => {
     draft.current = id;
   }, []);
-  const partial = usePartialSave(() => ({
+  const partial = usePartialSave(appId, () => ({
     identity: stage.at === "identity" ? draft.current : identity,
     answers,
     catOther,
@@ -1232,8 +1237,9 @@ export default function ScoreQuiz({ bare = false }: { bare?: boolean }) {
   const finish = () => {
     done.current = true;
     funnel.submit();
-    track("generate_lead", {}, { event: "Lead", params: { content_name: "Startup Operating Score" } });
+    track("generate_lead", {});
     go({ at: "scoring" });
+    const app = (appId.current ||= applicationId());
     const result = grade(answers, catOther);
     setDelivery("sending");
     setFile(null);
@@ -1241,12 +1247,21 @@ export default function ScoreQuiz({ bare = false }: { bare?: boolean }) {
     const send = fetch("/api/score", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ identity, answers, catOther, session: partial.session() }),
+      body: JSON.stringify({ identity, answers, catOther, session: app, attribution: leadAttribution() }),
     })
       .then(async (res) => {
-        const body = (await res.json().catch(() => null)) as { emailed?: boolean; pdf?: ReportFile } | null;
+        const body = (await res.json().catch(() => null)) as { emailed?: boolean; pdf?: ReportFile; meta?: { id: string; startup_type: string; route: string } | null } | null;
         setDelivery(res.ok && body?.emailed ? "sent" : "failed");
         if (res.ok && body?.pdf) setFile(body.pdf);
+        // Saved: the pixel copy of SubmitApplication, under the ID the server already sent it with.
+        if (res.ok && body?.meta && firstTime(body.meta.id)) {
+          pixel("SubmitApplication", { content_name: SCORE_CONTENT, startup_type: body.meta.startup_type, route: body.meta.route }, body.meta.id);
+        }
+        // This application is done; a retake in the same visit starts a new one.
+        if (res.ok) {
+          closeApplication(app);
+          appId.current = "";
+        }
       })
       .catch(() => setDelivery("failed"));
     pause.then(() => {
@@ -1263,8 +1278,11 @@ export default function ScoreQuiz({ bare = false }: { bare?: boolean }) {
         onDraft={onDraft}
         onNext={(id) => {
           setIdentity(id);
-          identify({ email: id.email, phone: id.phone, name: id.name });
+          const app = (appId.current ||= applicationId());
+          identify({ email: id.email, phone: id.phone, name: id.name, city: id.scholarship.city, appId: app });
           go({ at: "page", page: 0 });
+          // Page one done, contact details in hand (and saved with the half-filled row as page 1 of the questions opens).
+          if (firstTime(`ld_${app}`)) meta("Lead", { content_name: SCORE_CONTENT }, `ld_${app}`);
         }}
       />
     ) : stage.at === "page" ? (
@@ -1291,8 +1309,14 @@ export default function ScoreQuiz({ bare = false }: { bare?: boolean }) {
     );
 
   // Typing into the details form is the start; nobody reaches a question page without it.
+  // Its ID is fixed per application, so reopening the dialog and typing again
+  // reaches Meta as the same FormStart, counted once.
+  const startScore = () => {
+    const app = (appId.current ||= applicationId());
+    funnel.start({ params: { content_name: SCORE_CONTENT }, id: `fs_${app}` });
+  };
   const inner = (
-    <div className="flex min-h-[30rem] flex-col" onChange={funnel.start}>
+    <div className="flex min-h-[30rem] flex-col" onChange={startScore}>
       {card}
     </div>
   );
