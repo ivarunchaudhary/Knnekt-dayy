@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { IconBrandWhatsapp } from "@tabler/icons-react";
 import { createPortal } from "react-dom";
 import { feeIncludes, ledgerIn, paymentSteps, pricing, pricingFacts, scorePillars } from "@/lib/data";
@@ -1169,7 +1169,10 @@ function usePartialSave(session: { current: string }, snapshot: () => { identity
     };
   }, [save]);
 
-  return { save };
+  // Stable, so the caller's "save on each new page" effect runs once per page
+  // and not on every answer: a fresh object each render re-ran it on every click,
+  // queueing a Sheet write per click behind the script's lock.
+  return useMemo(() => ({ save }), [save]);
 }
 
 /**
