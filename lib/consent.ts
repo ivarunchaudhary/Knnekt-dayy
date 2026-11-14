@@ -8,7 +8,14 @@
  * visitor allows analytics they set no cookies and send cookieless pings only.
  * The Meta pixel doesn't load at all until advertising is allowed, and nothing
  * goes to the Conversions API before then either (app/api/meta checks too).
+ *
+ * The score (score.knnekt.studio) asks nothing: a visitor there who hasn't
+ * made a choice is treated as having allowed both, so the ads it's built for
+ * hear about every application. A choice already made on the site still
+ * stands there, and the footer's Cookie settings can still change it.
  */
+import { SCORE_HOST } from "./site";
+
 export const CONSENT_COOKIE = "knnekt_consent";
 /** Raise when the list of cookies changes: everyone is asked again. */
 export const CONSENT_VERSION = 1;
@@ -40,6 +47,21 @@ export function parseConsent(cookies: string): Consent | null {
 
 export const readConsent = () => (typeof document === "undefined" ? null : parseConsent(document.cookie));
 
+/** What the score assumes for a visitor who hasn't chosen. */
+const SCORE_DEFAULT: Consent = { analytics: true, ads: true };
+
+/** The score, on its own host or (localhost, previews) at its path. */
+export const onScorePage = () =>
+  typeof location !== "undefined" && (location.hostname === SCORE_HOST || location.pathname.startsWith("/en/score"));
+
+/** The choice that applies here: the saved one, else the score's default on the score. */
+export const effectiveConsent = (): Consent | null => readConsent() ?? (onScorePage() ? SCORE_DEFAULT : null);
+
+/** The same for a request to our API: posts from the score page arrive on the score host. */
+export const requestConsent = (request: Request): Consent | null =>
+  parseConsent(request.headers.get("cookie") ?? "") ??
+  ((request.headers.get("host") ?? "").split(":")[0] === SCORE_HOST ? SCORE_DEFAULT : null);
+
 /** For useSyncExternalStore: every choice made in this tab fires `knnekt:consent`. */
 export function onConsentChange(callback: () => void) {
   window.addEventListener("knnekt:consent", callback);
@@ -47,7 +69,7 @@ export function onConsentChange(callback: () => void) {
 }
 
 /** Whether the visitor has allowed this kind of cookie. */
-export const allowed = (kind: keyof Consent) => readConsent()?.[kind] === true;
+export const allowed = (kind: keyof Consent) => effectiveConsent()?.[kind] === true;
 
 /** knnekt.studio and its subdomains share the cookie; anywhere else (previews, localhost) it stays on the host. */
 const sharedDomain = () => (/(^|\.)knnekt\.studio$/.test(location.hostname) ? "; domain=.knnekt.studio" : "");
@@ -95,8 +117,8 @@ export function applyConsent({ analytics, ads }: Consent) {
 
 /**
  * Runs in <head> before any tag: everything defaults to denied, then a
- * returning visitor's saved choice is applied straight away, so the first
- * page view already goes out under it. Kept as a string because it has to be
+ * returning visitor's saved choice (or, on the score, its default) is applied
+ * straight away, so the first page view already goes out under it. Kept as a string because it has to be
  * inline; it mirrors parseConsent and applyConsent above.
  */
 export function consentBootstrap(clarityId?: string) {
@@ -108,7 +130,8 @@ clarity('set','layout',innerWidth<768?'phone':innerWidth<1024?'tablet':'desktop'
   return `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}
 gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied'});
 ${clarity}
-try{var m=document.cookie.match(/(?:^|;\\s*)${CONSENT_COOKIE}=([^;]*)/),c=m&&JSON.parse(decodeURIComponent(m[1]));
+try{var c=null,m=document.cookie.match(/(?:^|;\\s*)${CONSENT_COOKIE}=([^;]*)/);try{c=m&&JSON.parse(decodeURIComponent(m[1]))}catch(e){}
+if(!(c&&c.v===${CONSENT_VERSION})&&(location.hostname==='${SCORE_HOST}'||location.pathname.indexOf('/en/score')===0))c={v:${CONSENT_VERSION},analytics:true,ads:true};
 if(c&&c.v===${CONSENT_VERSION}){var g=function(b){return b===true?'granted':'denied'};
 gtag('consent','update',{analytics_storage:g(c.analytics),ad_storage:g(c.ads),ad_user_data:g(c.ads),ad_personalization:g(c.ads)});
 ${clarityId ? "clarity('consentv2',{analytics_Storage:g(c.analytics),ad_Storage:g(c.ads)});" : ""}}}catch(e){}`;

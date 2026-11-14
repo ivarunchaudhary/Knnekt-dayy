@@ -167,7 +167,7 @@ export const privacyPolicy: LegalDoc = {
           ],
         },
         {
-          p: "Analytics and advertising cookies only run if you accept them in our cookie banner, and you can change your choice at any time from the link in the footer. You can also block cookies in your browser, use Google’s Analytics opt-out browser add-on, or manage ad settings in your Meta account. If you tell us you’re under 18, we don’t send your data to Meta or use it to target ads.",
+          p: "On our website, analytics and advertising cookies only run if you accept them in our cookie banner. The score page doesn’t show the banner: unless you’ve already made a choice on our website, they run there, and you can turn them off at any time from “Cookie settings” in the footer of any page. You can also block cookies in your browser, use Google’s Analytics opt-out browser add-on, or manage ad settings in your Meta account. If you tell us you’re under 18, we don’t send your data to Meta or use it to target ads.",
         },
       ],
     },

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { applyConsent, onConsentChange, readConsent, saveConsent, type Consent } from "@/lib/consent";
+import { applyConsent, onConsentChange, onScorePage, readConsent, saveConsent, type Consent } from "@/lib/consent";
 
 /**
  * "Cookies, your call." Shown on a first visit, and again once the saved
@@ -14,12 +14,14 @@ import { applyConsent, onConsentChange, readConsent, saveConsent, type Consent }
  * withdraw it. Every choice fires a `knnekt:consent` event on window, and
  * `window.KnnektConsent.get()` returns the saved one.
  *
- * Returning visitors never see it: <head> applied their choice before any
+ * Nor does the score: it treats a visitor who hasn't chosen as allowing
+ * both. Returning visitors never see it: <head> applied their choice before any
  * tag ran (lib/consent.ts). Not modal: the page stays usable behind it.
  */
 export default function CookieBanner() {
   // "unknown" on the server and through hydration, so the banner is never in the HTML.
-  const saved = useSyncExternalStore(onConsentChange, () => (readConsent() ? "yes" : "no"), () => "unknown");
+  // The score never asks on its own (lib/consent.ts); Cookie settings still opens it there.
+  const saved = useSyncExternalStore(onConsentChange, () => (readConsent() || onScorePage() ? "yes" : "no"), () => "unknown");
   /** Opened on purpose: from "Choose what to allow" or a Cookie settings link. */
   const [reopened, setReopened] = useState(false);
   const [settings, setSettings] = useState(false);

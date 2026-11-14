@@ -4,7 +4,7 @@ import { sendMail } from "@/lib/mailer";
 import { reportEmailHtml, reportEmailText, reportSubject } from "@/lib/scoreEmail";
 import { reportFilename, reportPdfBase64 } from "@/lib/scoreReport";
 import { forwardToSheet } from "@/lib/scoreWebhook";
-import { parseConsent } from "@/lib/consent";
+import { requestConsent } from "@/lib/consent";
 import { cookieValue, liveHost, requestClient, sendCapi } from "@/lib/capi";
 import { SCORE_CONTENT, scoreRoute, startupType } from "@/lib/metaEvents";
 import { leadRecordExtras } from "@/lib/leadRecord";
@@ -79,7 +79,7 @@ export async function POST(request: Request) {
   // founder's row from the half-filled tab now that they've finished.
   const session = typeof body.session === "string" && /^[a-z0-9][a-z0-9-]{7,63}$/i.test(body.session) ? body.session : "";
   const cookies = request.headers.get("cookie") ?? "";
-  const adsConsent = parseConsent(cookies)?.ads === true;
+  const adsConsent = requestConsent(request)?.ads === true;
   const extras = leadRecordExtras(request, body.attribution, adsConsent);
   const base = payload(result, id, clean, "result");
   const data = { ...base, session_id: session, application_id: session, ...extras, report_pdf_filename: filename, report_pdf_base64: pdf, emailed: mail.sent };

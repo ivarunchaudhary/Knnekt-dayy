@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { CONFIG, cleanAnswers, cleanScholarship, questions, responses, scholarshipData, started, stepLabel } from "@/lib/score";
 import { forwardToSheet } from "@/lib/scoreWebhook";
-import { parseConsent } from "@/lib/consent";
+import { requestConsent } from "@/lib/consent";
 import { leadRecordExtras } from "@/lib/leadRecord";
 
 type Body = { session?: unknown; identity?: { name?: unknown; email?: unknown; phone?: unknown; waConsent?: unknown; scholarship?: unknown }; answers?: unknown; catOther?: unknown; page?: unknown; attribution?: unknown };
@@ -46,7 +46,7 @@ export async function POST(request: Request) {
       instrument_version: CONFIG.INSTRUMENT_VERSION,
       session_id: session,
       application_id: session,
-      ...leadRecordExtras(request, body.attribution, parseConsent(request.headers.get("cookie") ?? "")?.ads === true),
+      ...leadRecordExtras(request, body.attribution, requestConsent(request)?.ads === true),
       updated_at: new Date().toISOString(),
       name,
       email,

@@ -20,7 +20,7 @@ Still firing as before: FormView, FormStep, FormAbandon, ScoreClick, ViewContent
 
 ## Rules the code keeps
 
-- Nothing goes to Meta, from the browser or the server, until the visitor allows advertising cookies. Pipeline events need `ads_consent: true` from the lead row.
+- Nothing goes to Meta, from the browser or the server, until the visitor allows advertising cookies. Exception: the score (score.knnekt.studio) shows no banner and treats a visitor who hasn't chosen as allowing analytics and advertising (`effectiveConsent` / `requestConsent` in lib/consent.ts); a choice already saved on the site still wins there. Pipeline events need `ads_consent: true` from the lead row.
 - Only the live site reports. Localhost and Vercel previews are skipped unless `META_CAPI_TEST_CODE` is set (server) or `NEXT_PUBLIC_META_ANY_HOST=1` (browser).
 - Lead and SubmitApplication fire once per application (sessionStorage flags plus fixed IDs).
 - Every Conversions API call is logged in Vercel as `[capi] sent <event> <id> events_received=… fbtrace_id=…` or `[capi] FAILED …`. Network errors, 429 and 5xx are retried, 3 tries in all. Check Vercel logs for `[capi] FAILED` daily.

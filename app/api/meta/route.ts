@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { parseConsent } from "@/lib/consent";
+import { requestConsent } from "@/lib/consent";
 import { cookieValue, liveHost, requestClient, sendCapi } from "@/lib/capi";
 import { BROWSER_RELAYED, type RelayedEvent } from "@/lib/metaEvents";
 
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
   if (!liveHost(host)) return new NextResponse(null, { status: 204 });
 
   const cookies = request.headers.get("cookie") ?? "";
-  if (!parseConsent(cookies)?.ads) return new NextResponse(null, { status: 204 });
+  if (!requestConsent(request)?.ads) return new NextResponse(null, { status: 204 });
 
   const text = await request.text();
   if (text.length > 6000) return NextResponse.json({ error: "Too large" }, { status: 413 });
